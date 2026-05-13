@@ -177,7 +177,7 @@ class OptionSnapshotQueryTool(BaseTool):
         query = f"""
             SELECT date, strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') as time,
                    strike, option_type, ltp, volume, oi, iv,
-                   expiry_label, expiry_date, strike_offset
+                   expiry_label, expiry_date, tsym, strike_offset
             FROM market.option_snapshots
             WHERE {where_clause}
             ORDER BY timestamp DESC
