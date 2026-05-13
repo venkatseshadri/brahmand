@@ -112,10 +112,11 @@ class DuckDBMarket:
             "iv_rank": float(snap.get("iv_rank", 0)),
             "time": snap.get("time", ""),
             "date": snap.get("date", ""),
+            "expiry_weekly": snap.get("expiry_weekly", ""),
         }
 
-    def get_option_ltp(self, strike: int, option_type: str) -> float:
-        """Get latest LTP for a specific option from DuckDB."""
+    def get_option_ltp(self, strike: int, option_type: str, expiry: str) -> float:
+        """Get latest LTP for a specific option, filtered by expiry date + weekly label."""
         raw = self.option_tool._run(
             date=self.today,
             strike=strike,
@@ -124,19 +125,28 @@ class DuckDBMarket:
         )
         try:
             rows = json.loads(raw)
-            if rows and isinstance(rows, list) and len(rows) > 0:
-                return float(rows[0].get("ltp", 0))
+            if rows and isinstance(rows, list):
+                for row in rows:
+                    row_expiry = row.get("expiry_date", "")
+                    row_label = row.get("expiry_label", "")
+                    if expiry and row_expiry == expiry and row_label == "weekly":
+                        return float(row.get("ltp", 0))
+                # Fallback: first row matching expiry only
+                for row in rows:
+                    if expiry and row.get("expiry_date", "") == expiry:
+                        return float(row.get("ltp", 0))
+                return float(rows[0].get("ltp", 0)) if rows else 0.0
         except (json.JSONDecodeError, KeyError, ValueError):
             pass
         return 0.0
 
-    def get_atm_chain(self, atm_strike: int) -> dict:
-        """Get LTPs for all 4 legs of Iron Butterfly from DuckDB."""
+    def get_atm_chain(self, atm_strike: int, expiry: str) -> dict:
+        """Get LTPs for all 4 legs of Iron Butterfly, filtered by same expiry."""
         return {
-            "center_ce": self.get_option_ltp(atm_strike, "CE"),
-            "center_pe": self.get_option_ltp(atm_strike, "PE"),
-            "wing_ce": self.get_option_ltp(atm_strike - WING_WIDTH, "CE"),
-            "wing_pe": self.get_option_ltp(atm_strike + WING_WIDTH, "PE"),
+            "center_ce": self.get_option_ltp(atm_strike, "CE", expiry),
+            "center_pe": self.get_option_ltp(atm_strike, "PE", expiry),
+            "wing_ce": self.get_option_ltp(atm_strike - WING_WIDTH, "CE", expiry),
+            "wing_pe": self.get_option_ltp(atm_strike + WING_WIDTH, "PE", expiry),
         }
 
 
@@ -162,8 +172,9 @@ class TradeSimulator:
         spot = snap["spot"]
         atm = snap["atm_strike"]
         vix = snap["vix"]
+        expiry = snap.get("expiry_weekly", "")
 
-        prices = self.market.get_atm_chain(atm)
+        prices = self.market.get_atm_chain(atm, expiry)
         if all(v == 0 for v in prices.values()):
             log("  ⚠ No option chain data in DuckDB — skipping entry")
             return {}
