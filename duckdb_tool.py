@@ -164,16 +164,18 @@ class OptionSnapshotQueryTool(BaseTool):
             if "-" in time_range:
                 t_start, t_end = time_range.split("-")
                 where.append(
-                    f"strftime(timestamp, '%H:%M:%S') >= '{t_start}' "
-                    f"AND strftime(timestamp, '%H:%M:%S') <= '{t_end}'"
+                    f"strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') >= '{t_start}' "
+                    f"AND strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') <= '{t_end}'"
                 )
             else:
-                where.append(f"strftime(timestamp, '%H:%M:%S') = '{time_range}'")
+                where.append(
+                    f"strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') = '{time_range}'"
+                )
 
         where_clause = " AND ".join(where)
 
         query = f"""
-            SELECT date, strftime(timestamp, '%H:%M:%S') as time,
+            SELECT date, strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') as time,
                    strike, option_type, ltp, volume, oi, iv,
                    expiry_label, strike_offset
             FROM market.option_snapshots
