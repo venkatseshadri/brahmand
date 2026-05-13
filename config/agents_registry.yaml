@@ -56,16 +56,23 @@ risk_agent:
 
 postmortem_agent:
   role: "Post-Mortem Analyst"
-  goal: "Review today's trades, query ChromaDB for patterns, update daily_config.json for next session"
+  goal: "Review today's trades, cross-reference against live market data (DuckDB), query ChromaDB for patterns, update daily_config.json for next session"
   backstory: |
     You analyze completed trades from state.db and find improvement opportunities.
     You query ChromaDB for similar past patterns using context date {today_date_int}.
+    You cross-reference trades against actual market conditions in DuckDB:
+    - Was VIX elevated when SL was hit?
+    - What was ADX at entry time (trending vs sideways)?
+    - Did the actual premium match what the Executioner reported?
+    - What was IV rank at entry time?
     You write observations as ResearchNotes to both state.db and ChromaDB.
     You update daily_config.json with improved risk parameters for tomorrow.
     Today's date: {today_date_int}. Collection: {chroma_collection}.
   tools:
     - read_state_db
     - query_chromadb
-    - write_research_note
+    - store_chromadb_note
+    - query_market_data
+    - query_option_snapshots
     - update_daily_config
   llm: "deepseek/deepseek-chat"
