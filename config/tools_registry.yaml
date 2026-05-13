@@ -7,10 +7,16 @@ NSE_OPTIONS:
   broker: "shoonya"
   broker_fallback: "flattrade"
   tools:
+    # Execution tools
     - broker_place_order
     - broker_get_ltp
-    - validate_trade_signal
-    - enforce_risk_limits
+    # Risk / SL-TP tools
+    - place_sl_order
+    - place_tp_order
+    - modify_sl_order
+    - cancel_sl_order
+    - monitor_pnl_greeks
+    # Post-Mortem tools
     - read_state_db
     - query_chromadb
     - write_research_note
