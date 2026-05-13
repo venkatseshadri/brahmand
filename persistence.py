@@ -87,7 +87,7 @@ def save_execution_report(report: ExecutionReport) -> int:
                 report.timestamp,
                 report.agent_version,
                 report.error,
-                json.dumps(report.meta_data),
+                json.dumps(getattr(report, "meta_data", {})),
             ),
         )
         conn.commit()

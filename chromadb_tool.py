@@ -144,16 +144,27 @@ class QueryChromaDBTool(BaseTool):
         min_date: int = 0,
         max_date: int = 0,
     ) -> str:
-        where = {}
+        conditions = []
         if strategy:
-            where["strategy"] = strategy
+            conditions.append({"strategy": strategy})
         if min_date > 0 and max_date > 0:
-            where["$and"] = [
-                {"context_date": {"$gte": min_date}},
-                {"context_date": {"$lte": max_date}},
-            ]
+            conditions.append(
+                {
+                    "$and": [
+                        {"context_date": {"$gte": min_date}},
+                        {"context_date": {"$lte": max_date}},
+                    ]
+                }
+            )
         elif min_date > 0:
-            where["context_date"] = {"$gte": min_date}
+            conditions.append({"context_date": {"$gte": min_date}})
+
+        if len(conditions) > 1:
+            where = {"$and": conditions}
+        elif len(conditions) == 1:
+            where = conditions[0]
+        else:
+            where = None
 
         notes = query_similar_notes(
             query_text=query,
