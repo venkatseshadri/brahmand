@@ -1,8 +1,10 @@
 # Brahmand — Status & Next Steps
 
-**Last updated:** 2026-05-13
+**Last updated:** 2026-05-13 23:00
 **Phase:** 01-dress-rehearsal (Brahmand MVC)
 **Architecture:** 3-agent CrewAI circadian rhythm (Execution + Risk + Post-Mortem)
+**Autonomous test:** Scheduled for tomorrow 11:00-12:00 IST (Mon/Wed/Fri cron)
+**Repo:** https://github.com/venkatseshadri/brahmand (private)
 
 ---
 
