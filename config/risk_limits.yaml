@@ -1,0 +1,14 @@
+# Brahmand Risk Limits Configuration
+# Seeded from antariksh/config/antariksh_rules.yaml
+# Self-contained — brahmand does not import antariksh.
+
+risk_limits:
+  max_drawdown: 4500.0        # Daily loss limit in ₹
+  max_lots: 1                 # Single lot for MVP (expand in Phase 2)
+  sl_enabled: true            # Stop-loss active
+  tp_enabled: true            # Take-profit active
+  margin_cap: 500000.0        # Maximum margin usage in ₹ (₹5L)
+  hard_exit: "14:30"          # Hard exit time IST (HH:MM)
+  entry_window_start: "10:30" # Entry window opens IST
+  entry_window_end: "11:30"   # Entry window closes IST
+  vix_max: 20.0               # VIX ceiling — skip trade if VIX >= this

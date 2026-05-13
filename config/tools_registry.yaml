@@ -1,0 +1,35 @@
+# Brahmand Tool Registry
+# Maps market types to tool sets. Consumed by ToolFactory.
+# Adding a new market = adding a YAML entry — no code changes.
+
+NSE_OPTIONS:
+  description: "NIFTY / BANKNIFTY weekly option strategies"
+  broker: "shoonya"
+  broker_fallback: "flattrade"
+  tools:
+    - broker_place_order
+    - broker_get_ltp
+    - validate_trade_signal
+    - enforce_risk_limits
+    - read_state_db
+    - query_chromadb
+    - write_research_note
+    - update_daily_config
+
+MCX_FUTURES:
+  description: "MCX commodity futures (Phase 3+)"
+  broker: "shoonya"
+  tools:
+    - broker_place_order
+    - broker_get_ltp
+    - validate_trade_signal
+    - enforce_risk_limits
+
+NASDAQ_OPTIONS:
+  description: "NASDAQ index options (Phase 5+)"
+  broker: "flattrade"
+  tools:
+    - broker_place_order
+    - broker_get_ltp
+    - validate_trade_signal
+    - enforce_risk_limits
