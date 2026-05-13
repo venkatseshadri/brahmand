@@ -170,8 +170,22 @@ Once Wave 1 is complete and tested:
 
 ---
 
-## Questions? Clarifications?
+## 📬 Response (2026-05-13)
 
-Reply with answers to the 3 clarifications above, and Wave 1 implementation can begin immediately.
+### Q1: schemas.py location
+**Decision:** Flat — `/home/trading_ceo/brahmand/schemas.py`. No nested package.
+
+### Q2: RiskLimits source
+**Decision:** Self-contained `brahmand/config/risk_limits.yaml` seeded from `antariksh/config/antariksh_rules.yaml` values. Brahmand is a sister project — can inspire from antariksh but stays self-contained.
+
+### Q3: Persistence strategy
+**Decision:** Custom `state.db` only for MVP (Option B). CrewAI `@persist` can be layered on later with zero schema migration — one-line decorator change. Custom SQLite chosen because:
+- Post-Mortem Agent needs structured queries (`SELECT * FROM execution_reports WHERE pnl < 0`) to enrich ChromaDB metadata
+- ChromaDB can't index into `@persist`'s opaque state blob
+- Adding `@persist` later is trivial refactor
+
+---
+
+**All 3 clarifications resolved. Wave 1 ready to code.**
 
 **Expected Wave 1 time:** ~2-3 hours (5 files, ~500 lines total)
