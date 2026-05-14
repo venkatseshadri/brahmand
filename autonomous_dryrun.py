@@ -465,20 +465,67 @@ def main():
 
         actual_exit = sl_hit_time or tp_hit_time or exit_t
 
-        # Calculate P&L from DuckDB LTP at exit — SELL legs + hedge BUY legs
+        # ── Hedge trailing: after SELL exits, trail BUY hedge ────────
+        # SELL leg lost → BUY hedge is likely profitable. Trail it.
+        sell_types_exited = set()
+        for leg in trade["legs"]:
+            if leg["action"] == "SELL":
+                sell_types_exited.add(leg["type"])
+
+        hedge_exits = {}
+        if sl_hit_time or tp_hit_time:
+            for leg in trade["legs"]:
+                if leg["action"] != "BUY":
+                    continue
+                # Only trail the hedge matching the hit SELL leg
+                if sl_hit_time and leg["type"] not in sell_types_exited:
+                    continue
+                if tp_hit_time and leg["type"] not in sell_types_exited:
+                    continue
+
+                fill = leg["fill_price"]
+                best_ltp = fill
+                trail_check = time_to_minutes(actual_exit)
+                trail_end = time_to_minutes(WINDOW_END) - 1
+
+                log(
+                    f"  [{actual_exit}] Hedge trail started — {leg['tsym']} (fill=₹{fill})"
+                )
+
+                while trail_check < trail_end:
+                    trail_check += 1
+                    time.sleep(POLL_SECONDS)
+                    ltp = market.get_option_ltp(leg["strike"], leg["type"], expiry)
+                    if ltp > 0:
+                        if ltp > best_ltp:
+                            best_ltp = ltp
+                        if ltp < fill:
+                            log(
+                                f"  [{fmt(trail_check)}] Hedge closed — {leg['tsym']}: LTP={ltp} < fill={fill}"
+                            )
+                            break
+                    else:
+                        break
+
+                exit_price = ltp if ltp > 0 else best_ltp
+                hedge_exits[leg["type"]] = exit_price
+                log(
+                    f"  [{fmt(trail_check)}] Hedge exit — {leg['tsym']}: ₹{exit_price} (best=₹{best_ltp})"
+                )
+
+        # Calculate P&L — SELL legs + trailing hedge BUY legs
         expiry = trade.get("expiry", "")
         total_pnl = 0.0
-        sell_types_exited = set()
         for leg in trade["legs"]:
             if leg["action"] == "SELL":
                 exit_ltp = market.get_option_ltp(leg["strike"], leg["type"], expiry)
                 total_pnl += leg["fill_price"] - exit_ltp
                 sell_types_exited.add(leg["type"])
 
-        # Close corresponding hedges (BUY legs matching exited SELL type)
+        # Use trailing exit prices for hedges
         for leg in trade["legs"]:
             if leg["action"] == "BUY" and leg["type"] in sell_types_exited:
-                hedge_exit = market.get_option_ltp(leg["strike"], leg["type"], expiry)
+                hedge_exit = hedge_exits.get(leg["type"], leg["fill_price"])
                 total_pnl += hedge_exit - leg["fill_price"]
                 trade.setdefault("hedge_pnl", {})[leg["type"]] = round(
                     hedge_exit - leg["fill_price"], 2
