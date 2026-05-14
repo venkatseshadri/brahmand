@@ -465,13 +465,24 @@ def main():
 
         actual_exit = sl_hit_time or tp_hit_time or exit_t
 
-        # Calculate P&L from DuckDB LTP at exit for each SELL leg
+        # Calculate P&L from DuckDB LTP at exit — SELL legs + hedge BUY legs
         expiry = trade.get("expiry", "")
         total_pnl = 0.0
+        sell_types_exited = set()
         for leg in trade["legs"]:
             if leg["action"] == "SELL":
                 exit_ltp = market.get_option_ltp(leg["strike"], leg["type"], expiry)
                 total_pnl += leg["fill_price"] - exit_ltp
+                sell_types_exited.add(leg["type"])
+
+        # Close corresponding hedges (BUY legs matching exited SELL type)
+        for leg in trade["legs"]:
+            if leg["action"] == "BUY" and leg["type"] in sell_types_exited:
+                hedge_exit = market.get_option_ltp(leg["strike"], leg["type"], expiry)
+                total_pnl += hedge_exit - leg["fill_price"]
+                trade.setdefault("hedge_pnl", {})[leg["type"]] = round(
+                    hedge_exit - leg["fill_price"], 2
+                )
 
         trade["exit_time"] = actual_exit
         trade["pnl"] = round(total_pnl, 2)
