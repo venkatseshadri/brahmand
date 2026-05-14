@@ -102,7 +102,11 @@ def enter_trade(state: dict):
     """Run 5-agent E2E chain. Regime Agent decides entry."""
     from e2e_chain import run_full_chain
 
-    trade = run_full_chain(now_str())
+    try:
+        trade = run_full_chain(now_str())
+    except Exception as e:
+        _log(f"Chain failed: {e} — skipping this cycle")
+        return state
     if trade is None:
         _log("Regime: SKIP — no trade entered")
         return state
