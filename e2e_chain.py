@@ -71,7 +71,8 @@ def run_full_chain(entry_time: str) -> dict | None:
     atm = int(float(snap.get("atm_strike", 0)))
     expiry = snap.get("expiry_weekly", "")
     vix = float(snap.get("india_vix", 0))
-    adx = float(snap.get("adx", 0) or 0)
+    adx_val = snap.get("adx")
+    adx = float(adx_val) if adx_val and adx_val != "None" else 0.0
 
     if not spot or not atm:
         _log("  E2E Chain: ⚠ DuckDB empty — skipping")
@@ -249,8 +250,8 @@ def _resolve_contracts(
         leg_specs = [
             ("center_ce", atm, "CE", "SELL"),
             ("center_pe", atm, "PE", "SELL"),
-            ("wing_ce", atm - wing_width, "CE", "BUY"),
-            ("wing_pe", atm + wing_width, "PE", "BUY"),
+            ("wing_below", atm - wing_width, "PE", "BUY"),
+            ("wing_above", atm + wing_width, "CE", "BUY"),
         ]
 
     con = _connect()
@@ -258,7 +259,7 @@ def _resolve_contracts(
         result = {}
         for label, strike, ot, action in leg_specs:
             row = con.execute(
-                "SELECT tsym, ltp FROM market.option_snapshots "
+                "SELECT tsym, ltp FROM option_snapshots "
                 "WHERE expiry_date = ? AND strike = ? AND option_type = ? "
                 "AND tsym IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
                 (expiry, strike, ot),

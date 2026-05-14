@@ -25,13 +25,17 @@ STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 
 def _connect() -> duckdb.DuckDBPyConnection:
-    """Open read-only DuckDB connection with ATTACHed static metadata."""
-    con = duckdb.connect(":memory:")
-    if VARAH_DATA.exists():
-        con.execute(f"ATTACH '{VARAH_DATA}' AS market (READ_ONLY)")
-    if STATIC_DB.exists():
-        con.execute(f"ATTACH '{STATIC_DB}' AS meta (READ_ONLY)")
-    return con
+    """Open read-only DuckDB connection with retry on lock contention."""
+    import time
+
+    for attempt in range(5):
+        try:
+            return duckdb.connect(str(VARAH_DATA), read_only=True)
+        except Exception:
+            if attempt < 4:
+                time.sleep(2)
+            else:
+                raise
 
 
 class MarketDataQueryInput(BaseModel):
@@ -101,7 +105,7 @@ class MarketDataQueryTool(BaseTool):
 
         query = f"""
             SELECT {col}
-            FROM market.market_data
+            FROM market_data
             WHERE {where_clause}
             ORDER BY timestamp DESC
             LIMIT 10
@@ -178,7 +182,7 @@ class OptionSnapshotQueryTool(BaseTool):
             SELECT date, strftime(CAST(timestamp AS TIMESTAMP), '%H:%M:%S') as time,
                    strike, option_type, ltp, volume, oi, iv,
                    expiry_label, expiry_date, tsym, strike_offset
-            FROM market.option_snapshots
+            FROM option_snapshots
             WHERE {where_clause}
             ORDER BY timestamp DESC
             LIMIT 20
@@ -199,7 +203,7 @@ def get_latest_market_snapshot() -> dict:
     """Convenience: return the most recent market_data row."""
     con = _connect()
     row = con.execute(
-        "SELECT * FROM market.market_data ORDER BY timestamp DESC LIMIT 1"
+        "SELECT * FROM market_data ORDER BY timestamp DESC LIMIT 1"
     ).fetchone()
     if row:
         cols = [c[0] for c in con.description]
