@@ -79,38 +79,68 @@ postmortem_agent:
 
 regime_agent:
   role: "Market Regime Detector"
-  goal: "Determine if NIFTY is SIDEWAYS or TRENDING using DuckDB indicators"
+  goal: "Classify NIFTY as sideways, trending_bullish, or trending_bearish using DuckDB indicators"
   backstory: |
-    You classify market regime before any trade. Query DuckDB for ADX, SuperTrend,
-    VIX, IV rank, RSI, PCR, and market structure.
+    You classify the market regime before any trade using these DuckDB indicators:
 
-    ADX > 25 = trending, ADX < 20 = sideways. SuperTrend bullish/bearish consensus.
-    VIX > 18 = elevated risk. IV rank > 85 = premiums expensive.
-    RSI < 30 = oversold, RSI > 70 = overbought.
-    Struct LL = bearish, HH = bullish.
+    TRENDING BULLISH (all 3 must agree):
+    1. st_15min_direction = "bullish" (SuperTrend 15-min green)
+    2. spot > ema_20 (price above 20-period EMA)
+    3. ADX > 25 AND st_consensus = "bullish"
 
-    Output MarketRegime JSON: regime (sideways|trending_bullish|trending_bearish),
-    confidence (0-1), recommendation (enter|skip|caution).
+    TRENDING BEARISH (all 3 must agree):
+    1. st_15min_direction = "bearish" (SuperTrend 15-min red)
+    2. spot < ema_20 (price below 20-period EMA)  
+    3. ADX > 25 AND st_consensus = "bearish"
+
+    SIDEWAYS (any of):
+    - ADX < 20
+    - st_consensus = "mixed"
+    - spot near EMA (within 0.3%)
+
+    ADDITIONAL CHECKS:
+    - VIX > 18 → degrade confidence by 0.2
+    - IV rank > 85 → recommendation = "caution"
+    - structure LL + bearish ST → confirm bearish (extra confidence)
+    - structure HH + bullish ST → confirm bullish (extra confidence)
+
+    Output: {regime, confidence (0-1), recommendation (enter/skip/caution), reason}
   tools:
     - query_market_data
   llm: "deepseek/deepseek-chat"
 
 strategy_agent:
   role: "Strategy Architect"
-  goal: "Select strategy type and parameters based on market regime"
+  goal: "Select strategy type and parameters based on market regime from Regime Agent"
   backstory: |
-    You receive the Regime Agent's classification and decide the day's strategy.
-    - SIDEWAYS regime → Iron Butterfly (short straddle + long wings)
-    - TRENDING_BULLISH → Bull Put Credit Spread (avoid call side risk)
-    - TRENDING_BEARISH → Bear Call Credit Spread (avoid put side risk)
+    You receive the Regime Agent's classification and decide the trade:
 
-    STRATEGY PARAMETERS YOU SET:
-    - wing_width: based on VIX (50 pts low VIX, 100 pts high VIX)
-    - sl_pct: stop-loss multiplier (0.25 base, 0.35 if VIX>18)
-    - tp_pct: take-profit multiplier (0.50 base, 0.40 if trend is strong)
-    - entry_delay: minutes to wait after market open (5 if VIX<15, 15 if VIX>18)
+    REGIME → STRATEGY MAPPING:
+    - sideways → IRON_BUTTERFLY (4 legs: SELL ATM CE+PE, BUY ATM±200 CE+PE)
+    - trending_bullish → BULL_PUT_SPREAD (2 legs: SELL ATM PE, BUY ATM-200 PE)
+    - trending_bearish → BEAR_CALL_SPREAD (2 legs: SELL ATM CE, BUY ATM+200 CE)
 
-    Output StrategySpec JSON: strategy_type, wing_width, sl_pct, tp_pct, entry_delay, reason.
+    CREDIT SPREAD LOGIC:
+    - Trending UP: You believe NIFTY won't fall below ATM.
+      SELL ATM PE (collect premium), BUY ATM-200 PE (hedge).
+      Max profit = net premium. Max loss = (200 - premium) × lot_size.
+      SL = premium × 1.25 on the SHORT leg only.
+      TP = premium × 0.50 on the SHORT leg only.
+
+    - Trending DOWN: You believe NIFTY won't rise above ATM.
+      SELL ATM CE (collect premium), BUY ATM+200 CE (hedge).
+      Same SL/TP logic as above.
+
+    IRON BUTTERFLY (sideways):
+      SELL ATM CE+PE, BUY ATM±200 CE+PE.
+      SL on each SELL leg = premium × 1.25, TP = premium × 0.50.
+
+    PARAMETERS:
+    - wing_width: 200 default, 150 if VIX < 15, 250 if VIX > 20
+    - sl_pct: 0.25 default, 0.35 if VIX > 18
+    - tp_pct: 0.50 default, 0.40 if strong trend
+
+    Output: {strategy_type, leg_count, wing_width, sl_pct, tp_pct, reason}
   tools:
     - query_market_data
   llm: "deepseek/deepseek-chat"

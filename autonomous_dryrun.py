@@ -439,50 +439,42 @@ def main():
             check_t += 1
             time.sleep(POLL_SECONDS)
 
-            # Check current LTPs
-            atm = trade["atm_strike"]
+            # Check current LTPs for each SELL leg
             expiry = trade.get("expiry", "")
-            ce_ltp = market.get_option_ltp(atm, "CE", expiry)
-            pe_ltp = market.get_option_ltp(atm, "PE", expiry)
+            hit = False
+            for leg in trade["legs"]:
+                if leg["action"] != "SELL":
+                    continue
+                t = leg["type"].lower()
+                ltp = market.get_option_ltp(leg["strike"], leg["type"], expiry)
 
-            if ce_ltp > 0 and ce_ltp >= trade["sl"]["ce"]:
-                log(
-                    f"  [{fmt(check_t)}] SL HIT — 23600 CE: LTP={ce_ltp} >= SL={trade['sl']['ce']}"
-                )
-                sl_hit_time = fmt(check_t)
-                forced_exit = True
-            elif pe_ltp > 0 and pe_ltp >= trade["sl"]["pe"]:
-                log(
-                    f"  [{fmt(check_t)}] SL HIT — 23600 PE: LTP={pe_ltp} >= SL={trade['sl']['pe']}"
-                )
-                sl_hit_time = fmt(check_t)
-                forced_exit = True
-            elif ce_ltp > 0 and ce_ltp <= trade["tp"]["ce"]:
-                log(
-                    f"  [{fmt(check_t)}] TP HIT — 23600 CE: LTP={ce_ltp} <= TP={trade['tp']['ce']}"
-                )
-                tp_hit_time = fmt(check_t)
-                forced_exit = True
-            elif pe_ltp > 0 and pe_ltp <= trade["tp"]["pe"]:
-                log(
-                    f"  [{fmt(check_t)}] TP HIT — 23600 PE: LTP={pe_ltp} <= TP={trade['tp']['pe']}"
-                )
-                tp_hit_time = fmt(check_t)
+                if ltp > 0 and trade["sl"].get(t) and ltp >= trade["sl"][t]:
+                    log(
+                        f"  [{fmt(check_t)}] SL HIT — {leg['tsym']}: LTP={ltp} >= SL={trade['sl'][t]}"
+                    )
+                    sl_hit_time = fmt(check_t)
+                    hit = True
+                elif ltp > 0 and trade["tp"].get(t) and ltp <= trade["tp"][t]:
+                    log(
+                        f"  [{fmt(check_t)}] TP HIT — {leg['tsym']}: LTP={ltp} <= TP={trade['tp'][t]}"
+                    )
+                    tp_hit_time = fmt(check_t)
+                    hit = True
+            if hit:
                 forced_exit = True
 
         actual_exit = sl_hit_time or tp_hit_time or exit_t
 
-        # Calculate P&L from DuckDB LTP at exit
+        # Calculate P&L from DuckDB LTP at exit for each SELL leg
         expiry = trade.get("expiry", "")
-        ce_exit = market.get_option_ltp(trade["atm_strike"], "CE", expiry)
-        pe_exit = market.get_option_ltp(trade["atm_strike"], "PE", expiry)
-        pnl_ce = round(trade["legs"][0]["fill_price"] - ce_exit, 2)
-        pnl_pe = round(trade["legs"][1]["fill_price"] - pe_exit, 2)
+        total_pnl = 0.0
+        for leg in trade["legs"]:
+            if leg["action"] == "SELL":
+                exit_ltp = market.get_option_ltp(leg["strike"], leg["type"], expiry)
+                total_pnl += leg["fill_price"] - exit_ltp
 
         trade["exit_time"] = actual_exit
-        trade["pnl"] = round(pnl_ce + pnl_pe, 2)
-        trade["pnl_ce"] = pnl_ce
-        trade["pnl_pe"] = pnl_pe
+        trade["pnl"] = round(total_pnl, 2)
         trade["status"] = "CLOSED"
 
         if sl_hit_time:

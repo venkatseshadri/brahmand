@@ -161,16 +161,20 @@ def run_full_chain(entry_time: str) -> dict | None:
     _log(f"  Strategy: {strategy.get('strategy_type')} wings={ww} sl={sl_p} tp={tp_p}")
 
     # ── Agent 3: Contract ─────────────────────────────────────────────
-    contracts = _resolve_contracts(atm, ww, expiry, option_tool, llm, af)
-    if not contracts or all(c.get("ltp", 0) == 0 for c in contracts.values()):
+    contracts, leg_specs = _resolve_contracts(
+        atm, ww, expiry, option_tool, strategy.get("strategy_type", "IRON_BUTTERFLY")
+    )
+    if not contracts:
         _log("  Contract: ⚠ no data — skipping")
         return None
 
     ctsyms = [c.get("tsym", "?") for c in contracts.values()]
+    stype = strategy.get("strategy_type", "IRON_BUTTERFLY")
+    _log(f"  Strategy: {stype} wings={ww} sl={sl_p} tp={tp_p}")
     _log(f"  Contracts: {', '.join(ctsyms)}")
 
     # ── Agent 4: Execution ────────────────────────────────────────────
-    trade = _build_trade(entry_time, spot, atm, vix, expiry, ww, sl_p, tp_p, contracts)
+    trade = _build_trade(entry_time, spot, atm, vix, expiry, ww, sl_p, tp_p, contracts, stype)
     if not trade:
         return None
 
@@ -224,22 +228,33 @@ def run_full_chain(entry_time: str) -> dict | None:
 
 
 def _resolve_contracts(
-    atm: int, wing_width: int, expiry: str, option_tool, llm, af
-) -> dict:
-    """Query DuckDB for contract tsyms and LTPs for all 4 legs."""
+    atm: int, wing_width: int, expiry: str, option_tool, strategy_type: str
+) -> tuple:
+    """Generate leg specs from strategy + query DuckDB for contract tsyms/LTPs."""
     from duckdb_tool import _connect
-    import duckdb
 
-    con = _connect()
-    try:
-        result = {}
-        legs = [
+    if strategy_type == "BULL_PUT_SPREAD":
+        leg_specs = [
+            ("sell_pe", atm, "PE", "SELL"),
+            ("buy_pe", atm - wing_width, "PE", "BUY"),
+        ]
+    elif strategy_type == "BEAR_CALL_SPREAD":
+        leg_specs = [
+            ("sell_ce", atm, "CE", "SELL"),
+            ("buy_ce", atm + wing_width, "CE", "BUY"),
+        ]
+    else:  # IRON_BUTTERFLY
+        leg_specs = [
             ("center_ce", atm, "CE", "SELL"),
             ("center_pe", atm, "PE", "SELL"),
             ("wing_ce", atm - wing_width, "CE", "BUY"),
             ("wing_pe", atm + wing_width, "PE", "BUY"),
         ]
-        for label, strike, ot, action in legs:
+
+    con = _connect()
+    try:
+        result = {}
+        for label, strike, ot, action in leg_specs:
             row = con.execute(
                 "SELECT tsym, ltp FROM market.option_snapshots "
                 "WHERE expiry_date = ? AND strike = ? AND option_type = ? "
@@ -262,26 +277,40 @@ def _resolve_contracts(
                     "option_type": ot,
                     "action": action,
                 }
-        return result
+        return result, leg_specs
+    finally:
+        con.close()
     finally:
         con.close()
 
 
 def _build_trade(
-    entry_time: str,
-    spot: float,
-    atm: int,
-    vix: float,
-    expiry: str,
-    ww: int,
-    sl_p: float,
-    tp_p: float,
-    contracts: dict,
+    entry_time: str, spot: float, atm: int, vix: float, expiry: str,
+    ww: int, sl_p: float, tp_p: float, contracts: dict, strategy_type: str,
 ) -> dict:
-    """Build trade dict from contract data."""
-    c = contracts
-    prem_sell = c["center_ce"]["ltp"] + c["center_pe"]["ltp"]
-    prem_buy = c["wing_ce"]["ltp"] + c["wing_pe"]["ltp"]
+    """Build trade dict from contract data. Works for 2-leg and 4-leg strategies."""
+    legs = []
+    sl = {}
+    tp = {}
+    prem_sell = 0.0
+    prem_buy = 0.0
+
+    for label, c in contracts.items():
+        leg = {
+            "action": c["action"], "strike": c["strike"],
+            "type": c["option_type"], "fill_price": c["ltp"],
+            "tsym": c["tsym"],
+        }
+        legs.append(leg)
+
+        if c["action"] == "SELL":
+            prem_sell += c["ltp"]
+            key = c["option_type"].lower()
+            sl[key] = round(c["ltp"] * sl_p, 2)
+            tp[key] = round(c["ltp"] * tp_p, 2)
+        else:
+            prem_buy += c["ltp"]
+
     net = prem_sell - prem_buy
 
     return {
@@ -291,46 +320,13 @@ def _build_trade(
         "vix": vix,
         "expiry": expiry,
         "wing_width": ww,
+        "strategy_type": strategy_type,
+        "leg_count": len(legs),
         "net_credit": round(net, 2),
         "premium_sell": round(prem_sell, 2),
         "premium_buy": round(prem_buy, 2),
-        "legs": [
-            {
-                "action": "SELL",
-                "strike": atm,
-                "type": "CE",
-                "fill_price": c["center_ce"]["ltp"],
-                "tsym": c["center_ce"]["tsym"],
-            },
-            {
-                "action": "SELL",
-                "strike": atm,
-                "type": "PE",
-                "fill_price": c["center_pe"]["ltp"],
-                "tsym": c["center_pe"]["tsym"],
-            },
-            {
-                "action": "BUY",
-                "strike": atm - ww,
-                "type": "CE",
-                "fill_price": c["wing_ce"]["ltp"],
-                "tsym": c["wing_ce"]["tsym"],
-            },
-            {
-                "action": "BUY",
-                "strike": atm + ww,
-                "type": "PE",
-                "fill_price": c["wing_pe"]["ltp"],
-                "tsym": c["wing_pe"]["tsym"],
-            },
-        ],
-        "sl": {
-            "ce": round(c["center_ce"]["ltp"] * sl_p, 2),
-            "pe": round(c["center_pe"]["ltp"] * sl_p, 2),
-        },
-        "tp": {
-            "ce": round(c["center_ce"]["ltp"] * tp_p, 2),
-            "pe": round(c["center_pe"]["ltp"] * tp_p, 2),
-        },
+        "legs": legs,
+        "sl": sl,
+        "tp": tp,
         "status": "OPEN",
     }
