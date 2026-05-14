@@ -128,6 +128,11 @@ def run_full_chain(entry_time: str) -> dict | None:
 
     _log(f"  Regime: {regime.get('regime')} → {regime.get('recommendation')}")
 
+    # Regime Agent gate: if it says skip, stop here
+    if regime.get("recommendation") == "skip":
+        _log("  Regime says SKIP — aborting chain")
+        return regime  # return regime dict so wrapper can see why
+
     # ── Agent 2: Strategy ─────────────────────────────────────────────
     strategy = {
         "strategy_type": "IRON_BUTTERFLY",

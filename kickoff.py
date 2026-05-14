@@ -99,17 +99,23 @@ def should_enter(state: dict) -> bool:
 
 
 def enter_trade(state: dict):
-    """Run 5-agent E2E chain and store the trade."""
+    """Run 5-agent E2E chain. Regime Agent decides entry."""
     from e2e_chain import run_full_chain
 
     trade = run_full_chain(now_str())
-    if trade:
-        trade["monitored_since"] = now_str()
-        state["active_trade"] = trade
-        state["trades_today"] += 1
-        _log(
-            f"ENTERED: {trade['strategy_type']} ({trade['leg_count']} legs) | Net ₹{trade['net_credit']}"
-        )
+    if trade is None:
+        _log("Regime: SKIP — no trade entered")
+        return state
+    if isinstance(trade, dict) and trade.get("recommendation") == "skip":
+        _log(f"Regime: SKIP — {trade.get('regime', 'unknown')}")
+        return state
+
+    trade["monitored_since"] = now_str()
+    state["active_trade"] = trade
+    state["trades_today"] += 1
+    _log(
+        f"ENTERED: {trade['strategy_type']} ({trade['leg_count']} legs) | Net ₹{trade['net_credit']}"
+    )
     return state
 
 
