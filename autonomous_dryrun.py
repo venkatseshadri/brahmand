@@ -441,6 +441,21 @@ def main():
                 )
         log(f"  Risk Agent: 4 mock orders placed (2 SL + 2 TP)")
 
+        # ── CrewAI Chain: Execution→Risk with context passing ─────────
+        try:
+            from crewai_chain import run_crewai_chain
+
+            crew_result = run_crewai_chain(trade)
+            if crew_result.get("status") == "success":
+                log(f"  CrewAI Chain: ✅ Execution→Risk context passed")
+                log(f"  CrewAI Chain: added 4 AI-SL/AI-TP orders to state.db")
+            else:
+                log(
+                    f"  CrewAI Chain: ⚠ skipped ({crew_result.get('reason', 'unknown')})"
+                )
+        except Exception as e:
+            log(f"  CrewAI Chain: ⚠ failed ({e})")
+
         # Wait for exit time
         exit_t = exit_times_str[i]
         sleep_until(exit_t)
