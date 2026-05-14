@@ -18,7 +18,6 @@ import json
 import os
 import sys
 import time
-import random
 from datetime import datetime
 from pathlib import Path
 
@@ -82,31 +81,21 @@ def is_market_hours() -> bool:
 
 
 def should_enter(state: dict) -> bool:
-    """Decide if we should enter a new trade this run.
-
-    Production rules (all must pass):
-    1. No active trade
-    2. Below daily max trades (env BRAHMAND_MAX_TRADES, default 4)
-    3. Enough time since last entry (env BRAHMAND_COOLDOWN_MIN, default 15)
-    4. Probability check (env BRAHMAND_ENTRY_PROB, default 0.25 = 25%)
-    5. Market regime must not be 'skip' (checked in enter_trade)
-    """
+    """Gate entry: no active trade, below max, cooldown. Regime check next."""
     if state["active_trade"] is not None:
         return False
     max_trades = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
     if state["trades_today"] >= max_trades:
         return False
     if state["all_trades"]:
-        last_entry = state["all_trades"][-1].get("entry_time", "00:00")
+        last = state["all_trades"][-1].get("entry_time", "00:00")
         cooldown = int(os.environ.get("BRAHMAND_COOLDOWN_MIN", 15))
-        mins_since = (
-            datetime.strptime(now_str(), "%H:%M")
-            - datetime.strptime(last_entry, "%H:%M")
+        mins = (
+            datetime.strptime(now_str(), "%H:%M") - datetime.strptime(last, "%H:%M")
         ).total_seconds() / 60
-        if mins_since < cooldown:
+        if mins < cooldown:
             return False
-    prob = float(os.environ.get("BRAHMAND_ENTRY_PROB", 0.25))
-    return random.random() < prob
+    return True
 
 
 def enter_trade(state: dict):
@@ -286,9 +275,12 @@ def main():
         )
 
         if state["active_trade"]:
+            # Trade open — just monitor, no agent evaluation
             monitor_trade(state)
         elif should_enter(state):
+            # No trade, gates passed — run full 5-agent chain
             enter_trade(state)
+        # else: cooldown or max trades reached — skip
 
         save_state(state)
     finally:
