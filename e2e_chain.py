@@ -322,8 +322,8 @@ def _build_trade(
         if c["action"] == "SELL":
             prem_sell += c["ltp"]
             key = c["option_type"].lower()
-            sl[key] = round(c["ltp"] * sl_p, 2)
-            tp[key] = round(c["ltp"] * tp_p, 2)
+            sl[key] = round(c["ltp"] * (1 + sl_p), 2)
+            tp[key] = round(c["ltp"] * (1 - tp_p), 2)
         else:
             prem_buy += c["ltp"]
 
