@@ -12,6 +12,7 @@ Used exclusively by the Post-Mortem Agent for trade→market cross-referencing.
 """
 
 import json
+import time
 from pathlib import Path
 from typing import Type, Optional
 
@@ -25,7 +26,13 @@ STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 
 def _connect() -> duckdb.DuckDBPyConnection:
-    """Open read-only DuckDB connection. Safe alongside active writer."""
+    """Open read-only DuckDB connection. Retries if writer holds lock."""
+    for attempt in range(3):
+        try:
+            return duckdb.connect(str(VARAH_DATA), read_only=True)
+        except Exception:
+            if attempt < 2:
+                time.sleep(1)
     return duckdb.connect(str(VARAH_DATA), read_only=True)
 
 
