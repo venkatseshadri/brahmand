@@ -8,7 +8,7 @@ First run of the day: enters a random trade. All runs: monitors open trades.
 
 Usage:
     python kickoff.py                 # manual
-    */5 9-15 * * 1-5  python3 kickoff.py >> logs/kickoff_$(date +\%Y\%m\%d).log 2>&1
+    */5 9-15 * * 1-5  python3 kickoff.py >> logs/kickoff_$(date +\\%Y\\%m\\%d).log 2>&1
 
 State tracked in /tmp/brahmand_kickoff.json:
     - pid, last_run, active_trade, trades_today
@@ -145,6 +145,10 @@ def monitor_trade(state: dict):
                 (expiry, leg["strike"], leg["type"]),
             ).fetchone()
             ltp = float(row[0] or 0) if row else 0
+
+            # Sanity: option LTP must be < 5000 (spot values are 23000+)
+            if ltp > 5000:
+                continue
 
             if ltp > 0 and trade["sl"].get(t) and ltp >= trade["sl"][t]:
                 _log(f"SL HIT — {leg['tsym']}: LTP={ltp} >= {trade['sl'][t]}")
