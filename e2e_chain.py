@@ -174,7 +174,9 @@ def run_full_chain(entry_time: str) -> dict | None:
     _log(f"  Contracts: {', '.join(ctsyms)}")
 
     # ── Agent 4: Execution ────────────────────────────────────────────
-    trade = _build_trade(entry_time, spot, atm, vix, expiry, ww, sl_p, tp_p, contracts, stype)
+    trade = _build_trade(
+        entry_time, spot, atm, vix, expiry, ww, sl_p, tp_p, contracts, stype
+    )
     if not trade:
         return None
 
@@ -280,13 +282,19 @@ def _resolve_contracts(
         return result, leg_specs
     finally:
         con.close()
-    finally:
-        con.close()
 
 
 def _build_trade(
-    entry_time: str, spot: float, atm: int, vix: float, expiry: str,
-    ww: int, sl_p: float, tp_p: float, contracts: dict, strategy_type: str,
+    entry_time: str,
+    spot: float,
+    atm: int,
+    vix: float,
+    expiry: str,
+    ww: int,
+    sl_p: float,
+    tp_p: float,
+    contracts: dict,
+    strategy_type: str,
 ) -> dict:
     """Build trade dict from contract data. Works for 2-leg and 4-leg strategies."""
     legs = []
@@ -297,8 +305,10 @@ def _build_trade(
 
     for label, c in contracts.items():
         leg = {
-            "action": c["action"], "strike": c["strike"],
-            "type": c["option_type"], "fill_price": c["ltp"],
+            "action": c["action"],
+            "strike": c["strike"],
+            "type": c["option_type"],
+            "fill_price": c["ltp"],
             "tsym": c["tsym"],
         }
         legs.append(leg)
