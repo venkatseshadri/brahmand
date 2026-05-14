@@ -248,9 +248,10 @@ class TradeSimulator:
         Returns trade dict with P&L calculated.
         """
         atm = trade["atm_strike"]
+        expiry = trade.get("expiry", "")
         prices = {
-            "center_ce": self.market.get_option_ltp(atm, "CE"),
-            "center_pe": self.market.get_option_ltp(atm, "PE"),
+            "center_ce": self.market.get_option_ltp(atm, "CE", expiry),
+            "center_pe": self.market.get_option_ltp(atm, "PE", expiry),
         }
 
         pnl_ce = trade["legs"][0]["fill_price"] - prices["center_ce"]
@@ -418,6 +419,28 @@ def main():
             f"  SL: CE={trade['sl']['ce']} PE={trade['sl']['pe']} | TP: CE={trade['tp']['ce']} PE={trade['tp']['pe']}"
         )
 
+        # ── Risk Agent: place mock SL/TP orders ─────────────────────────
+        for leg in trade["legs"]:
+            if leg["action"] == "SELL":
+                t = leg["type"]
+                save_execution_report(
+                    ExecutionReport(
+                        order_id=f"SL-{leg['tsym']}",
+                        status="MOCK",
+                        fill_price=trade["sl"][t.lower()],
+                        agent_version="risk-agent-autonomous",
+                    )
+                )
+                save_execution_report(
+                    ExecutionReport(
+                        order_id=f"TP-{leg['tsym']}",
+                        status="MOCK",
+                        fill_price=trade["tp"][t.lower()],
+                        agent_version="risk-agent-autonomous",
+                    )
+                )
+        log(f"  Risk Agent: 4 mock orders placed (2 SL + 2 TP)")
+
         # Wait for exit time
         exit_t = exit_times_str[i]
         sleep_until(exit_t)
@@ -436,8 +459,9 @@ def main():
 
             # Check current LTPs
             atm = trade["atm_strike"]
-            ce_ltp = market.get_option_ltp(atm, "CE")
-            pe_ltp = market.get_option_ltp(atm, "PE")
+            expiry = trade.get("expiry", "")
+            ce_ltp = market.get_option_ltp(atm, "CE", expiry)
+            pe_ltp = market.get_option_ltp(atm, "PE", expiry)
 
             if ce_ltp > 0 and ce_ltp >= trade["sl"]["ce"]:
                 log(
