@@ -94,3 +94,36 @@ regime_agent:
   tools:
     - query_market_data
   llm: "deepseek/deepseek-chat"
+
+strategy_agent:
+  role: "Strategy Architect"
+  goal: "Select strategy type and parameters based on market regime"
+  backstory: |
+    You receive the Regime Agent's classification and decide the day's strategy.
+    - SIDEWAYS regime → Iron Butterfly (short straddle + long wings)
+    - TRENDING_BULLISH → Bull Put Credit Spread (avoid call side risk)
+    - TRENDING_BEARISH → Bear Call Credit Spread (avoid put side risk)
+
+    STRATEGY PARAMETERS YOU SET:
+    - wing_width: based on VIX (50 pts low VIX, 100 pts high VIX)
+    - sl_pct: stop-loss multiplier (0.25 base, 0.35 if VIX>18)
+    - tp_pct: take-profit multiplier (0.50 base, 0.40 if trend is strong)
+    - entry_delay: minutes to wait after market open (5 if VIX<15, 15 if VIX>18)
+
+    Output StrategySpec JSON: strategy_type, wing_width, sl_pct, tp_pct, entry_delay, reason.
+  tools:
+    - query_market_data
+  llm: "deepseek/deepseek-chat"
+
+contract_agent:
+  role: "Contract Specialist"
+  goal: "Resolve trading symbols (tsym) and lot sizes for given strikes and expiry from DuckDB"
+  backstory: |
+    You query DuckDB option_snapshots for exact contract tsyms.
+    Each contract: NIFTY12MAY26C23650 format. Lot size = 65 for NIFTY.
+
+    Output: JSON array of {tsym, strike, option_type, action, lot_size, ltp}
+    for each leg of the Iron Butterfly.
+  tools:
+    - query_option_snapshots
+  llm: "deepseek/deepseek-chat"

@@ -52,9 +52,9 @@ LOG_DIR = Path(__file__).parent / "logs"
 WINDOW_START = "11:00"
 WINDOW_END = "12:00"
 N_TRADES = random.randint(3, 5)
-WING_WIDTH = 200  # points from ATM
-SL_PCT = 1.25  # premium * 1.25
-TP_PCT = 0.50  # premium * 0.50
+WING_WIDTH = 200  # points from ATM (overridden by e2e_chain Strategy Agent)
+SL_PCT = 1.25  # premium * 1.25 (overridden by e2e_chain Strategy Agent)
+TP_PCT = 0.50  # premium * 0.50 (overridden by e2e_chain Strategy Agent)
 POLL_SECONDS = 60  # DuckDB refresh rate
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -140,13 +140,15 @@ class DuckDBMarket:
             pass
         return 0.0
 
-    def get_atm_chain(self, atm_strike: int, expiry: str) -> dict:
-        """Get LTPs for all 4 legs of Iron Butterfly, filtered by same expiry."""
+    def get_atm_chain(
+        self, atm_strike: int, expiry: str, wing_width: int = 200
+    ) -> dict:
+        """Get LTPs for all 4 legs of Iron Butterfly, all sharing the same expiry."""
         return {
             "center_ce": self.get_option_ltp(atm_strike, "CE", expiry),
             "center_pe": self.get_option_ltp(atm_strike, "PE", expiry),
-            "wing_ce": self.get_option_ltp(atm_strike - WING_WIDTH, "CE", expiry),
-            "wing_pe": self.get_option_ltp(atm_strike + WING_WIDTH, "PE", expiry),
+            "wing_ce": self.get_option_ltp(atm_strike - wing_width, "CE", expiry),
+            "wing_pe": self.get_option_ltp(atm_strike + wing_width, "PE", expiry),
         }
 
 
@@ -159,11 +161,21 @@ class TradeSimulator:
     def __init__(self, market: DuckDBMarket):
         self.market = market
 
-    def enter_trade(self, entry_time: str) -> dict:
+    def enter_trade(
+        self,
+        entry_time: str,
+        wing_width: int = None,
+        sl_pct: float = None,
+        tp_pct: float = None,
+    ) -> dict:
         """
         Enter an Iron Butterfly at the current DuckDB snapshot.
         Returns trade dict with all legs, premiums, SL, TP.
         """
+        ww = wing_width if wing_width is not None else WING_WIDTH
+        sl = sl_pct if sl_pct is not None else SL_PCT
+        tp = tp_pct if tp_pct is not None else TP_PCT
+
         snap = self.market.latest_snapshot()
         if not snap or snap.get("spot", 0) == 0:
             log("  ⚠ DuckDB snapshot empty — skipping entry")
@@ -369,18 +381,6 @@ def main():
         f"Window: {WINDOW_START}-{WINDOW_END} | Trades: {N_TRADES} | Wing width: {WING_WIDTH}"
     )
 
-    # ── Regime Agent: classify market before any trade ─────────────────
-    regime = {"regime": "unknown", "recommendation": "enter"}
-    try:
-        from regime_check import run_regime_check
-
-        regime = run_regime_check()
-        log(
-            f"Regime Agent: {regime.get('regime')} (conf={regime.get('confidence')}) → {regime.get('recommendation')}"
-        )
-    except Exception as e:
-        log(f"Regime Agent: ⚠ skipped ({e})")
-
     # Generate random entry/exit times
     start_m = time_to_minutes(WINDOW_START) + random.randint(2, 5)
     end_m = time_to_minutes(WINDOW_END) - random.randint(3, 8)
@@ -410,66 +410,18 @@ def main():
     sleep_until(WINDOW_START)
     log("=== DRY-RUN SESSION STARTED ===")
 
-    simulator = TradeSimulator(market)
     all_trades = []
 
     for i, entry_t in enumerate(entry_times_str):
         sleep_until(entry_t)
-        log(f"\\n[{entry_t}] Trade {i + 1}/{N_TRADES} — ENTRY")
+        log(f"\n[{entry_t}] Trade {i + 1}/{N_TRADES} — ENTRY")
 
-        trade = simulator.enter_trade(entry_t)
+        # ── E2E Chain: Regime → Strategy → Contract → Execution → Risk ─────
+        from e2e_chain import run_full_chain
+
+        trade = run_full_chain(entry_t)
         if not trade:
             continue
-
-        # Attach regime classification for Post-Mortem analysis
-        trade["regime"] = regime
-        log(f"  Regime: {regime.get('regime')} → {regime.get('recommendation')}")
-        log(
-            f"  Spot={trade['spot_at_entry']} ATM={trade['atm_strike']} VIX={trade['vix']}"
-        )
-        log(
-            f"  Net credit={trade['net_credit']} SELL prem={trade['premium_sell']} BUY prem={trade['premium_buy']}"
-        )
-        log(
-            f"  SL: CE={trade['sl']['ce']} PE={trade['sl']['pe']} | TP: CE={trade['tp']['ce']} PE={trade['tp']['pe']}"
-        )
-
-        # ── Risk Agent: place mock SL/TP orders ─────────────────────────
-        for leg in trade["legs"]:
-            if leg["action"] == "SELL":
-                t = leg["type"]
-                save_execution_report(
-                    ExecutionReport(
-                        order_id=f"SL-{leg['tsym']}",
-                        status="MOCK",
-                        fill_price=trade["sl"][t.lower()],
-                        agent_version="risk-agent-autonomous",
-                    )
-                )
-                save_execution_report(
-                    ExecutionReport(
-                        order_id=f"TP-{leg['tsym']}",
-                        status="MOCK",
-                        fill_price=trade["tp"][t.lower()],
-                        agent_version="risk-agent-autonomous",
-                    )
-                )
-        log(f"  Risk Agent: 4 mock orders placed (2 SL + 2 TP)")
-
-        # ── CrewAI Chain: Execution→Risk with context passing ─────────
-        try:
-            from crewai_chain import run_crewai_chain
-
-            crew_result = run_crewai_chain(trade)
-            if crew_result.get("status") == "success":
-                log(f"  CrewAI Chain: ✅ Execution→Risk context passed")
-                log(f"  CrewAI Chain: added 4 AI-SL/AI-TP orders to state.db")
-            else:
-                log(
-                    f"  CrewAI Chain: ⚠ skipped ({crew_result.get('reason', 'unknown')})"
-                )
-        except Exception as e:
-            log(f"  CrewAI Chain: ⚠ failed ({e})")
 
         # Wait for exit time
         exit_t = exit_times_str[i]
@@ -519,18 +471,28 @@ def main():
                 forced_exit = True
 
         actual_exit = sl_hit_time or tp_hit_time or exit_t
-        log(
-            f"  [{actual_exit}] Trade {i + 1} — EXIT (reason={'SL' if sl_hit_time else 'TP' if tp_hit_time else 'TIMED'})"
-        )
 
-        trade = simulator.exit_trade(trade, actual_exit)
+        # Calculate P&L from DuckDB LTP at exit
+        expiry = trade.get("expiry", "")
+        ce_exit = market.get_option_ltp(trade["atm_strike"], "CE", expiry)
+        pe_exit = market.get_option_ltp(trade["atm_strike"], "PE", expiry)
+        pnl_ce = round(trade["legs"][0]["fill_price"] - ce_exit, 2)
+        pnl_pe = round(trade["legs"][1]["fill_price"] - pe_exit, 2)
+
+        trade["exit_time"] = actual_exit
+        trade["pnl"] = round(pnl_ce + pnl_pe, 2)
+        trade["pnl_ce"] = pnl_ce
+        trade["pnl_pe"] = pnl_pe
+        trade["status"] = "CLOSED"
+
         if sl_hit_time:
             trade["exit_reason"] = "SL_HIT"
         elif tp_hit_time:
             trade["exit_reason"] = "TP_HIT"
+        else:
+            trade["exit_reason"] = "RANDOM_CLOSE"
 
-        log(f"  P&L: ₹{trade['pnl']} (CE={trade['pnl_ce']} PE={trade['pnl_pe']})")
-        log(f"  Exit reason: {trade['exit_reason']}")
+        log(f"  [{actual_exit}] EXIT ({trade['exit_reason']}) — P&L: ₹{trade['pnl']}")
 
         all_trades.append(trade)
         time.sleep(random.randint(10, 30))
