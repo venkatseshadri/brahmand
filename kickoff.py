@@ -274,6 +274,9 @@ def main():
 
     try:
         if not is_market_hours():
+            if state["active_trade"] and not state["post_mortem_done"]:
+                _log("Market closed — force-closing active trade")
+                exit_trade(state, "MARKET_CLOSE")
             _log("Market closed — exiting")
             return
 
