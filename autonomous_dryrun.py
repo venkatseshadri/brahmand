@@ -369,6 +369,18 @@ def main():
         f"Window: {WINDOW_START}-{WINDOW_END} | Trades: {N_TRADES} | Wing width: {WING_WIDTH}"
     )
 
+    # ── Regime Agent: classify market before any trade ─────────────────
+    regime = {"regime": "unknown", "recommendation": "enter"}
+    try:
+        from regime_check import run_regime_check
+
+        regime = run_regime_check()
+        log(
+            f"Regime Agent: {regime.get('regime')} (conf={regime.get('confidence')}) → {regime.get('recommendation')}"
+        )
+    except Exception as e:
+        log(f"Regime Agent: ⚠ skipped ({e})")
+
     # Generate random entry/exit times
     start_m = time_to_minutes(WINDOW_START) + random.randint(2, 5)
     end_m = time_to_minutes(WINDOW_END) - random.randint(3, 8)
@@ -409,6 +421,9 @@ def main():
         if not trade:
             continue
 
+        # Attach regime classification for Post-Mortem analysis
+        trade["regime"] = regime
+        log(f"  Regime: {regime.get('regime')} → {regime.get('recommendation')}")
         log(
             f"  Spot={trade['spot_at_entry']} ATM={trade['atm_strike']} VIX={trade['vix']}"
         )
