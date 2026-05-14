@@ -25,17 +25,8 @@ STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 
 def _connect() -> duckdb.DuckDBPyConnection:
-    """Open read-only DuckDB connection with retry on lock contention."""
-    import time
-
-    for attempt in range(5):
-        try:
-            return duckdb.connect(str(VARAH_DATA), read_only=True)
-        except Exception:
-            if attempt < 4:
-                time.sleep(2)
-            else:
-                raise
+    """Open read-only DuckDB connection. Safe alongside active writer."""
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
 
 
 class MarketDataQueryInput(BaseModel):
