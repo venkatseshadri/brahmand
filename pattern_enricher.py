@@ -41,7 +41,15 @@ TF_ORDER = [
 ]
 
 # Outcome horizons: how far forward to check spot change
-OUTCOME_HORIZONS = {"5m": 5, "15m": 15, "30m": 30, "1h": 60, "4h": 240}
+OUTCOME_HORIZONS = {
+    "5m": 5,
+    "15m": 15,
+    "30m": 30,
+    "1h": 60,
+    "4h": 240,
+    "EOD": None,  # special: same-day close
+    "1D": None,  # special: next-day close
+}
 
 
 def init_pattern_table(db):
@@ -64,6 +72,8 @@ def init_pattern_table(db):
             fwd_30m        FLOAT,
             fwd_1h         FLOAT,
             fwd_4h         FLOAT,
+            fwd_EOD        FLOAT,         -- spot change % to same-day close
+            fwd_1D         FLOAT,         -- spot change % to next-day close
             enriched_at    VARCHAR,
             UNIQUE(timestamp, index_name)
         )
@@ -122,32 +132,54 @@ def compute_forward_outcomes(db, timestamp: str, index: str, spot: float) -> dic
     try:
         base_time = dt.fromisoformat(timestamp)
     except (ValueError, TypeError):
-        return {f"fwd_{l}": None for l in ["5m", "15m", "30m", "1h", "4h"]}
+        return {}
 
     outcomes = {}
-    for label, horizon_min in [
-        ("5m", 5),
-        ("15m", 15),
-        ("30m", 30),
-        ("1h", 60),
-        ("4h", 240),
-    ]:
-        target = base_time + timedelta(minutes=horizon_min)
-        window_start = (target - timedelta(minutes=3)).isoformat()
-        window_end = (target + timedelta(minutes=3)).isoformat()
-
+    # ── Intraday horizons: 5m, 15m, 30m, 1h, 4h ──
+    for label, mins in [("5m", 5), ("15m", 15), ("30m", 30), ("1h", 60), ("4h", 240)]:
+        target = base_time + timedelta(minutes=mins)
+        wstart = (target - timedelta(minutes=3)).isoformat()
+        wend = (target + timedelta(minutes=3)).isoformat()
         row = db.execute(
             """SELECT close FROM market_data_multitf
                WHERE index_name = ? AND timeframe_min = 5
                AND timestamp >= ? AND timestamp <= ?
                ORDER BY timestamp ASC LIMIT 1""",
-            (index, window_start, window_end),
+            (index, wstart, wend),
         ).fetchone()
-
         if row and row[0] and spot > 0:
             outcomes[f"fwd_{label}"] = round((float(row[0]) - spot) / spot * 100, 4)
         else:
             outcomes[f"fwd_{label}"] = None
+
+    # ── EOD: same-day close (daily bar close for this date) ──
+    date_str = base_time.strftime("%Y-%m-%d")
+    row = db.execute(
+        """SELECT close FROM market_data_multitf
+           WHERE index_name = ? AND timeframe_min = 1440
+           AND timestamp LIKE ?
+           ORDER BY timestamp DESC LIMIT 1""",
+        (index, f"{date_str}%"),
+    ).fetchone()
+    if row and row[0] and spot > 0:
+        outcomes["fwd_EOD"] = round((float(row[0]) - spot) / spot * 100, 4)
+    else:
+        outcomes["fwd_EOD"] = None
+
+    # ── 1D: NEXT trading day's daily bar close ──
+    # Find the next distinct date with a daily bar
+    row = db.execute(
+        """SELECT close FROM market_data_multitf
+           WHERE index_name = ? AND timeframe_min = 1440
+           AND SUBSTR(timestamp, 1, 10) > ?
+           ORDER BY timestamp ASC LIMIT 1""",
+        (index, date_str),
+    ).fetchone()
+    if row and row[0] and spot > 0:
+        outcomes["fwd_1D"] = round((float(row[0]) - spot) / spot * 100, 4)
+    else:
+        outcomes["fwd_1D"] = None
+
     return outcomes
 
 
@@ -201,8 +233,8 @@ def enrich_bars(db, index: str = "NIFTY", limit: int = 500):
             """INSERT OR IGNORE INTO market_data_patterns
                (timestamp, index_name, pattern, spot,
                 candle_1440m, candle_240m, candle_60m, candle_30m, candle_15m, candle_5m,
-                fwd_5m, fwd_15m, fwd_30m, fwd_1h, fwd_4h, enriched_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                fwd_5m, fwd_15m, fwd_30m, fwd_1h, fwd_4h, fwd_EOD, fwd_1D, enriched_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 ts,
                 index,
@@ -219,6 +251,8 @@ def enrich_bars(db, index: str = "NIFTY", limit: int = 500):
                 outcomes.get("fwd_30m"),
                 outcomes.get("fwd_1h"),
                 outcomes.get("fwd_4h"),
+                outcomes.get("fwd_EOD"),
+                outcomes.get("fwd_1D"),
                 datetime.now().isoformat(),
             ),
         )

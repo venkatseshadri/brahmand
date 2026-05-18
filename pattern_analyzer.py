@@ -42,6 +42,100 @@ class PatternAnalyzer:
         self.min_samples = min_samples
 
     def predict_pattern(self, pattern: str) -> dict:
+        """Alias: full 6-char pattern query (convenience wrapper)."""
+        filters = {}
+        tf_map = {
+            "0": "1440m",
+            "1": "240m",
+            "2": "60m",
+            "3": "30m",
+            "4": "15m",
+            "5": "5m",
+        }
+        for i, ch in enumerate(pattern):
+            if ch in ("G", "R"):
+                filters[f"candle_{tf_map[str(i)]}"] = ch
+        return self.predict_partial(filters)
+
+    def predict_partial(self, filters: dict) -> dict:
+        """
+        Query by PARTIAL pattern — any combination of TFs.
+
+        Args:
+            filters: e.g., {"candle_1440m": "G", "candle_240m": "G"}
+                     → "When daily AND 4H are GREEN, what happens?"
+        Returns:
+            Probability dict with direction + confidence across all horizons.
+        """
+        import duckdb
+
+        db = duckdb.connect(str(V4_DB), read_only=True)
+
+        wheres = []
+        params = []
+        for col, val in filters.items():
+            wheres.append(f"{col} = ?")
+            params.append(val)
+
+        where_clause = " AND ".join(wheres) if wheres else "1=1"
+
+        try:
+            rows = db.execute(
+                f"""SELECT fwd_5m, fwd_15m, fwd_30m, fwd_1h, fwd_4h, fwd_EOD, fwd_1D
+                   FROM market_data_patterns
+                   WHERE {where_clause} AND fwd_5m IS NOT NULL
+                   ORDER BY timestamp DESC LIMIT 200""",
+                params,
+            ).fetchall()
+        except Exception:
+            rows = []
+        finally:
+            db.close()
+
+        if not rows or len(rows) < self.min_samples:
+            return {
+                "filters": filters,
+                "n_samples": len(rows),
+                "status": "insufficient_data",
+            }
+
+        n = len(rows)
+        result = {"filters": filters, "n_samples": n}
+
+        for horizon, col_idx in [
+            ("5m", 0),
+            ("15m", 1),
+            ("30m", 2),
+            ("1h", 3),
+            ("4h", 4),
+            ("EOD", 5),
+            ("1D", 6),
+        ]:
+            values = [r[col_idx] for r in rows if r[col_idx] is not None]
+            if not values:
+                result[f"up_{horizon}"] = None
+                result[f"down_{horizon}"] = None
+                result[f"side_{horizon}"] = None
+                continue
+
+            up = round(sum(1 for v in values if v > UP_THRESHOLD) / len(values), 3)
+            down = round(sum(1 for v in values if v < DOWN_THRESHOLD) / len(values), 3)
+            side = round(1.0 - up - down, 3)
+
+            result[f"up_{horizon}"] = up
+            result[f"down_{horizon}"] = down
+            result[f"side_{horizon}"] = side
+            result[f"med_{horizon}"] = round(_median(values), 3)
+
+        best_dir, best_hor, best_prob = "side", "5m", 0.0
+        for d, h, prob in self._iter_directions(result):
+            if prob > best_prob:
+                best_dir, best_hor, best_prob = d, h, prob
+
+        result["prediction"] = best_dir.upper()
+        result["confidence"] = round(best_prob * 100, 1)
+        result["horizon"] = best_hor
+        return result
         """
         Query historical outcomes for a given 6-TF pattern.
         Returns probability dict per horizon.
@@ -52,7 +146,7 @@ class PatternAnalyzer:
 
         try:
             rows = db.execute(
-                """SELECT fwd_5m, fwd_15m, fwd_30m, fwd_1h, fwd_4h
+                """SELECT fwd_5m, fwd_15m, fwd_30m, fwd_1h, fwd_4h, fwd_EOD, fwd_1D
                    FROM market_data_patterns
                    WHERE pattern = ? AND fwd_5m IS NOT NULL
                    ORDER BY timestamp DESC LIMIT 200""",
@@ -191,6 +285,13 @@ if __name__ == "__main__":
     parser.add_argument("--top", type=int, default=10, help="Show top N patterns")
     args = parser.parse_args()
 
+    parser.add_argument(
+        "--filter",
+        type=str,
+        nargs="*",
+        help="Partial pattern filter: candle_1440m=G candle_60m=R",
+    )
+
     pa = PatternAnalyzer()
 
     if args.live:
@@ -199,6 +300,14 @@ if __name__ == "__main__":
 
     elif args.pattern:
         res = pa.predict_pattern(args.pattern)
+        print(json.dumps(res, indent=2))
+
+    elif args.filter:
+        filters = {}
+        for f in args.filter:
+            k, v = f.split("=")
+            filters[k] = v
+        res = pa.predict_partial(filters)
         print(json.dumps(res, indent=2))
 
     elif args.top:
