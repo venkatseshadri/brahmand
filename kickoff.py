@@ -103,7 +103,9 @@ def enter_trade(state: dict):
     from e2e_chain import run_full_chain
 
     try:
-        trade = run_full_chain(now_str())
+        sig = entry_scores.get("entry_combined_signal", None) if entry_scores else None
+        conf = entry_scores.get("entry_combined_confidence", 0) if entry_scores else 0
+        trade = run_full_chain(now_str(), entry_signal=sig, entry_confidence=conf)
     except Exception as e:
         _log(f"Chain failed: {e} — skipping this cycle")
         return state

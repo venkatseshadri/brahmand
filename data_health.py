@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+"""
+Data Pipeline Health Monitor — checks v3.1, v4, Redis for NULLs/empties.
+
+Runs every 5 min via cron. Slient when healthy. Logs warnings when:
+  - Redis indicators have NULL values
+  - v3.1 DuckDB NULL% spikes above baseline
+  - v4 bars stop updating (stale data)
+  - Redis queue stops growing (capture died)
+
+Usage:
+  python3 data_health.py              # Quick health check
+  python3 data_health.py --alert      # Returns non-zero exit code if unhealthy
+"""
+
+import sys, json, os, time
+from pathlib import Path
+from datetime import datetime
+from typing import Tuple
+
+V31_DB = Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
+V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
+STATE_FILE = Path("/tmp/data_health_state.json")
+
+# Baseline: expected NULL% for indicators (buffer warmup on first 50 bars)
+BASELINE_NULL_MAX = {
+    "ema_5": 25.0,
+    "ema_20": 35.0,
+    "ema_50": 40.0,
+    "rsi": 30.0,
+    "adx": 30.0,
+    "atr": 30.0,
+    "supertrend_direction": 30.0,
+}
+
+# Stale thresholds (minutes since last update before warning)
+STALE_V31_MIN = 5
+STALE_V4_MIN = 5
+STALE_REDIS_MIN = 5
+
+# Redis expected fields
+REQUIRED_REDIS_KEYS = [
+    "ema5",
+    "ema20",
+    "ema50",
+    "rsi",
+    "adx",
+    "atr",
+    "st_direction",
+    "bb_pct_b",
+]
+
+
+def check_v31() -> Tuple[bool, list]:
+    """Check v3.1 DuckDB for NULL spikes. Returns (healthy, warnings)."""
+    warnings = []
+    try:
+        import duckdb
+
+        db = duckdb.connect(str(V31_DB), read_only=True)
+        n = db.execute("SELECT COUNT(*) FROM market_data").fetchone()[0]
+        if n == 0:
+            warnings.append("v3.1: EMPTY — 0 rows")
+            return False, warnings
+
+        for col, max_pct in BASELINE_NULL_MAX.items():
+            null_count = db.execute(
+                f"SELECT COUNT(*) FROM market_data WHERE {col} IS NULL"
+            ).fetchone()[0]
+            pct = round(null_count / n * 100, 1)
+            if pct > max_pct:
+                warnings.append(f"v3.1 {col}: {pct}% NULL (limit: {max_pct}%)")
+
+        # Check staleness
+        ts = db.execute("SELECT MAX(timestamp) FROM market_data").fetchone()[0]
+        if ts:
+            try:
+                t = datetime.fromisoformat(ts)
+                age = (datetime.now() - t).total_seconds() / 60
+                if age > STALE_V31_MIN:
+                    warnings.append(f"v3.1: stale — last update {age:.0f} min ago")
+            except ValueError:
+                warnings.append(f"v3.1: invalid timestamp: {ts}")
+
+        db.close()
+    except Exception as e:
+        warnings.append(f"v3.1: connection failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
+def check_v4() -> Tuple[bool, list]:
+    """Check v4 multi-TF DuckDB for empty bars and staleness."""
+    warnings = []
+    try:
+        import duckdb
+
+        db = duckdb.connect(str(V4_DB), read_only=True)
+
+        for tf in [5, 15, 30, 60, 240, 1440]:
+            n = db.execute(
+                f"SELECT COUNT(*) FROM market_data_multitf WHERE timeframe_min = {tf}"
+            ).fetchone()[0]
+            nulls = db.execute(
+                f"SELECT COUNT(*) FROM market_data_multitf WHERE timeframe_min = {tf} AND (close IS NULL OR open IS NULL)"
+            ).fetchone()[0]
+            ts = db.execute(
+                f"SELECT MAX(timestamp) FROM market_data_multitf WHERE timeframe_min = {tf}"
+            ).fetchone()[0]
+
+            if n == 0:
+                warnings.append(f"v4 {tf}m: EMPTY")
+                continue
+            if nulls > 0:
+                warnings.append(f"v4 {tf}m: {nulls}/{n} NULL O/C")
+
+            if ts:
+                try:
+                    t = datetime.fromisoformat(ts)
+                    age = (datetime.now() - t).total_seconds() / 60
+                    if age > STALE_V4_MIN:
+                        warnings.append(f"v4 {tf}m: stale — last bar {age:.0f} min ago")
+                except ValueError:
+                    pass
+        db.close()
+    except Exception as e:
+        warnings.append(f"v4: connection failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
+def check_redis() -> Tuple[bool, list]:
+    """Check Redis queue for NULL indicators and staleness."""
+    warnings = []
+    try:
+        import redis as rds
+
+        r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+        r.ping()
+
+        n = r.llen("v3_ohlcv_queue")
+        if n == 0:
+            warnings.append("Redis: EMPTY queue")
+            return False, warnings
+
+        # Check latest bar
+        latest = json.loads(r.lindex("v3_ohlcv_queue", 0))
+        ts = latest.get("timestamp")
+
+        # Check staleness
+        if ts:
+            try:
+                t = datetime.fromisoformat(ts)
+                age = (datetime.now() - t).total_seconds() / 60
+                if age > STALE_REDIS_MIN:
+                    warnings.append(
+                        f"Redis: stale — last bar {age:.0f} min ago ({ts[:19]})"
+                    )
+            except ValueError:
+                warnings.append(f"Redis: invalid timestamp: {ts}")
+
+        # Check required indicator keys
+        missing = [k for k in REQUIRED_REDIS_KEYS if k not in latest]
+        if missing:
+            warnings.append(f"Redis: MISSING indicator keys: {missing}")
+
+        # Check NULL values
+        nulls = [k for k, v in latest.items() if v is None and k in REQUIRED_REDIS_KEYS]
+        if nulls:
+            warnings.append(f"Redis: NULL indicators: {nulls}")
+
+        # Check queue growth (compare with last check)
+        prev_state = {}
+        if STATE_FILE.exists():
+            prev_state = json.loads(STATE_FILE.read_text())
+        prev_n = prev_state.get("redis_len", 0)
+        prev_ts = prev_state.get("redis_ts", "")
+        if n == prev_n and ts == prev_ts and datetime.now().hour >= 9:
+            warnings.append(f"Redis: NOT GROWING — stuck at {n} bars, ts={ts[:19]}")
+
+        # Save state for next check
+        STATE_FILE.write_text(
+            json.dumps(
+                {
+                    "redis_len": n,
+                    "redis_ts": ts,
+                    "checked_at": datetime.now().isoformat(),
+                }
+            )
+        )
+
+    except Exception as e:
+        warnings.append(f"Redis: connection failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
+def run_all() -> Tuple[bool, list]:
+    """Run all health checks. Returns (healthy, all_warnings)."""
+    results = []
+    all_warnings = []
+
+    for name, fn in [("v3.1", check_v31), ("v4", check_v4), ("Redis", check_redis)]:
+        ok, warnings = fn()
+        results.append(ok)
+        for w in warnings:
+            all_warnings.append(f"[{name}] {w}")
+
+    healthy = all(results)
+    return healthy, all_warnings
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--alert", action="store_true", help="Return non-zero if unhealthy"
+    )
+    args = parser.parse_args()
+
+    healthy, warnings = run_all()
+
+    if warnings:
+        print(f"[{datetime.now().strftime('%H:%M')}] DATA HEALTH:")
+        for w in warnings:
+            print(f"  ⚠️  {w}")
+        if args.alert:
+            sys.exit(1)
+    elif args.alert:
+        # Silent healthy check (for cron)
+        pass
+    else:
+        print(f"[{datetime.now().strftime('%H:%M')}] ✅ All data pipelines healthy")

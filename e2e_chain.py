@@ -39,16 +39,15 @@ def _get_llm():
     )
 
 
-def run_full_chain(entry_time: str) -> dict | None:
+def run_full_chain(
+    entry_time: str, entry_signal: str = None, entry_confidence: int = 0
+) -> dict | None:
     """
     Run the full 5-agent chain. Returns trade dict or None if skipped.
 
-    Agents:
-      1. Regime     — DuckDB → classification
-      2. Strategy   — regime output → strategy params
-      3. Contract   — strategy + DuckDB → contract tsyms
-      4. Execution  — contracts → fill simulation → state.db
-      5. Risk       — Execution output → mock SL/TP → state.db
+    entry_signal: "BULLISH" → PUT_CREDIT_SPREAD (morphs to butterfly if NEUTRAL later)
+                  "BEARISH" → CALL_CREDIT_SPREAD (morphs to butterfly if NEUTRAL later)
+                  None/"NEUTRAL" → IRON_BUTTERFLY
     """
     llm = _get_llm()
 
@@ -134,19 +133,35 @@ def run_full_chain(entry_time: str) -> dict | None:
         return regime  # return regime dict so wrapper can see why
 
     # ── Agent 2: Strategy ─────────────────────────────────────────────
+    # Default strategy based on entry gate signal (credit spread → can morph later)
+    if entry_signal == "BULLISH":
+        default_strategy = "PUT_CREDIT_SPREAD"
+        default_wings = 150
+    elif entry_signal == "BEARISH":
+        default_strategy = "CALL_CREDIT_SPREAD"
+        default_wings = 150
+    else:
+        default_strategy = "IRON_BUTTERFLY"
+        default_wings = 200
+
     strategy = {
-        "strategy_type": "IRON_BUTTERFLY",
-        "wing_width": 200,
+        "strategy_type": default_strategy,
+        "wing_width": default_wings,
         "sl_pct": 0.25,
         "tp_pct": 0.50,
         "entry_delay": 5,
+        "entry_signal": entry_signal or "NEUTRAL",
     }
     if llm:
         try:
             agent = af.create_agent("strategy_agent", {}, tools=[market_tool])
             agent.llm = llm
             task = Task(
-                description=f"Regime: {json.dumps(regime)}. VIX: {vix}. Select strategy + params. Output JSON: {{'strategy_type','wing_width','sl_pct','tp_pct','entry_delay'}}",
+                description=f"Regime: {json.dumps(regime)}. VIX: {vix}. "
+                f"Entry signal from gate: {entry_signal or 'NEUTRAL'} (conf={entry_confidence}%). "
+                f"Default: {default_strategy} wings={default_wings}. "
+                f"BULLISH→PUT_SPREAD, BEARISH→CALL_SPREAD, NEUTRAL→BUTTERFLY. "
+                f"These can MORPH later via position manager.",
                 expected_output="StrategySpec JSON",
                 agent=agent,
             )
