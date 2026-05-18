@@ -215,6 +215,14 @@ def exit_trade(state: dict, reason: str):
     state["all_trades"].append(trade)
     state["active_trade"] = None
 
+    # Log trade→pattern correlation for EOD analysis
+    try:
+        from pattern_enricher import log_trade_pattern
+
+        log_trade_pattern(trade)
+    except Exception:
+        pass
+
     # Trigger Post-Mortem if market closing
     if not is_market_hours() and not state["post_mortem_done"]:
         run_pm(state)

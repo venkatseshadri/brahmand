@@ -262,6 +262,126 @@ def enrich_bars(db, index: str = "NIFTY", limit: int = 500):
     logger.info(f"Enriched {enriched}/{len(timestamps)} patterns")
 
 
+def init_trade_outcomes_table(db):
+    """Create trade_outcomes table for pattern→P&L correlation."""
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS trade_outcomes (
+            entry_time     VARCHAR,
+            exit_time      VARCHAR,
+            index_name     VARCHAR,
+            pattern        VARCHAR,
+            strategy       VARCHAR,
+            wing_width     INTEGER,
+            net_credit     FLOAT,
+            pnl            FLOAT,
+            exit_reason    VARCHAR,
+            trend_signal   VARCHAR,
+            tl_signal      VARCHAR,
+            entry_confidence INTEGER,
+            enriched_at    VARCHAR
+        )
+    """)
+    db.commit()
+
+
+def log_trade_pattern(trade: dict) -> bool:
+    """
+    Link a closed trade to its entry-time pattern.
+    Called from kickoff.py exit_trade() after a trade closes.
+
+    Writes to trade_outcomes table for probability-based pattern analysis.
+    """
+    import duckdb
+
+    try:
+        db = duckdb.connect(str(V4_DB))
+        init_trade_outcomes_table(db)
+
+        entry_time = trade.get("entry_time", trade.get("monitored_since", ""))
+        exit_time = trade.get("exit_time", "")
+        pnl = trade.get("pnl", 0)
+        strategy = trade.get("strategy_type", "UNKNOWN")
+        wing = trade.get("wing_width", trade.get("legs", [{}])[0].get("wing_width", 0))
+        net_credit = trade.get("net_credit", 0)
+        exit_reason = trade.get("exit_reason", "UNKNOWN")
+
+        es = trade.get("entry_scores", {})
+        trend_sig = es.get("entry_trend_signal", "?")
+        tl_sig = es.get("entry_traffic_light_signal", "?")
+        conf = es.get("entry_combined_confidence", 0)
+
+        # ── Look up pattern by querying raw bars at nearest timestamp ──
+        from datetime import datetime as dt, timedelta
+
+        try:
+            date_row = db.execute(
+                "SELECT SUBSTR(MAX(timestamp), 1, 10) FROM market_data_patterns"
+            ).fetchone()
+            trade_date = date_row[0] if date_row else dt.now().strftime("%Y-%m-%d")
+            entry_dt = dt.fromisoformat(f"{trade_date}T{entry_time}:00")
+
+            # Build pattern from raw bars closest to entry time (within ±7 min)
+            tf_order = [
+                (1440, "1440m"),
+                (240, "240m"),
+                (60, "60m"),
+                (30, "30m"),
+                (15, "15m"),
+                (5, "5m"),
+            ]
+            pattern = ""
+            for tf_min, _ in tf_order:
+                row = db.execute(
+                    """SELECT open, close FROM market_data_multitf
+                       WHERE index_name = 'NIFTY' AND timeframe_min = ?
+                       AND timestamp >= ? AND timestamp <= ?
+                       ORDER BY timestamp DESC LIMIT 1""",
+                    (
+                        tf_min,
+                        (entry_dt - timedelta(minutes=7)).isoformat(),
+                        (entry_dt + timedelta(minutes=7)).isoformat(),
+                    ),
+                ).fetchone()
+                if row and row[0] and row[1]:
+                    pattern += "G" if row[1] > row[0] else "R"
+                else:
+                    pattern += "-"
+
+            pattern = pattern if pattern and "-" not in pattern else "partial"
+        except Exception:
+            pattern = "unknown"
+
+        db.execute(
+            """INSERT INTO trade_outcomes
+               (entry_time, exit_time, index_name, pattern, strategy, wing_width,
+                net_credit, pnl, exit_reason, trend_signal, tl_signal,
+                entry_confidence, enriched_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                entry_time,
+                exit_time,
+                "NIFTY",
+                pattern,
+                strategy,
+                wing,
+                net_credit,
+                pnl,
+                exit_reason,
+                trend_sig,
+                tl_sig,
+                conf,
+                datetime.now().isoformat(),
+            ),
+        )
+        db.commit()
+        db.close()
+        logger.info(f"Trade→Pattern logged: {pattern} | P&L ₹{pnl}")
+        return True
+    except Exception as e:
+        logger.warning(f"Trade→Pattern logging failed: {e}")
+        return False
+
+
 def main():
     import argparse
 
