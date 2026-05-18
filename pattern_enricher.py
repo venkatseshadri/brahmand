@@ -116,25 +116,36 @@ def compute_gap(bars: dict) -> Optional[float]:
 
 
 def compute_forward_outcomes(db, timestamp: str, index: str, spot: float) -> dict:
-    """Compute forward spot changes at each horizon.
-    Uses a window of bars: fwd_5m = 1 bar ahead, fwd_15m = 3 bars ahead, etc.
-    """
-    # Get all 5m bars after timestamp, ordered
-    rows = db.execute(
-        """SELECT close FROM market_data_multitf
-           WHERE index_name = ? AND timeframe_min = 5
-           AND timestamp > ?
-           ORDER BY timestamp ASC
-           LIMIT 48""",
-        (index, timestamp),
-    ).fetchall()
-    closes = [r[0] for r in rows if r[0] is not None]
+    """Compute forward spot changes at each horizon using timestamp lookahead."""
+    from datetime import datetime as dt, timedelta
 
-    offset_map = {"5m": 0, "15m": 2, "30m": 5, "1h": 11, "4h": 47}
+    try:
+        base_time = dt.fromisoformat(timestamp)
+    except (ValueError, TypeError):
+        return {f"fwd_{l}": None for l in ["5m", "15m", "30m", "1h", "4h"]}
+
     outcomes = {}
-    for label, offset in offset_map.items():
-        if offset < len(closes) and spot > 0:
-            outcomes[f"fwd_{label}"] = round((closes[offset] - spot) / spot * 100, 4)
+    for label, horizon_min in [
+        ("5m", 5),
+        ("15m", 15),
+        ("30m", 30),
+        ("1h", 60),
+        ("4h", 240),
+    ]:
+        target = base_time + timedelta(minutes=horizon_min)
+        window_start = (target - timedelta(minutes=3)).isoformat()
+        window_end = (target + timedelta(minutes=3)).isoformat()
+
+        row = db.execute(
+            """SELECT close FROM market_data_multitf
+               WHERE index_name = ? AND timeframe_min = 5
+               AND timestamp >= ? AND timestamp <= ?
+               ORDER BY timestamp ASC LIMIT 1""",
+            (index, window_start, window_end),
+        ).fetchone()
+
+        if row and row[0] and spot > 0:
+            outcomes[f"fwd_{label}"] = round((float(row[0]) - spot) / spot * 100, 4)
         else:
             outcomes[f"fwd_{label}"] = None
     return outcomes
