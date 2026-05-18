@@ -82,8 +82,8 @@ def get_optimal_wing(
         wing_width = spread["wing_width"]
         margin = spread["margin"]
 
-        # Per-lot calculations (NIFTY lot = 50)
-        lot = 50
+        # Per-lot calculations (NIFTY lot = 65)
+        lot = 65
         net_credit_ps = atm_premium - buy_premium  # per share
         reward = net_credit_ps * lot  # max gain per lot
         risk = (wing_width - net_credit_ps) * lot  # max loss per lot
@@ -149,7 +149,7 @@ def compare_wings(spread_type: str, atm: int, expiry: str) -> list[dict]:
 
         w = spread["wing_width"]
         m = spread["margin"]
-        lot = 50
+        lot = 65
         net_credit_ps = atm_premium - buy_premium
         reward = net_credit_ps * lot
         risk = (w - net_credit_ps) * lot

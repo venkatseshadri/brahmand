@@ -35,8 +35,8 @@ logger = logging.getLogger("MarginCapture")
 # ── Config ──
 STRIKE_COUNT = 5  # Capture ATM ±5 strikes
 STRIKE_STEP = 50  # NIFTY strike gap
-LOT_SIZE = 50  # NIFTY lot size (paper: assume 100 qty for 2 lots)
-DEFAULT_QTY = 50  # Per leg quantity for span calc
+LOT_SIZE = 65  # NIFTY lot size
+DEFAULT_QTY = 65  # Per leg quantity (1 lot) for span calc
 MARKET_CLOSE = "15:30"
 
 # Output
