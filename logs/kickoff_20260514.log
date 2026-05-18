@@ -1,0 +1,336 @@
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:15:01] Scheduled run | Active: False | Today: 0/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:20:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 291, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 282, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 195, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 29, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361442) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:25:02] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 195, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 29, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361552) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:30:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:35:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:40:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:45:02] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:50:02] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[12:55:02] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:00:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1361929) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:05:01] Scheduled run | Active: False | Today: 0/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 297, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 288, in main
+    enter_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 105, in enter_trade
+    trade = run_full_chain(now_str())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/e2e_chain.py", line 68, in run_full_chain
+    snap = get_latest_market_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 202, in get_latest_market_snapshot
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    return duckdb.connect(str(VARAH_DATA), read_only=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1363034) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:10:02] Scheduled run | Active: True | Today: 1/4
+[13:10:10] SL HIT — NIFTY19MAY26C23750: LTP=185.45 >= 69.53
+[13:10:10] EXIT (SL_HIT): P&L ₹3.6
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:15:01] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:20:01] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:25:01] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:30:01] Scheduled run | Active: True | Today: 1/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 301, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 289, in main
+    monitor_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 135, in monitor_trade
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    raise IOError("DuckDB locked by capture after 10 retries — skip this cycle")
+OSError: DuckDB locked by capture after 10 retries — skip this cycle
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:35:01] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:40:02] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:45:01] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:50:02] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[13:55:02] Scheduled run | Active: True | Today: 1/4
+/home/trading_ceo/brahmand/kickoff.py:2: SyntaxWarning: invalid escape sequence '\%'
+  """
+[14:00:01] Scheduled run | Active: True | Today: 1/4
+[14:00:11] SL HIT — NIFTY19MAY26C23700: LTP=23752.2 >= 273.11
+[14:00:11] EXIT (SL_HIT): P&L ₹-23528.0
+[14:05:02] Scheduled run | Active: False | Today: 1/4
+[14:05:10]   Regime: sideways → caution
+[14:05:10]   Strategy: IRON_BUTTERFLY wings=200 sl=0.25 tp=0.5
+[14:05:10]   Strategy: IRON_BUTTERFLY wings=200 sl=0.25 tp=0.5
+[14:05:10]   Contracts: NIFTY19MAY26C23750, NIFTY19MAY26P23750, NIFTY19MAY26P23550, NIFTY19MAY26C23950
+[14:05:10]   Execution: net_credit=₹161.95
+[14:05:10]   Risk: 4 orders placed (2 SL + 2 TP)
+[14:05:10] ENTERED: IRON_BUTTERFLY (4 legs) | Net ₹161.95
+[14:10:01] Scheduled run | Active: True | Today: 2/4
+[14:15:01] Scheduled run | Active: True | Today: 2/4
+[14:20:01] Scheduled run | Active: True | Today: 2/4
+[14:25:01] Scheduled run | Active: True | Today: 2/4
+[14:30:02] Scheduled run | Active: True | Today: 2/4
+[14:35:02] Scheduled run | Active: True | Today: 2/4
+[14:40:01] Scheduled run | Active: True | Today: 2/4
+[14:45:02] Scheduled run | Active: True | Today: 2/4
+[14:50:01] Scheduled run | Active: True | Today: 2/4
+[14:55:01] Scheduled run | Active: True | Today: 2/4
+[14:55:10] Auto-exit after 50 min
+[14:55:10] EXIT (TIME_EXIT): P&L ₹1.85
+[15:00:01] Scheduled run | Active: False | Today: 2/4
+[15:00:10]   Regime: sideways → caution
+[15:00:10]   Strategy: IRON_BUTTERFLY wings=200 sl=0.25 tp=0.5
+[15:00:10]   Strategy: IRON_BUTTERFLY wings=200 sl=0.25 tp=0.5
+[15:00:10]   Contracts: NIFTY19MAY26C23700, NIFTY19MAY26P23700, NIFTY19MAY26P23500, NIFTY19MAY26C23900
+[15:00:10]   Execution: net_credit=₹164.3
+[15:00:10]   Risk: 4 orders placed (2 SL + 2 TP)
+[15:00:10] ENTERED: IRON_BUTTERFLY (4 legs) | Net ₹164.3
+[15:05:02] Scheduled run | Active: True | Today: 3/4
+[15:10:01] Scheduled run | Active: True | Today: 3/4
+[15:15:02] Scheduled run | Active: True | Today: 3/4
+[15:20:01] Scheduled run | Active: True | Today: 3/4
+[15:25:01] Scheduled run | Active: True | Today: 3/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 308, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 277, in main
+    if state["active_trade"] and not state["post_mortem_done"]:
+       ^^^^^
+UnboundLocalError: cannot access local variable 'state' where it is not associated with a value

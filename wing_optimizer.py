@@ -19,12 +19,71 @@ Usage:
 
 import json
 import os
+import time
+import logging
 from pathlib import Path
 from typing import Optional
+from datetime import datetime, timedelta
 
 MARGIN_FILE = Path("/home/trading_ceo/brahmand/data/margin_matrix.json")
-
 DUCKDB_V31 = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
+
+logger = logging.getLogger("WingOptimizer")
+
+
+def _check_margin_freshness(max_age_minutes: int = 60) -> tuple[bool, str]:
+    """Check if margin_matrix.json is fresh (not stale from yesterday)."""
+    if not MARGIN_FILE.exists():
+        return False, "margin_matrix.json not found"
+
+    # Check file timestamp
+    mtime = MARGIN_FILE.stat().st_mtime
+    age_min = (time.time() - mtime) / 60
+    if age_min > max_age_minutes:
+        return False, f"margin_matrix.json is {age_min:.0f}min old (stale)"
+
+    # Check JSON timestamp field
+    try:
+        data = json.loads(MARGIN_FILE.read_text())
+        if "timestamp" not in data:
+            return False, "margin_matrix.json missing timestamp field"
+        ts_str = data["timestamp"]
+        ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        age_sec = (datetime.now(ts.tzinfo) - ts).total_seconds() / 60
+        if age_sec > max_age_minutes:
+            return False, f"margin data is {age_sec:.0f}min old"
+        return True, f"margin data is {age_sec:.0f}min old ✓"
+    except Exception as e:
+        return False, f"timestamp parse error: {e}"
+
+
+def _check_premium_freshness(strike: int, otype: str, expiry: str, max_age_sec: int = 300) -> Optional[float]:
+    """Get premium only if data is fresh (< max_age_sec old)."""
+    try:
+        import duckdb
+
+        db = duckdb.connect(DUCKDB_V31, read_only=True)
+        row = db.execute(
+            "SELECT ltp, timestamp FROM option_snapshots "
+            "WHERE strike = ? AND option_type = ? AND expiry_date = ? "
+            "AND tsym IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
+            (strike, otype, expiry),
+        ).fetchone()
+        db.close()
+
+        if not row:
+            return None
+
+        ltp, ts_str = row
+        # Check if data is fresh
+        ts = datetime.fromisoformat(ts_str)
+        age_sec = (datetime.now() - ts).total_seconds()
+        if age_sec > max_age_sec:
+            logger.warning(f"Premium data too stale for {strike}{otype}: {age_sec:.0f}s old")
+            return None
+        return float(ltp)
+    except Exception:
+        return None
 
 
 def _get_premium(strike: int, otype: str, expiry: str) -> Optional[float]:
@@ -71,11 +130,11 @@ def get_optimal_wing(
     for spread in margins.get("spreads", []):
         if spread["type"] != spread_type:
             continue
-        if spread.get("margin") is None:
-            continue
+        if spread.get("margin") is None or spread.get("margin") <= 0:
+            continue  # Skip zero/negative margin
 
         buy_strike = spread["buy_strike"]
-        buy_premium = _get_premium(buy_strike, spread_type, expiry)
+        buy_premium = _check_premium_freshness(buy_strike, spread_type, expiry, max_age_sec=300)
         if buy_premium is None:
             continue
 
@@ -85,14 +144,21 @@ def get_optimal_wing(
         # Per-lot calculations (NIFTY lot = 65)
         lot = 65
         net_credit_ps = atm_premium - buy_premium  # per share
+
+        # Skip if no credit (or loss on entry)
+        if net_credit_ps <= 0:
+            continue  # Won't trade a debit spread
+
+        # Skip if risk is inverted/negative
+        if wing_width <= net_credit_ps:
+            continue  # Risk would be zero or negative
+
         reward = net_credit_ps * lot  # max gain per lot
         risk = (wing_width - net_credit_ps) * lot  # max loss per lot
-        roi_pct = round(reward / margin * 100, 2)  # return on margin
-        rr = (
-            round(net_credit_ps / (wing_width - net_credit_ps), 3)
-            if wing_width > net_credit_ps
-            else 0
-        )
+
+        # Safe division for ROI
+        roi_pct = round(reward / margin * 100, 2) if margin > 0 else 0
+        rr = round(net_credit_ps / (wing_width - net_credit_ps), 3)
 
         candidates.append(
             {
@@ -113,15 +179,23 @@ def get_optimal_wing(
     if not candidates:
         return None
 
-    # Score: 70% ROI + 30% RR, discount by wing_width (wider = more margin locked)
+    # Score: 70% ROI + 30% RR
     for c in candidates:
         c["score"] = round(c["roi_pct"] * 0.7 + c["rr"] * 100 * 0.3, 2)
 
-    # Filter by minimums
+    # Filter by minimums (strict criteria for live trading)
     valid = [c for c in candidates if c["roi_pct"] >= min_roi_pct and c["rr"] >= min_rr]
 
     if not valid:
-        # Relax criteria — pick best available
+        # No spreads meet criteria — log warning but still pick best
+        import logging
+        logger = logging.getLogger("WingOptimizer")
+        best_avail = max(candidates, key=lambda c: c["score"])
+        logger.warning(
+            f"⚠️  No {spread_type} spreads meet criteria (ROI>={min_roi_pct}%, RR>={min_rr}). "
+            f"Selecting best available: wing={best_avail['wing_width']}pt, "
+            f"ROI={best_avail['roi_pct']}%, RR={best_avail['rr']}"
+        )
         valid = candidates
 
     # Sort by score descending

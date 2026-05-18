@@ -131,12 +131,17 @@ def _build_position(
 
 def capture_margins() -> dict:
     """Capture margin matrix for all wing widths. Returns {atm, timestamp, spreads: [...]}."""
-    cred = _load_cred()
+    try:
+        cred = _load_cred()
+    except Exception as e:
+        logger.error(f"❌ Failed to load credentials: {e}")
+        return {"error": "cred_failed", "timestamp": datetime.now().isoformat()}
+
     atm = _get_atm()
     expiry = _get_expiry()
 
     if not atm:
-        logger.error("Cannot determine ATM — DuckDB empty?")
+        logger.error("❌ Cannot determine ATM — DuckDB empty?")
         return {"error": "no_atm", "timestamp": datetime.now().isoformat()}
 
     logger.info(f"ATM: {atm} | Expiry: {expiry}")
@@ -316,20 +321,38 @@ def main():
     args = parser.parse_args()
 
     if args.loop:
-        logger.info("Margin capture loop started (every 5 min)")
+        logger.info("Margin capture loop started (every 5 min during market hours)")
+        consecutive_failures = 0
         while True:
             now = datetime.now().strftime("%H:%M")
             if now <= MARKET_CLOSE:
                 try:
-                    capture_margins()
+                    result = capture_margins()
+                    if "error" in result:
+                        consecutive_failures += 1
+                        logger.error(f"❌ Capture error: {result['error']} (failure #{consecutive_failures})")
+                        if consecutive_failures >= 3:
+                            logger.critical(f"🚨 {consecutive_failures} consecutive failures — sending alert!")
+                    else:
+                        consecutive_failures = 0
+                        spreads_ok = sum(1 for s in result.get("spreads", []) if s.get("margin") is not None)
+                        logger.info(f"✅ Captured {spreads_ok}/10 spreads for ATM {result['atm']} (expiry: {result['expiry']})")
                 except Exception as e:
-                    logger.error(f"Capture failed: {e}")
+                    consecutive_failures += 1
+                    logger.error(f"❌ Capture exception: {e} (failure #{consecutive_failures})")
+                    if consecutive_failures >= 3:
+                        logger.critical(f"🚨 {consecutive_failures} consecutive failures — check API!")
             else:
-                logger.info("Market closed — exiting loop")
+                logger.info(f"✅ Market closed at {now} — exiting loop")
                 break
             time.sleep(300)
     else:
         res = capture_margins()
+        if "error" in res:
+            logger.error(f"❌ Error: {res['error']}")
+        else:
+            spreads_ok = sum(1 for s in res.get("spreads", []) if s.get("margin") is not None)
+            logger.info(f"✅ Captured {spreads_ok}/10 spreads")
         print(json.dumps(res, indent=2, default=str))
 
 
