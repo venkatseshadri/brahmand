@@ -81,10 +81,18 @@ def get_optimal_wing(
 
         wing_width = spread["wing_width"]
         margin = spread["margin"]
-        reward = atm_premium - buy_premium  # net credit per lot
-        risk = wing_width - reward  # max loss per lot
-        roi_pct = round(reward / margin * 100, 2)  # return on margin %
-        rr = round(reward / risk, 3) if risk > 0 else 0
+
+        # Per-lot calculations (NIFTY lot = 50)
+        lot = 50
+        net_credit_ps = atm_premium - buy_premium  # per share
+        reward = net_credit_ps * lot  # max gain per lot
+        risk = (wing_width - net_credit_ps) * lot  # max loss per lot
+        roi_pct = round(reward / margin * 100, 2)  # return on margin
+        rr = (
+            round(net_credit_ps / (wing_width - net_credit_ps), 3)
+            if wing_width > net_credit_ps
+            else 0
+        )
 
         candidates.append(
             {
@@ -141,10 +149,12 @@ def compare_wings(spread_type: str, atm: int, expiry: str) -> list[dict]:
 
         w = spread["wing_width"]
         m = spread["margin"]
-        reward = atm_premium - buy_premium
-        risk = w - reward
+        lot = 50
+        net_credit_ps = atm_premium - buy_premium
+        reward = net_credit_ps * lot
+        risk = (w - net_credit_ps) * lot
         roi = round(reward / m * 100, 2) if m > 0 else 0
-        rr = round(reward / risk, 3) if risk > 0 else 0
+        rr = round(net_credit_ps / (w - net_credit_ps), 3) if w > net_credit_ps else 0
 
         candidates.append(
             {
