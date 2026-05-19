@@ -177,10 +177,25 @@ def enter_trade(state: dict):
 
 
 def monitor_trade(state: dict):
-    """Monitor active trade — check SL/TP via DuckDB every run, adjust TSL."""
+    """Monitor active trade — check SL/TP, adjust TSL, detect MORPH."""
     trade = state["active_trade"]
     if not trade:
         return state
+
+    # ── Check for MORPH (signal change → add/remove side) ──
+    try:
+        from position_manager import run as pm_run
+        actions = pm_run(trade)
+        if actions:
+            for action in actions:
+                if action["type"] == "MORPH":
+                    _log(f"MORPH: {action['from_type']} → {action['to_type']} ({action['reason']})")
+                    # Execute the morph
+                    from position_manager import execute_action
+                    trade = execute_action(action, trade)
+                    state["active_trade"] = trade
+    except Exception as e:
+        _log(f"Position manager check failed: {str(e)[:80]}")
 
     from duckdb_tool import _connect
 
