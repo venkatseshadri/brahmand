@@ -71,10 +71,48 @@ def now_str():
     return datetime.now().strftime("%H:%M")
 
 
+def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> None:
+    """Ratchet SL downward as option decays (favorable for SELL).
+
+    TSL activates when current profit >= 25% of max TP profit.
+    Then locks portion of every favorable tick past the threshold (lock_ratio from pattern or default 0.5).
+    Only ratchets SL DOWN (never up) — locks in gains.
+    """
+    t = leg_type.lower()
+    sl = trade["sl"].get(t)
+    if not sl:
+        return
+
+    tp = trade["tp"].get(t, entry_price * 0.50)
+    max_profit = entry_price - tp  # full TP profit per share
+    current_profit = entry_price - ltp  # current profit per share
+
+    # TSL not yet active
+    if current_profit < max_profit * 0.25:
+        return
+
+    # Lock ratio can be overridden by pattern adaptation (from risk agent)
+    lock_ratio = trade.get("tsl_lock_ratio", 0.5)
+
+    # Lock portion of every favorable move past the 25% threshold
+    threshold_profit = max_profit * 0.25
+    excess = current_profit - threshold_profit
+    locked_profit = threshold_profit + (excess * lock_ratio)
+    new_sl = round(entry_price - locked_profit, 2)
+
+    # Only ratchet SL DOWN (more favorable = lower price for shorts to trigger)
+    if new_sl < sl:
+        old_sl = trade["sl"][t]
+        trade["sl"][t] = new_sl
+        _log(
+            f"TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} (lock_ratio={lock_ratio})"
+        )
+
+
 def is_market_hours() -> bool:
     t = datetime.now()
     return (
-        datetime.strptime("09:30", "%H:%M").time()
+        datetime.strptime("09:15", "%H:%M").time()
         <= t.time()
         <= datetime.strptime("15:30", "%H:%M").time()
     )
@@ -102,9 +140,20 @@ def enter_trade(state: dict):
     """Run 5-agent E2E chain. Regime Agent decides entry."""
     from e2e_chain import run_full_chain
 
+    # Capture entry gate output at entry time for pattern logging on exit
+    entry_scores = {}
     try:
-        sig = entry_scores.get("entry_combined_signal", None) if entry_scores else None
-        conf = entry_scores.get("entry_combined_confidence", 0) if entry_scores else 0
+        p = Path("/tmp/entry_check_latest.json")
+        if p.exists():
+            entry_scores = json.loads(p.read_text())
+    except Exception:
+        pass
+
+    try:
+        sig = entry_scores.get("signal") or entry_scores.get("entry_combined_signal")
+        conf = entry_scores.get("confidence", 0) or entry_scores.get(
+            "entry_combined_confidence", 0
+        )
         trade = run_full_chain(now_str(), entry_signal=sig, entry_confidence=conf)
     except Exception as e:
         _log(f"Chain failed: {e} — skipping this cycle")
@@ -116,6 +165,8 @@ def enter_trade(state: dict):
         _log(f"Regime: SKIP — {trade.get('regime', 'unknown')}")
         return state
 
+    # Store entry_scores on trade for pattern logging on exit
+    trade["entry_scores"] = entry_scores
     trade["monitored_since"] = now_str()
     state["active_trade"] = trade
     state["trades_today"] += 1
@@ -126,7 +177,7 @@ def enter_trade(state: dict):
 
 
 def monitor_trade(state: dict):
-    """Monitor active trade — check SL/TP via DuckDB every run."""
+    """Monitor active trade — check SL/TP via DuckDB every run, adjust TSL."""
     trade = state["active_trade"]
     if not trade:
         return state
@@ -152,6 +203,12 @@ def monitor_trade(state: dict):
             if ltp > 5000:
                 continue
 
+            # Apply TSL adjustment before SL/TP check
+            fill = leg.get("fill_price", ltp)
+            if ltp > 0:
+                _apply_tsl(trade, leg["type"], fill, ltp)
+
+            # Check SL/TP triggers
             if ltp > 0 and trade["sl"].get(t) and ltp >= trade["sl"][t]:
                 _log(f"SL HIT — {leg['tsym']}: LTP={ltp} >= {trade['sl'][t]}")
                 exit_trade(state, "SL_HIT")
