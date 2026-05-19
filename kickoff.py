@@ -340,18 +340,18 @@ def main():
         sys.exit(0)
 
     try:
+        state = load_state()
+        today = datetime.now().strftime("%Y%m%d")
+        if state["date"] != today:
+            state = load_state()  # Reset for new day
+            state["date"] = today
+
         if not is_market_hours():
             if state["active_trade"] and not state["post_mortem_done"]:
                 _log("Market closed — force-closing active trade")
                 exit_trade(state, "MARKET_CLOSE")
             _log("Market closed — exiting")
             return
-
-        state = load_state()
-        today = datetime.now().strftime("%Y%m%d")
-        if state["date"] != today:
-            state = load_state()  # Reset for new day
-            state["date"] = today
 
         max_t = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
         _log(

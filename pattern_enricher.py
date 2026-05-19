@@ -393,20 +393,24 @@ def main():
 
     import duckdb
 
-    db = duckdb.connect(str(V4_DB))
-
     if args.all:
         args.limit = 100000
 
     if args.live:
-        logger.info("Live mode — enriching every 5 min")
+        logger.info("Live mode — enriching every 5 min (new connection per cycle)")
         while True:
-            enrich_bars(db, limit=50)
+            try:
+                # Create fresh connection for each cycle to avoid lock conflicts
+                db = duckdb.connect(str(V4_DB))
+                enrich_bars(db, limit=50)
+                db.close()
+            except Exception as e:
+                logger.warning(f"Enrichment cycle failed: {str(e)[:100]}")
             time.sleep(300)
     else:
+        db = duckdb.connect(str(V4_DB))
         enrich_bars(db, limit=args.limit)
-
-    db.close()
+        db.close()
 
 
 if __name__ == "__main__":
