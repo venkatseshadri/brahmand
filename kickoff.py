@@ -104,6 +104,22 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
     if new_sl < sl:
         old_sl = trade["sl"][t]
         trade["sl"][t] = new_sl
+        shift_pct = round((old_sl - new_sl) / old_sl * 100, 1)
+
+        # Capture TSL history for RL analysis
+        if "tsl_history" not in trade:
+            trade["tsl_history"] = []
+        trade["tsl_history"].append({
+            "timestamp": datetime.now().isoformat(),
+            "leg": leg_type,
+            "old_sl": old_sl,
+            "new_sl": new_sl,
+            "shift_pct": shift_pct,
+            "lock_ratio": lock_ratio,
+            "current_profit": round(current_profit, 2),
+            "threshold_profit": round(threshold_profit, 2)
+        })
+
         _log(
             f"TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} (lock_ratio={lock_ratio})"
         )
