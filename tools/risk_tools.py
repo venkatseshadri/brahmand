@@ -604,3 +604,314 @@ class OrderAdjusterTool(BaseTool):
             return json.dumps(
                 {"status": "ERROR", "mode": "LIVE", "error": str(e)[:300]}
             )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MISSING TOOLS 1-4: SL/TP Placement & Cancellation
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class PlaceSLInput(BaseModel):
+    tsym: str = Field(..., description="Trading symbol (e.g., NIFTY14MAY202623650CE)")
+    trigger_price: float = Field(..., description="SL trigger price (premium × 1.50)")
+    quantity: int = Field(default=65, description="Quantity per leg (default 1 lot = 65)")
+    order_id_tag: str = Field(default="", description="Optional tag for audit")
+
+
+class PlaceSLOrderTool(BaseTool):
+    name: str = "place_sl_order"
+    description: str = (
+        "Place an SL-LMT (stop-loss limit) order for a SELL leg. "
+        "Triggers when option LTP rises to trigger_price (SL = entry_premium × 1.50). "
+        "In simulation: logs mock order. In live: calls Shoonya api.place_order with SL-LMT."
+    )
+    args_schema: Type[BaseModel] = PlaceSLInput
+
+    def _run(
+        self, tsym: str, trigger_price: float, quantity: int = 65, order_id_tag: str = ""
+    ) -> str:
+        from tools.execution_tools import _get_api as _get_broker_api
+
+        api, is_sim = _get_broker_api()
+        order_id = f"SL-{tsym}-{int(trigger_price)}-{order_id_tag or 'AUTO'}"
+
+        if is_sim:
+            return json.dumps(
+                {
+                    "status": "PLACED",
+                    "mode": "SIMULATION",
+                    "order_id": order_id,
+                    "tsym": tsym,
+                    "trigger_price": round(trigger_price, 2),
+                    "quantity": quantity,
+                    "type": "SL-LMT",
+                    "audit": f"SL placed: {tsym} trigger={trigger_price:.2f}",
+                },
+                indent=2,
+            )
+
+        try:
+            resp = api.place_order(
+                buy_or_sell="B",
+                product_type="H",
+                exchange="NFO",
+                tradingsymbol=tsym,
+                quantity=quantity,
+                discloseqty=0,
+                price_type="SL-LMT",
+                price=trigger_price,
+                trigger_price=trigger_price,
+                retention="DAY",
+                remarks="SL",
+            )
+            return json.dumps(
+                {
+                    "status": resp.get("stat", "ERROR"),
+                    "mode": "LIVE",
+                    "order_id": resp.get("norenordno"),
+                    "tsym": tsym,
+                    "trigger_price": round(trigger_price, 2),
+                },
+                indent=2,
+            )
+        except Exception as e:
+            return json.dumps({"status": "ERROR", "error": str(e)[:200]}, indent=2)
+
+
+class PlaceTPInput(BaseModel):
+    tsym: str = Field(..., description="Trading symbol")
+    limit_price: float = Field(..., description="TP trigger price (premium × 0.50)")
+    quantity: int = Field(default=65, description="Quantity per leg (default 1 lot = 65)")
+    order_id_tag: str = Field(default="", description="Optional tag for audit")
+
+
+class PlaceTPOrderTool(BaseTool):
+    name: str = "place_tp_order"
+    description: str = (
+        "Place a TP (take-profit limit) order for a SELL leg. "
+        "Triggers when option LTP drops to limit_price (TP = entry_premium × 0.50). "
+        "In simulation: logs mock order. In live: calls Shoonya api.place_order with LMT."
+    )
+    args_schema: Type[BaseModel] = PlaceTPInput
+
+    def _run(
+        self, tsym: str, limit_price: float, quantity: int = 65, order_id_tag: str = ""
+    ) -> str:
+        from tools.execution_tools import _get_api as _get_broker_api
+
+        api, is_sim = _get_broker_api()
+        order_id = f"TP-{tsym}-{int(limit_price)}-{order_id_tag or 'AUTO'}"
+
+        if is_sim:
+            return json.dumps(
+                {
+                    "status": "PLACED",
+                    "mode": "SIMULATION",
+                    "order_id": order_id,
+                    "tsym": tsym,
+                    "limit_price": round(limit_price, 2),
+                    "quantity": quantity,
+                    "type": "LIMIT",
+                    "audit": f"TP placed: {tsym} limit={limit_price:.2f}",
+                },
+                indent=2,
+            )
+
+        try:
+            resp = api.place_order(
+                buy_or_sell="B",
+                product_type="H",
+                exchange="NFO",
+                tradingsymbol=tsym,
+                quantity=quantity,
+                discloseqty=0,
+                price_type="LMT",
+                price=limit_price,
+                retention="DAY",
+                remarks="TP",
+            )
+            return json.dumps(
+                {
+                    "status": resp.get("stat", "ERROR"),
+                    "mode": "LIVE",
+                    "order_id": resp.get("norenordno"),
+                    "tsym": tsym,
+                    "limit_price": round(limit_price, 2),
+                },
+                indent=2,
+            )
+        except Exception as e:
+            return json.dumps({"status": "ERROR", "error": str(e)[:200]}, indent=2)
+
+
+class ModifySLInput(BaseModel):
+    order_id: str = Field(..., description="Norenordno of existing SL order")
+    tsym: str = Field(..., description="Trading symbol")
+    new_trigger_price: float = Field(..., description="New TSL level (lower = more favorable)")
+
+
+class ModifySLOrderTool(BaseTool):
+    name: str = "modify_sl_order"
+    description: str = (
+        "Modify an existing SL order to a new trigger price (TSL adjustment). "
+        "Only ratchets SL DOWN (favorable moves). Calls order_adjuster API in live mode."
+    )
+    args_schema: Type[BaseModel] = ModifySLInput
+
+    def _run(self, order_id: str, tsym: str, new_trigger_price: float) -> str:
+        from tools.execution_tools import _get_api as _get_broker_api
+
+        api, is_sim = _get_broker_api()
+
+        if is_sim:
+            return json.dumps(
+                {
+                    "status": "MODIFIED",
+                    "mode": "SIMULATION",
+                    "order_id": order_id,
+                    "tsym": tsym,
+                    "new_trigger_price": round(new_trigger_price, 2),
+                    "reason": "TSL_UPDATE",
+                    "audit": f"TSL adjusted: {tsym} trigger→{new_trigger_price:.2f}",
+                },
+                indent=2,
+            )
+
+        try:
+            resp = api.modify_order(
+                orderno=order_id,
+                tradingsymbol=tsym,
+                newprice=0,
+                newtrigger_price=new_trigger_price,
+                exchange="NFO",
+            )
+            return json.dumps(
+                {
+                    "status": resp.get("stat", "ERROR"),
+                    "mode": "LIVE",
+                    "order_id": order_id,
+                    "new_trigger_price": round(new_trigger_price, 2),
+                },
+                indent=2,
+            )
+        except Exception as e:
+            return json.dumps({"status": "ERROR", "error": str(e)[:200]}, indent=2)
+
+
+class CancelOrderInput(BaseModel):
+    order_id: str = Field(..., description="Norenordno to cancel")
+    cancel_reason: str = Field(
+        default="TP_FILLED",
+        description="Reason: TP_FILLED, SL_FILLED, or MANUAL. For audit trail.",
+    )
+
+
+class CancelOrderTool(BaseTool):
+    name: str = "cancel_sl_order"
+    description: str = (
+        "Cancel an SL or TP order at the broker. Used when one side fills — "
+        "immediately cancel the other side to prevent pyramid. "
+        "In simulation: logs mock cancel. In live: calls api.cancel_order."
+    )
+    args_schema: Type[BaseModel] = CancelOrderInput
+
+    def _run(self, order_id: str, cancel_reason: str = "TP_FILLED") -> str:
+        from tools.execution_tools import _get_api as _get_broker_api
+
+        api, is_sim = _get_broker_api()
+
+        if is_sim:
+            return json.dumps(
+                {
+                    "status": "CANCELLED",
+                    "mode": "SIMULATION",
+                    "order_id": order_id,
+                    "reason": cancel_reason,
+                    "audit": f"OCO cancel: {cancel_reason}",
+                },
+                indent=2,
+            )
+
+        try:
+            resp = api.cancel_order(orderno=order_id)
+            return json.dumps(
+                {
+                    "status": resp.get("stat", "ERROR"),
+                    "mode": "LIVE",
+                    "order_id": order_id,
+                    "reason": cancel_reason,
+                },
+                indent=2,
+            )
+        except Exception as e:
+            return json.dumps({"status": "ERROR", "error": str(e)[:200]}, indent=2)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TOOL 6: Pattern Query — RL via 6-TF Traffic Light
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+def _pattern_to_risk_guidance(result: dict, horizon: str) -> dict:
+    """Convert pattern probabilities to actionable risk parameters."""
+    up = result.get(f"up_{horizon}", 0) or 0
+    down = result.get(f"down_{horizon}", 0) or 0
+    side = result.get(f"side_{horizon}", 0) or 0
+    conf = result.get("confidence", 0) or 0
+
+    if conf >= 70:
+        if up >= 0.65:
+            return {"sl_pct": 0.35, "tsl_lock_ratio": 0.7, "bias": "BULLISH_STRONG"}
+        if down >= 0.65:
+            return {"sl_pct": 0.35, "tsl_lock_ratio": 0.7, "bias": "BEARISH_STRONG"}
+    if conf >= 50:
+        if side >= 0.55:
+            return {"sl_pct": 0.55, "tsl_lock_ratio": 0.4, "bias": "SIDEWAYS"}
+        return {"sl_pct": 0.50, "tsl_lock_ratio": 0.5, "bias": "NEUTRAL"}
+    return {"sl_pct": 0.60, "tsl_lock_ratio": 0.3, "bias": "UNCERTAIN"}
+
+
+class PatternQueryInput(BaseModel):
+    index: str = Field(default="NIFTY", description="Index symbol")
+    horizon: str = Field(
+        default="15m", description="Prediction horizon: 5m/15m/30m/1h/4h"
+    )
+
+
+class PatternQueryTool(BaseTool):
+    name: str = "query_pattern"
+    description: str = (
+        "Get the current 6-TF traffic light pattern (e.g GRGRGG) and historical "
+        "outcome probabilities. Pattern positions: [0]=daily [1]=4H [2]=1H [3]=30m [4]=15m [5]=5m. "
+        "G=green candle (bullish), R=red candle (bearish). "
+        "Returns P(UP), P(DOWN), P(SIDE) and confidence for the given horizon. "
+        "Use this for RL: trending → tighten SL (lock gains), sideways → widen SL (avoid noise)."
+    )
+    args_schema: Type[BaseModel] = PatternQueryInput
+
+    def _run(self, index: str = "NIFTY", horizon: str = "15m") -> str:
+        try:
+            from pattern_analyzer import PatternAnalyzer
+
+            pa = PatternAnalyzer(min_samples=5)
+            result = pa.predict_live()
+            if result is None:
+                return json.dumps(
+                    {"status": "no_data", "reason": "market_data_multitf empty"}
+                )
+
+            h = horizon
+            out = {
+                "pattern": result.get("pattern", "------"),
+                "n_samples": result.get("n_samples", 0),
+                "prediction": result.get("prediction", "SIDE"),
+                "confidence": result.get("confidence", 0),
+                "horizon": h,
+                f"up_{h}": result.get(f"up_{h}"),
+                f"down_{h}": result.get(f"down_{h}"),
+                f"side_{h}": result.get(f"side_{h}"),
+                "risk_guidance": _pattern_to_risk_guidance(result, h),
+            }
+            return json.dumps(out, indent=2)
+        except Exception as e:
+            return json.dumps({"status": "error", "error": str(e)[:200]})

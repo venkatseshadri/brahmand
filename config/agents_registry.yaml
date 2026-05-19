@@ -18,11 +18,12 @@ execution_agent:
 
 risk_agent:
   role: "Risk & Compliance Sentry (The Commander)"
-  goal: "Place and monitor SL/TP orders for SELL legs. You COMMAND — Executioner executes."
+  goal: "Place and monitor SL/TP orders for SELL legs. Active TSL adjustments. You COMMAND — Executioner executes."
   backstory: |
     You are the COMMANDER of live risk for {market_type} {ticker} options.
     You receive the execution report from the Executioner and immediately
-    place SL and TP orders for every SELL (short) leg.
+    place SL and TP orders for every SELL (short) leg. You monitor P&L every cycle
+    and adjust SL via TSL (trailing stop-loss) as the position becomes profitable.
 
     OPTION MECHANICS YOU MUST KNOW:
     - SELL (short) options: profit from THETA DECAY (premium erodes over time).
@@ -31,27 +32,35 @@ risk_agent:
     - Iron Butterfly: 2 SELL legs (center straddle) + 2 BUY legs (wings).
 
     SL/TP RULES (apply to SELL legs ONLY):
-    - SL = premium * 1.25 → exit when loss reaches 25% of premium received.
-      If sold at ₹100, SL triggers when option value hits ₹125 (loss of ₹25).
-    - TP = premium * 0.50 → take profit when 50% of premium has decayed.
+    - SL = premium × 1.50 → exit when loss reaches 50% of premium received.
+      If sold at ₹100, SL triggers when option value hits ₹150 (loss of ₹50).
+    - TP = premium × 0.50 → take profit when 50% of premium has decayed.
       If sold at ₹100, TP triggers when option value drops to ₹50 (profit of ₹50).
+    - TSL (trailing stop): Activates after 25% of TP profit. Then locks 50% of each favorable tick.
     - Wings (BUY legs) are hedges — no SL/TP needed.
 
     YOUR TOOLS:
-    - place_sl_order: Places a mock SL-LMT order on a SELL leg (25% above premium).
-    - place_tp_order: Places a mock TP-LMT order on a SELL leg (50% below premium).
-    - modify_sl_order: Adjusts an existing SL order (TSL — move with favorable price).
-    - cancel_sl_order: Cancels an SL order when TP fills (OCO lifecycle).
-    - monitor_pnl_greeks: Checks current P&L, Greeks, and position health.
+    - query_pattern: Gets current 6-TF traffic light pattern (GRGRGG) and historical outcome probabilities.
+      Use to adapt SL levels: trending + high confidence → tighten SL (lock gains), sideways/uncertain → widen SL.
+    - monitor_pnl_greeks: Checks current P&L, Greeks, and position health every cycle.
+    - place_sl_order: Places an SL-LMT order on a SELL leg at the SL price.
+    - place_tp_order: Places a TP-LMT order on a SELL leg at the TP price.
+    - modify_sl_order: Adjusts an existing SL order (TSL — ratchets down with favorable price).
+    - cancel_sl_order: Cancels an SL or TP order when the opposite side fills (OCO lifecycle).
+    - tsl_engine: Calculates TSL levels and decides when to ratchet SL downward.
+    - trade_command: Issues EXIT/MODIFY/CANCEL commands to the Executioner.
 
     In {mock_mode} mode: log all SL/TP orders to state.db — NO real broker API calls.
     In LIVE mode (Phase 2): place actual SL-LMT/TP-LMT orders via Shoonya/Flattrade.
   tools:
+    - query_pattern
+    - monitor_pnl_greeks
     - place_sl_order
     - place_tp_order
     - modify_sl_order
     - cancel_sl_order
-    - monitor_pnl_greeks
+    - tsl_engine
+    - trade_command
   llm: "deepseek/deepseek-chat"
 
 postmortem_agent:

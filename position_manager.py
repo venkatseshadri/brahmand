@@ -71,6 +71,58 @@ def _load_entry_signal() -> dict:
     return {"signal": "NEUTRAL", "confidence": 0}
 
 
+def _pattern_risk_adjust(trade: dict) -> None:
+    """P3.5: Adapt SL/TP and TSL lock ratio based on current traffic light pattern.
+
+    Runs every 5-min monitoring cycle. Learning: as data accumulates, predict_live()
+    gets more confident → SL/TP adjustments become tighter/wider based on regime.
+    """
+    try:
+        from pattern_analyzer import PatternAnalyzer
+
+        pa = PatternAnalyzer(min_samples=5)
+        result = pa.predict_live()
+        if result is None or result.get("status") == "insufficient_data":
+            return
+
+        conf = result.get("confidence", 0) or 0
+        if conf < 50:
+            return  # Not enough confidence to adapt
+
+        up = result.get("up_15m", 0) or 0
+        down = result.get("down_15m", 0) or 0
+        side = result.get("side_15m", 0) or 0
+        current_type = _classify_position(trade)
+
+        # Directional agreement: pattern agrees with position → tighten SL (protect gains)
+        if (current_type == "BULLISH" and up >= 0.65) or (
+            current_type == "BEARISH" and down >= 0.65
+        ):
+            new_sl_pct = 0.35
+            new_tsl = 0.7
+        elif side >= 0.60:
+            # Sideways → iron fly regime, keep wider SL to avoid noise exits
+            new_sl_pct = 0.60
+            new_tsl = 0.4
+        else:
+            return  # No strong signal, don't adapt
+
+        # Update SL levels in-place for all SELL legs
+        for leg in trade.get("legs", []):
+            if leg["action"] != "SELL":
+                continue
+            t = leg["type"].lower()
+            fill = leg.get("fill_price", 0)
+            if fill and trade["sl"].get(t):
+                trade["sl"][t] = round(fill * (1 + new_sl_pct), 2)
+
+        trade["tsl_lock_ratio"] = new_tsl
+        trade["pattern_confidence"] = conf
+
+    except Exception:
+        pass  # Never block position manager for pattern errors
+
+
 def run(trade: dict, entry_scores: dict = None) -> list[dict]:
     """
     Main entry point. Called from kickoff.py every 5 min.
@@ -183,6 +235,9 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
                     "reason": f"Signal {current_position_type} → {new_signal}",
                 }
             )
+
+        # ── P3.5: Pattern-driven risk adjustment ──
+        _pattern_risk_adjust(trade)
 
         # ── P4: SL check ──
         for ld in legs_data:
@@ -330,48 +385,188 @@ def execute_action(action: dict, trade: dict) -> dict:
 
     if action["type"] == MORPH:
         trade["morph_count"] = trade.get("morph_count", 0) + 1
-        # Morph execution is complex — placeholder for now
-        pass
+        from_type = action.get("from_type", "NEUTRAL")
+        to_type = action.get("to_type", "NEUTRAL")
+        legs = action.get("legs", trade.get("legs", []))
+
+        # ── Scenario 1: BULLISH → NEUTRAL (Add CALL_SPREAD) ──
+        if from_type == "BULLISH" and to_type == "NEUTRAL":
+            atm = _get_atm_from_legs(legs)
+            expiry = trade.get("expiry", "")
+            if atm > 0 and expiry:
+                # Add SELL CE and BUY CE (protection)
+                sell_ce_fill = 40.0  # Estimate
+                buy_ce_fill = 30.0
+                trade["legs"].extend([
+                    {
+                        "action": "SELL",
+                        "strike": atm,
+                        "type": "CE",
+                        "fill_price": sell_ce_fill,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
+                    },
+                    {
+                        "action": "BUY",
+                        "strike": atm + WING_BUTTERFLY,
+                        "type": "CE",
+                        "fill_price": buy_ce_fill,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_BUTTERFLY}C",
+                    },
+                ])
+                trade["sl"]["ce"] = round(sell_ce_fill * (1 + SL_PCT), 2)
+                trade["tp"]["ce"] = round(sell_ce_fill * (1 - TP_PCT), 2)
+
+        # ── Scenario 2: BEARISH → NEUTRAL (Add PUT_SPREAD) ──
+        elif from_type == "BEARISH" and to_type == "NEUTRAL":
+            atm = _get_atm_from_legs(legs)
+            expiry = trade.get("expiry", "")
+            if atm > 0 and expiry:
+                # Add SELL PE and BUY PE (protection)
+                sell_pe_fill = 40.0
+                buy_pe_fill = 30.0
+                trade["legs"].extend([
+                    {
+                        "action": "SELL",
+                        "strike": atm,
+                        "type": "PE",
+                        "fill_price": sell_pe_fill,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
+                    },
+                    {
+                        "action": "BUY",
+                        "strike": atm - WING_BUTTERFLY,
+                        "type": "PE",
+                        "fill_price": buy_pe_fill,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_BUTTERFLY}P",
+                    },
+                ])
+                trade["sl"]["pe"] = round(sell_pe_fill * (1 + SL_PCT), 2)
+                trade["tp"]["pe"] = round(sell_pe_fill * (1 - TP_PCT), 2)
+
+        # ── Scenario 3: NEUTRAL → BULLISH (Close CALL_SPREAD, keep PUT) ──
+        elif from_type == "NEUTRAL" and to_type == "BULLISH":
+            # Close CE legs (both SELL and BUY)
+            ce_legs = [l for l in trade.get("legs", []) if l["type"] == "CE"]
+            pnl_ce = 0
+            for leg in ce_legs:
+                # Get current LTP (estimate from fill price if not available)
+                ltp = leg.get("ltp", leg.get("fill_price", 0))
+                if leg["action"] == "SELL":
+                    pnl_ce += leg["fill_price"] - ltp
+                else:
+                    pnl_ce += ltp - leg["fill_price"]
+            trade["cumulative_pnl"] += pnl_ce
+            # Remove CE legs
+            trade["legs"] = [l for l in trade.get("legs", []) if l["type"] != "CE"]
+            # Clear CE SL/TP
+            trade["sl"]["ce"] = None
+            trade["tp"]["ce"] = None
+
+        # ── Scenario 4: NEUTRAL → BEARISH (Close PUT_SPREAD, keep CALL) ──
+        elif from_type == "NEUTRAL" and to_type == "BEARISH":
+            # Close PE legs (both SELL and BUY)
+            pe_legs = [l for l in trade.get("legs", []) if l["type"] == "PE"]
+            pnl_pe = 0
+            for leg in pe_legs:
+                ltp = leg.get("ltp", leg.get("fill_price", 0))
+                if leg["action"] == "SELL":
+                    pnl_pe += leg["fill_price"] - ltp
+                else:
+                    pnl_pe += ltp - leg["fill_price"]
+            trade["cumulative_pnl"] += pnl_pe
+            # Remove PE legs
+            trade["legs"] = [l for l in trade.get("legs", []) if l["type"] != "PE"]
+            # Clear PE SL/TP
+            trade["sl"]["pe"] = None
+            trade["tp"]["pe"] = None
+
+        # ── Scenario 5: BULLISH → BEARISH (Close PUT, add CALL) ──
+        elif from_type == "BULLISH" and to_type == "BEARISH":
+            # Close PE legs
+            pe_legs = [l for l in trade.get("legs", []) if l["type"] == "PE"]
+            pnl_pe = 0
+            for leg in pe_legs:
+                ltp = leg.get("ltp", leg.get("fill_price", 0))
+                if leg["action"] == "SELL":
+                    pnl_pe += leg["fill_price"] - ltp
+                else:
+                    pnl_pe += ltp - leg["fill_price"]
+            trade["cumulative_pnl"] += pnl_pe
+            trade["legs"] = [l for l in trade.get("legs", []) if l["type"] != "PE"]
+            trade["sl"]["pe"] = None
+            trade["tp"]["pe"] = None
+
+            # Add CALL_SPREAD
+            atm = _get_atm_from_legs(legs)
+            expiry = trade.get("expiry", "")
+            if atm > 0 and expiry:
+                trade["legs"].extend([
+                    {
+                        "action": "SELL",
+                        "strike": atm,
+                        "type": "CE",
+                        "fill_price": 40.0,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
+                    },
+                    {
+                        "action": "BUY",
+                        "strike": atm + WING_SPREAD,
+                        "type": "CE",
+                        "fill_price": 30.0,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_SPREAD}C",
+                    },
+                ])
+                trade["sl"]["ce"] = round(40.0 * (1 + SL_PCT), 2)
+                trade["tp"]["ce"] = round(40.0 * (1 - TP_PCT), 2)
+
+        # ── Scenario 6: BEARISH → BULLISH (Close CALL, add PUT) ──
+        elif from_type == "BEARISH" and to_type == "BULLISH":
+            # Close CE legs
+            ce_legs = [l for l in trade.get("legs", []) if l["type"] == "CE"]
+            pnl_ce = 0
+            for leg in ce_legs:
+                ltp = leg.get("ltp", leg.get("fill_price", 0))
+                if leg["action"] == "SELL":
+                    pnl_ce += leg["fill_price"] - ltp
+                else:
+                    pnl_ce += ltp - leg["fill_price"]
+            trade["cumulative_pnl"] += pnl_ce
+            trade["legs"] = [l for l in trade.get("legs", []) if l["type"] != "CE"]
+            trade["sl"]["ce"] = None
+            trade["tp"]["ce"] = None
+
+            # Add PUT_SPREAD
+            atm = _get_atm_from_legs(legs)
+            expiry = trade.get("expiry", "")
+            if atm > 0 and expiry:
+                trade["legs"].extend([
+                    {
+                        "action": "SELL",
+                        "strike": atm,
+                        "type": "PE",
+                        "fill_price": 40.0,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
+                    },
+                    {
+                        "action": "BUY",
+                        "strike": atm - WING_SPREAD,
+                        "type": "PE",
+                        "fill_price": 30.0,
+                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_SPREAD}P",
+                    },
+                ])
+                trade["sl"]["pe"] = round(40.0 * (1 + SL_PCT), 2)
+                trade["tp"]["pe"] = round(40.0 * (1 - TP_PCT), 2)
 
     return trade
 
-    if action["type"] in (ROLL, TIGHTEN):
-        leg = action["leg"]
-        # Paper: close old leg at current LTP
-        old_pnl = (
-            leg["fill"] - leg["ltp"]
-            if leg["action"] == "SELL"
-            else leg["ltp"] - leg["fill"]
-        )
-        trade.setdefault("cumulative_pnl", 0)
-        trade["cumulative_pnl"] += old_pnl
-        # Remove old leg
-        trade["legs"] = [
-            l
-            for l in trade["legs"]
-            if not (l["strike"] == leg["strike"] and l["type"] == leg["type"])
-        ]
-        # Add new leg at synthetic fill (current ATM premium estimate)
-        new_fill = (
-            leg["ltp"] * 0.85 if leg["action"] == "SELL" else leg["ltp"] * 1.15
-        )  # rough
-        trade["legs"].append(
-            {
-                "action": leg["action"],
-                "strike": action["new_strike"],
-                "type": leg["type"],
-                "fill_price": round(new_fill, 2),
-                "tsym": f"NIFTY{trade.get('expiry', '').replace('-', '')}{leg['type']}{action['new_strike']}",
-            }
-        )
 
-    if action["type"] == MORPH:
-        trade["morph_count"] = trade.get("morph_count", 0) + 1
-        # Morph execution is complex — placeholder for now
-        # Will add/remove sides based on signal transition
-        pass
-
-    return trade
+def _get_atm_from_legs(legs: list) -> int:
+    """Extract ATM strike from legs (all legs at ATM have same strike for sold legs)."""
+    sold_legs = [l for l in legs if l.get("action") == "SELL"]
+    if sold_legs:
+        return sold_legs[0].get("strike", 0)
+    return 0
 
 
 if __name__ == "__main__":

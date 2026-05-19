@@ -1,0 +1,40 @@
+2026-05-19 09:00:02,313 | INFO     | Live mode — enriching every 5 min
+2026-05-19 09:00:03,425 | INFO     | Enriched 0/50 patterns
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 413, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 396, in main
+    db = duckdb.connect(str(V4_DB))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1621043) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+2026-05-19 09:05:04,759 | INFO     | Enriched 0/50 patterns
+Terminated
+2026-05-19 09:10:03,446 | INFO     | Live mode — enriching every 5 min
+2026-05-19 09:10:04,728 | INFO     | Enriched 0/50 patterns
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 413, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 396, in main
+    db = duckdb.connect(str(V4_DB))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1622240) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+2026-05-19 09:15:04,904 | INFO     | Enriched 0/50 patterns
+Killed
+2026-05-19 09:20:02,743 | INFO     | Live mode — enriching every 5 min
+2026-05-19 09:20:03,507 | INFO     | Enriched 1/50 patterns
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 413, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 396, in main
+    db = duckdb.connect(str(V4_DB))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1624144) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+2026-05-19 09:25:04,044 | INFO     | Enriched 0/50 patterns
+Killed
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 413, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/pattern_enricher.py", line 396, in main
+    db = duckdb.connect(str(V4_DB))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_duckdb.IOException: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 1625214) by user root. However, you would be able to open this database in read-only mode, e.g. by using the -readonly parameter in the CLI. See also https://duckdb.org/docs/stable/connect/concurrency

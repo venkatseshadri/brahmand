@@ -147,7 +147,7 @@ def run_full_chain(
     strategy = {
         "strategy_type": default_strategy,
         "wing_width": default_wings,
-        "sl_pct": 0.25,
+        "sl_pct": 0.50,
         "tp_pct": 0.50,
         "entry_delay": 5,
         "entry_signal": entry_signal or "NEUTRAL",

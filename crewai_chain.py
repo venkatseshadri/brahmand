@@ -61,6 +61,16 @@ def run_crewai_chain(trade: dict) -> dict:
     executor.llm = llm
 
     # ── Risk Agent ───────────────────────────────────────────────────
+    from tools.risk_tools import (
+        TSLEngineTool,
+        TradeCommandHandlerTool,
+        PlaceSLOrderTool,
+        PlaceTPOrderTool,
+        ModifySLOrderTool,
+        CancelOrderTool,
+        PatternQueryTool,
+    )
+
     risk = af.create_agent(
         "risk_agent",
         {
@@ -71,7 +81,16 @@ def run_crewai_chain(trade: dict) -> dict:
             "max_lots": 1,
             "mock_mode": "DRY-RUN",
         },
-        tools=[MonitorPnLGreeksTool()],
+        tools=[
+            PatternQueryTool(),
+            MonitorPnLGreeksTool(),
+            TSLEngineTool(),
+            TradeCommandHandlerTool(),
+            PlaceSLOrderTool(),
+            PlaceTPOrderTool(),
+            ModifySLOrderTool(),
+            CancelOrderTool(),
+        ],
     )
     risk.llm = llm
 
@@ -88,12 +107,22 @@ strikes, sl_level, tp_level. Use the actual fill prices from above.""",
 
     # ── Task 2: Risk (context from Execution) ────────────────────────
     risk_task = Task(
-        description=f"""Validate the TradeSignal above against RiskLimits.
-Trade info: net_credit=₹{trade["net_credit"]}, VIX={trade["vix"]}, spot={trade["spot_at_entry"]}
-SL for each SELL leg: premium × 1.25. TP: premium × 0.50.
+        description=f"""You are the Risk Sentry. The Executioner has placed these legs:
+{json.dumps(trade["legs"], default=str)}
 
-Log each SL and TP order as mock to state.db. Output risk_decision JSON.""",
-        expected_output="Risk decision JSON with SL/TP orders",
+Risk Limits: net_credit=₹{trade["net_credit"]}, VIX={trade["vix"]}, spot={trade["spot_at_entry"]}
+SL levels (premium × 1.50): {trade["sl"]}
+TP levels (premium × 0.50): {trade["tp"]}
+Expiry: {trade["expiry"]}
+
+STEP 1: Call query_pattern to get 6-TF traffic light pattern + P(UP/DOWN/SIDE) for 15m horizon.
+        Use risk_guidance to set SL/TP adaptation: trending → tighten SL, sideways → widen SL.
+STEP 2: Call monitor_pnl_greeks with these legs to get current P&L + Greeks.
+STEP 3: For each SELL leg, call place_sl_order at SL price (from pattern guidance) and place_tp_order at TP price.
+STEP 4: Call tsl_engine with entry_price and current_price for each SELL leg.
+STEP 5: If TSL decision=TRAIL, call modify_sl_order with new tsl_level.
+STEP 6: Output risk_decision JSON with all order_ids, pattern guidance, P&L, and TSL status.""",
+        expected_output="Risk decision JSON with pattern-driven SL/TP, order IDs, and TSL monitoring active",
         agent=risk,
         context=[exec_task],  # ← Risk receives Execution's TradeSignal
     )

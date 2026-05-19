@@ -306,9 +306,9 @@ def log_trade_pattern(trade: dict) -> bool:
         exit_reason = trade.get("exit_reason", "UNKNOWN")
 
         es = trade.get("entry_scores", {})
-        trend_sig = es.get("entry_trend_signal", "?")
-        tl_sig = es.get("entry_traffic_light_signal", "?")
-        conf = es.get("entry_combined_confidence", 0)
+        trend_sig = es.get("trend_signal") or es.get("entry_trend_signal") or "?"
+        tl_sig = es.get("traffic_light_signal") or es.get("entry_traffic_light_signal") or "?"
+        conf = es.get("confidence", 0) or es.get("entry_combined_confidence", 0)
 
         # ── Look up pattern by querying raw bars at nearest timestamp ──
         from datetime import datetime as dt, timedelta
