@@ -15,7 +15,7 @@
 | 3 | Negative credit spreads accepted | No validation for net_credit_ps ≤ 0 | Added `if net_credit_ps <= 0: continue` | Only positive-credit spreads considered |
 | 4 | Inverted risk spreads | No check for wing_width ≤ net_credit_ps | Added `if wing_width <= net_credit_ps: continue` | Risk/reward validation enforced |
 | 5 | Stale premium data (up to 60min old) | No freshness check on option LTPs | Added _check_premium_freshness() (max 5 min old) | Fresh data guaranteed for SL/TP decisions |
-| 6 | MORPH execution missing entirely | execute_action() was placeholder only | Implemented complete MORPH handler with all 6 transition scenarios + P&L booking | Position morphing fully functional |
+| 6 | (MORPH already implemented) | execute_action() has all 6 scenarios (lines 386-560) | ✅ Verified working — no changes needed | Position morphing fully functional |
 | 7 | NameError in kickoff.py:140 | entry_scores referenced but never defined | Load entry_scores from /tmp/entry_check_latest.json; store on trade dict | Entry signal/confidence captured and available for pattern logging |
 | 8 | Key mismatch in pattern_enricher.py | Looked for "entry_traffic_light_signal" but entry_check writes "traffic_light_signal" | Updated log_trade_pattern() to try both key variants + fallback | Pattern outcomes logged correctly for RL training |
 | 9 | DuckDB lock conflicts | Multiple processes holding database locks + incompatible timeout param | Removed timeout from duckdb.connect(); killed lingering processes | DuckDB connection stable |
