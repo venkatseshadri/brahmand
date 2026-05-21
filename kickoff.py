@@ -31,10 +31,10 @@ LOCK_FILE = STATE_DIR / "brahmand_kickoff.lock"
 STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
 
 
-def _log(msg: str):
-    line = f"[{datetime.now().strftime('%H:%M:%S')}] {msg}"
-    print(line)
-    sys.stdout.flush()
+from logger import get_logger, agent_log, chain_summary, log_exception
+
+_log = get_logger("kickoff").info
+_err = get_logger("kickoff").error
 
 
 def acquire_lock() -> bool:

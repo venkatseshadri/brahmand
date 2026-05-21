@@ -22,10 +22,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 
-def _log(msg: str):
-    line = f"[{datetime.now().strftime('%H:%M:%S')}] {msg}"
-    print(line)
-    sys.stdout.flush()
+from logger import get_logger, agent_log, chain_summary, log_exception
+
+_log = get_logger("chain").info
+_agent = get_logger("chain")
+_err = lambda msg, exc=None: (
+    log_exception(get_logger("chain"), exc, msg)
+    if exc
+    else get_logger("chain").error(msg)
+)
 
 
 def _get_llm():
@@ -133,7 +138,6 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
         execution_agent = af.create_agent(
             "execution_agent",
-            {},
             variables={
                 "market_type": "NIFTY",
                 "strategy_type": "deterministic",
@@ -146,7 +150,6 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
         risk_agent = af.create_agent(
             "risk_agent",
-            {},
             variables={"market_type": "NIFTY", "ticker": "NIFTY", "mock_mode": "paper"},
             tools=[sl_tool, tp_tool],
         )
@@ -319,14 +322,14 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 try:
                     parsed = _parse_json_output(raw)
                     parsed_outputs[i] = parsed
-                    _log(f"  {name} Agent: {json.dumps(parsed)[:300]}")
+                    agent_log(_agent, f"{name}_Agent", parsed)
                 except Exception:
-                    _log(f"  {name} Agent (raw, parse failed): {raw[:500]}")
+                    _err(f"{name} Agent parse failed: {raw[:200]}")
     else:
         raw_str = str(result)
-        _log(f"  Crew raw output: {raw_str[:500]}")
+        _err(f"Crew raw output (no tasks_output): {raw_str[:500]}")
         try:
-            parsed_outputs[5] = _parse_json_output(raw_str)  # risk (last)
+            parsed_outputs[5] = _parse_json_output(raw_str)
         except Exception:
             pass
 
@@ -587,12 +590,26 @@ def run_full_chain(
     trade["entry_gate_signal"] = entry_decision.get("signal", "UNKNOWN")
     trade["entry_confidence"] = entry_decision.get("confidence", 0)
 
+    # Log chain summary
+    chain_summary(
+        _agent,
+        {
+            "entry_time": entry_time,
+            "signal": entry_decision.get("signal", "?"),
+            "confidence": entry_decision.get("confidence", 0),
+            "strategy": trade.get("strategy_type", "?"),
+            "legs": trade.get("leg_count", 0),
+            "net_credit": trade.get("net_credit", 0),
+            "wing_width": trade.get("wing_width", 0),
+        },
+    )
+
     # Optional CrewAI Execution→Risk chain test
     try:
         from crewai_chain import run_crewai_chain
 
         if run_crewai_chain(trade).get("status") == "success":
-            _log("  CrewAI Chain: ✅ context passed")
+            _log("CrewAI Chain: ✅ context passed")
     except Exception:
         pass
 
