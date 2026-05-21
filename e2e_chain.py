@@ -627,10 +627,35 @@ def run_full_chain(
 
     entry_decision = crew_result.get("entry_decision", {})
 
-    # Attach metadata for monitoring
+    # Attach ALL agent outputs for postmortem analysis
+    # ── Entry Agent ────────────────────────────────────────
     trade["entry_scores"] = entry_decision
     trade["entry_gate_signal"] = entry_decision.get("signal", "UNKNOWN")
     trade["entry_confidence"] = entry_decision.get("confidence", 0)
+
+    # ── Regime Agent ───────────────────────────────────────
+    trade["regime_analysis"] = regime  # regime classification, VIX, ADX, recommendation
+
+    # ── Strategy Agent ─────────────────────────────────────
+    strategy = crew_result.get("strategy", {})
+    trade["strategy_analysis"] = strategy  # wing_width optimization reasoning
+
+    # ── Contract Agent ─────────────────────────────────────
+    contracts_data = crew_result.get("contracts_data", {})
+    trade["contracts_analysis"] = contracts_data  # contract resolution details
+
+    # ── Execution Agent ────────────────────────────────────
+    # (trade dict already contains: legs, net_credit, sl, tp, spot_at_entry, etc.)
+    trade["execution_analysis"] = {
+        "leg_count": trade.get("leg_count"),
+        "net_credit": trade.get("net_credit"),
+        "premium_sell": trade.get("premium_sell"),
+        "premium_buy": trade.get("premium_buy"),
+    }
+
+    # ── Risk Agent ─────────────────────────────────────────
+    risk_confirmation = crew_result.get("risk_confirmation", {})
+    trade["risk_confirmation"] = risk_confirmation  # order_ids, placement status
 
     # Log chain summary
     chain_summary(

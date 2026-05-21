@@ -1,7 +1,7 @@
 {
   "atm": 23650,
   "expiry": "26-MAY-2026",
-  "timestamp": "2026-05-20T15:55:03.528414",
+  "timestamp": "2026-05-21T15:05:03.635353",
   "strike_step": 50,
   "lot_size": 65,
   "spreads": [
@@ -10,70 +10,70 @@
       "sell_strike": 23650,
       "buy_strike": 23600,
       "wing_width": 50,
-      "margin": 146787.75
+      "margin": 144747.25
     },
     {
       "type": "PE",
       "sell_strike": 23650,
       "buy_strike": 23550,
       "wing_width": 100,
-      "margin": 149942.25
+      "margin": 147966.75
     },
     {
       "type": "PE",
       "sell_strike": 23650,
       "buy_strike": 23500,
       "wing_width": 150,
-      "margin": 153325.75
+      "margin": 151142.75
     },
     {
       "type": "PE",
       "sell_strike": 23650,
       "buy_strike": 23450,
       "wing_width": 200,
-      "margin": 156509.6
+      "margin": 154310.65
     },
     {
       "type": "PE",
       "sell_strike": 23650,
       "buy_strike": 23400,
       "wing_width": 250,
-      "margin": 159716.75
+      "margin": 157516.0
     },
     {
       "type": "CE",
       "sell_strike": 23650,
       "buy_strike": 23700,
       "wing_width": 50,
-      "margin": 143869.5
+      "margin": 146688.75
     },
     {
       "type": "CE",
       "sell_strike": 23650,
       "buy_strike": 23750,
       "wing_width": 100,
-      "margin": 147170.4
+      "margin": 150000.5
     },
     {
       "type": "CE",
       "sell_strike": 23650,
       "buy_strike": 23800,
       "wing_width": 150,
-      "margin": 150472.4
+      "margin": 153279.1
     },
     {
       "type": "CE",
       "sell_strike": 23650,
       "buy_strike": 23850,
       "wing_width": 200,
-      "margin": 153713.3
+      "margin": 156549.25
     },
     {
       "type": "CE",
       "sell_strike": 23650,
       "buy_strike": 23900,
       "wing_width": 250,
-      "margin": 157015.95
+      "margin": 159810.3
     }
   ]
 }

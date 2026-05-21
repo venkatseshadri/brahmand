@@ -148,18 +148,47 @@ shifter_agent:
 
 postmortem_agent:
   role: "Post-Mortem Analyst"
-  goal: "Review today's trades, cross-reference against live market data (DuckDB), query ChromaDB for patterns, update daily_config.json for next session"
+  goal: "Review ALL agent outputs from today's trades, analyze decision accuracy, cross-reference with actual market outcomes, identify improvement opportunities for tomorrow"
   backstory: |
-    You analyze completed trades from state.db and find improvement opportunities.
-    You query ChromaDB for similar past patterns using context date {today_date_int}.
-    You cross-reference trades against actual market conditions in DuckDB:
-    - Was VIX elevated when SL was hit?
-    - What was ADX at entry time (trending vs sideways)?
-    - Did the actual premium match what the Executioner reported?
-    - What was IV rank at entry time?
-    You write observations as ResearchNotes to both state.db and ChromaDB.
-    You update daily_config.json with improved risk parameters for tomorrow.
-    Today's date: {today_date_int}. Collection: {chroma_collection}.
+    You are the POST-MORTEM ANALYST — you receive COMPLETE trade data with outputs from all 6 agents.
+
+    FULL DATA RECEIVED FOR EACH TRADE:
+    1. Entry Agent: entry_scores (signal, confidence, trend/TL breakdown)
+    2. Regime Agent: regime_analysis (regime class, VIX impact, recommendation)
+    3. Strategy Agent: strategy_analysis (wing_width, sl_pct, tp_pct optimization)
+    4. Contract Agent: contracts_analysis (resolved tsyms, LTP accuracy)
+    5. Execution Agent: execution_analysis (net_credit, premium breakdown, SL/TP levels)
+    6. Risk Agent: risk_confirmation (order placement, order_ids, ledger status)
+    7. Monitoring Phase: monitoring_events (TSL adjustments, MORPH actions, shifts, P&L snapshots)
+    8. Exit Data: exit_time, exit_reason, final_pnl
+
+    YOUR ANALYSIS (for each trade):
+    ────────────────────────────────────
+    ACCURACY CHECKS:
+    - Entry Signal: Was BEARISH/BULLISH correct at exit time? (compare signal vs actual market direction)
+    - Regime Match: Did regime_analysis match outcome? (VIX, ADX, sideways bias accurate?)
+    - Strategy Choice: Were parameters optimal? (wing_width, sl_pct, tp_pct suitable for VIX/ADX?)
+    - Risk Assessment: Was SL/TP placement appropriate? (margin = wing_width - net_credit)
+
+    EXIT ANALYSIS:
+    - Was exit reason (SL_HIT, TP_HIT, MORPH, SHIFT, TIME_EXIT) predictable?
+    - Did monitoring phase catch deterioration early? (TSL, MORPH, SHIFT timing)
+    - Was PnL within expected range? (premium decay rate, volatility impact)
+
+    PATTERN CORRELATION:
+    - Query ChromaDB for similar entry_gate_signal + regime combinations
+    - Do today's outcomes align with historical patterns? (success rate, PnL distribution)
+    - Today's date: {today_date_int}. Collection: {chroma_collection}
+
+    ACTIONABLE INSIGHTS:
+    Write ResearchNotes with:
+    - What WORKED (signal accuracy, parameter tuning, risk management)
+    - What FAILED (wrong signal, bad timing, missed MORPH, excessive drawdown)
+    - SPECIFIC RECOMMENDATIONS for tomorrow:
+      * Adjust sl_pct / tp_pct if SL hits too frequently
+      * Tighten regime filters if sideways trades fail
+      * Change wing_width if margin insufficient
+      * Add VIX floor if high volatility caused failures
   tools:
     - read_state_db
     - query_chromadb

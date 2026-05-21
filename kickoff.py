@@ -195,6 +195,15 @@ def enter_trade(state: dict):
         "entry_gate_signal", trade.get("entry_scores", {}).get("signal", "UNKNOWN")
     )
     trade["monitored_since"] = entry_time
+
+    # Initialize monitoring phase tracking for postmortem analysis
+    trade["monitoring_events"] = {
+        "tsl_adjustments": [],      # TSL ratchet history
+        "morph_actions": [],        # Signal reversal actions
+        "shift_actions": [],        # Premium decay shifts
+        "mtm_checks": [],           # P&L snapshots during monitoring
+    }
+
     state["active_trade"] = trade
     state["trades_today"] += 1
 
@@ -535,9 +544,41 @@ def run_pm(state: dict):
                 api_key=os.environ["DEEPSEEK_API_KEY"],
             )
 
+        trades_summary = json.dumps(state['all_trades'], default=str)[:3000]
         task = Task(
-            description=f"Post-Mortem for today. {len(state['all_trades'])} trades: {json.dumps(state['all_trades'], default=str)[:2000]}. Analyze and write to ChromaDB.",
-            expected_output="ResearchNotes JSON",
+            description=(
+                f"POST-MORTEM ANALYSIS for {len(state['all_trades'])} trades today.\n\n"
+                "COMPLETE trade data (all agent outputs) included:\n"
+                f"{trades_summary}\n\n"
+                "ANALYZE EACH TRADE:\n"
+                "1. Entry Agent Analysis:\n"
+                "   - Was entry_gate_signal accurate? (compare signal vs actual market direction at exit)\n"
+                "   - Was confidence level predictive of outcome?\n"
+                "   - Trend vs Traffic Light accuracy?\n\n"
+                "2. Regime Analysis:\n"
+                "   - Did regime_analysis.recommendation match outcome?\n"
+                "   - Was VIX level factored correctly?\n"
+                "   - ADX trend bias accurate?\n\n"
+                "3. Strategy Analysis:\n"
+                "   - Were strategy_analysis parameters (wing_width, sl_pct, tp_pct) optimal?\n"
+                "   - Did actual premium decay match expectations?\n\n"
+                "4. Execution Analysis:\n"
+                "   - Net credit sufficient for drawdown? (margin = wing_width - net_credit)\n"
+                "   - SL/TP levels appropriate?\n\n"
+                "5. Risk Analysis:\n"
+                "   - Risk_confirmation: were all orders placed? Any failures?\n"
+                "   - Order_ids tracked correctly in order_ledger?\n\n"
+                "6. Exit Analysis:\n"
+                "   - Exit reason (SL_HIT, TP_HIT, MORPH, TSL, TIME_EXIT)?\n"
+                "   - Was the exit reason predictable from earlier analysis?\n"
+                "   - PnL: was it within expected range given wing_width and net_credit?\n\n"
+                "WRITE ResearchNotes to ChromaDB with:\n"
+                "- key insights\n"
+                "- what worked (pattern, VIX level, regime match)\n"
+                "- what failed (wrong signal, bad timing, parameter miscalibration)\n"
+                "- recommendations for tomorrow (parameter adjustments, market regime filters)"
+            ),
+            expected_output="ResearchNotes JSON with trade analysis summary",
             agent=pm,
         )
         crew = Crew(

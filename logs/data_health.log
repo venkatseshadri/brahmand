@@ -801,3 +801,233 @@
   ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 9468) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
   ⚠️  [Redis] Redis: stale — last bar 26 min ago (2026-05-20T15:29:00)
   ⚠️  [Redis] Redis: NOT GROWING — stuck at 2680 bars, ts=2026-05-20T15:29:00
+[09:00] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: stale — last update 1051 min ago
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 219637) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [Redis] Redis: stale — last bar 1425 min ago (2026-05-20T09:15:02)
+  ⚠️  [Redis] Redis: MISSING indicator keys: ['ema5', 'ema20', 'ema50', 'rsi', 'adx', 'atr', 'st_direction', 'bb_pct_b']
+[09:05] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: stale — last update 1056 min ago
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 220660) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [Redis] Redis: stale — last bar 1430 min ago (2026-05-20T09:15:02)
+  ⚠️  [Redis] Redis: MISSING indicator keys: ['ema5', 'ema20', 'ema50', 'rsi', 'adx', 'atr', 'st_direction', 'bb_pct_b']
+  ⚠️  [Redis] Redis: NOT GROWING — stuck at 374 bars, ts=2026-05-20T09:15:02
+[09:10] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: stale — last update 1061 min ago
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 221689) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [Redis] Redis: stale — last bar 1435 min ago (2026-05-20T09:15:02)
+  ⚠️  [Redis] Redis: MISSING indicator keys: ['ema5', 'ema20', 'ema50', 'rsi', 'adx', 'atr', 'st_direction', 'bb_pct_b']
+  ⚠️  [Redis] Redis: NOT GROWING — stuck at 374 bars, ts=2026-05-20T09:15:02
+[09:15] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: stale — last update 1066 min ago
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 222756) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [Redis] Redis: stale — last bar 1440 min ago (2026-05-20T09:15:02)
+  ⚠️  [Redis] Redis: MISSING indicator keys: ['ema5', 'ema20', 'ema50', 'rsi', 'adx', 'atr', 'st_direction', 'bb_pct_b']
+  ⚠️  [Redis] Redis: NOT GROWING — stuck at 374 bars, ts=2026-05-20T09:15:02
+[09:20] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 223977) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:25] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 225197) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:30] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 221689) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:35] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 227662) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:40] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 228857) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:45] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 27 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 27 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 27 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 27 min ago
+[09:50] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 231243) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[09:55] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 232433) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:00] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 42 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 42 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 42 min ago
+[10:05] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 234825) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:10] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 236039) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:15] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 237224) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:20] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 232433) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:25] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 25 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 67 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 67 min ago
+[10:30] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 239630) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:35] DATA HEALTH:
+  ⚠️  [v4] v4 30m: stale — last bar 20 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 35 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 77 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 77 min ago
+[10:40] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 25 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 40 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 82 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 82 min ago
+[10:45] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 237224) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:50] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 245663) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[10:55] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 55 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 97 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 97 min ago
+[11:00] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 246880) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:05] DATA HEALTH:
+  ⚠️  [v4] v4 30m: stale — last bar 20 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 107 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 107 min ago
+[11:10] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 250486) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:15] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 30 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 117 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 117 min ago
+[11:20] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 252920) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:25] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 254125) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:30] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 30 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 132 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 132 min ago
+[11:35] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 256555) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:40] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 257772) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:45] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 258997) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[11:50] DATA HEALTH:
+  ⚠️  [v4] v4 60m: stale — last bar 50 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 152 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 152 min ago
+[11:55] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 55 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 157 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 157 min ago
+[12:00] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in . (PID 261529) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 60 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 162 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 162 min ago
+[12:05] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 263871) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:10] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 260223) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:15] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 266297) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:20] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in . (PID 266388) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [v4] v4 60m: stale — last bar 20 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 182 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 182 min ago
+[12:25] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 268729) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:30] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 267514) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:35] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 271153) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:40] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 272391) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:45] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 273611) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:50] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 274827) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[12:55] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 55 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 217 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 217 min ago
+[13:00] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 277276) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:05] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 278492) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:10] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 279717) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:15] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 280948) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:20] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 282175) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:25] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 283395) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:30] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 283395) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:35] DATA HEALTH:
+  ⚠️  [v4] v4 30m: stale — last bar 19 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 35 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 19 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 257 min ago
+[13:40] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 287089) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:45] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 288317) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:50] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 289568) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[13:55] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 55 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 39 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 277 min ago
+[14:00] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 294999) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:05] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 298982) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:10] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 284617) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:15] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 302547) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:20] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 306796) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:25] DATA HEALTH:
+  ⚠️  [v4] v4 15m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 10 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 25 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 69 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 307 min ago
+[14:30] DATA HEALTH:
+  ⚠️  [v3.1] v3.1: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 310051) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+  ⚠️  [v4] v4 15m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 30m: stale — last bar 15 min ago
+  ⚠️  [v4] v4 60m: stale — last bar 30 min ago
+  ⚠️  [v4] v4 240m: stale — last bar 75 min ago
+  ⚠️  [v4] v4 1440m: stale — last bar 312 min ago
+[14:35] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 312422) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:40] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 317397) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:45] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 318643) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:50] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 319899) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[14:55] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 321161) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[15:00] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 321161) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
+[15:05] DATA HEALTH:
+  ⚠️  [v4] v4: connection failed: IO Error: Could not set lock on file "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb": Conflicting lock is held in /usr/bin/python3.12 (PID 329944) by user root. See also https://duckdb.org/docs/stable/connect/concurrency
