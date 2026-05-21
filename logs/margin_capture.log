@@ -268,3 +268,1951 @@
   "error": "no_atm",
   "timestamp": "2026-05-19T09:30:04.474268"
 }
+2026-05-19 09:40:01,902 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 09:40:01,902 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T09:40:01.902752"
+}
+2026-05-19 09:45:01,881 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 09:45:01,882 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T09:45:01.882125"
+}
+2026-05-19 09:50:02,517 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 09:50:02,517 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T09:50:02.517715"
+}
+2026-05-19 09:55:01,668 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 09:55:01,670 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T09:55:01.670560"
+}
+2026-05-19 10:00:02,511 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:00:02,511 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:00:02.511692"
+}
+2026-05-19 10:05:01,870 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:05:01,871 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:05:01.871269"
+}
+2026-05-19 10:10:02,329 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:10:02,330 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:10:02.330006"
+}
+2026-05-19 10:15:02,454 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:15:02,455 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:15:02.455052"
+}
+2026-05-19 10:20:01,919 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:20:01,920 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:20:01.920365"
+}
+2026-05-19 10:25:02,522 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:25:02,523 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:25:02.523018"
+}
+2026-05-19 10:30:03,889 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:30:03,893 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:30:03.890812"
+}
+2026-05-19 10:35:01,567 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:35:01,568 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:35:01.568326"
+}
+2026-05-19 10:40:01,890 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:40:01,890 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:40:01.890456"
+}
+2026-05-19 10:45:02,138 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:45:02,138 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:45:02.138408"
+}
+2026-05-19 10:50:01,731 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:50:01,731 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:50:01.731569"
+}
+2026-05-19 10:55:02,195 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 10:55:02,196 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T10:55:02.196032"
+}
+2026-05-19 11:00:02,872 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:00:02,875 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:00:02.875388"
+}
+2026-05-19 11:05:01,520 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:05:01,520 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:05:01.520345"
+}
+2026-05-19 11:10:02,998 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:10:02,999 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:10:02.999130"
+}
+2026-05-19 11:15:01,536 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:15:01,537 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:15:01.536994"
+}
+2026-05-19 11:20:02,532 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:20:02,533 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:20:02.533092"
+}
+2026-05-19 11:25:02,161 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:25:02,161 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:25:02.161862"
+}
+2026-05-19 11:30:01,919 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:30:01,926 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:30:01.926763"
+}
+2026-05-19 11:35:01,824 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:35:01,824 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:35:01.824305"
+}
+2026-05-19 11:40:02,420 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:40:02,420 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:40:02.420303"
+}
+2026-05-19 11:45:02,419 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:45:02,419 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:45:02.419591"
+}
+2026-05-19 11:50:03,485 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:50:03,490 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:50:03.490241"
+}
+2026-05-19 11:55:02,369 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 11:55:02,369 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T11:55:02.369801"
+}
+2026-05-19 12:00:02,922 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:00:02,924 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:00:02.924791"
+}
+2026-05-19 12:05:01,355 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:05:01,356 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:05:01.356281"
+}
+2026-05-19 12:10:02,931 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:10:02,932 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:10:02.932096"
+}
+2026-05-19 12:15:01,354 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:15:01,354 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:15:01.354923"
+}
+2026-05-19 12:20:03,177 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:20:03,178 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:20:03.177967"
+}
+2026-05-19 12:25:01,500 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:25:01,501 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:25:01.501036"
+}
+2026-05-19 12:30:04,216 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:30:04,217 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:30:04.217172"
+}
+2026-05-19 12:35:02,000 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:35:02,001 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:35:02.001139"
+}
+2026-05-19 12:40:01,561 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:40:01,562 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:40:01.562178"
+}
+2026-05-19 12:45:03,000 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:45:03,004 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:45:03.004768"
+}
+2026-05-19 12:50:02,687 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:50:02,688 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:50:02.688151"
+}
+2026-05-19 12:55:03,187 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 12:55:03,187 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T12:55:03.187887"
+}
+2026-05-19 13:00:01,613 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:00:01,613 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:00:01.613862"
+}
+2026-05-19 13:05:02,851 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:05:02,852 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:05:02.852217"
+}
+2026-05-19 13:10:01,868 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:10:01,870 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:10:01.870089"
+}
+2026-05-19 13:15:01,860 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:15:01,860 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:15:01.860353"
+}
+2026-05-19 13:20:01,420 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:20:01,421 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:20:01.420991"
+}
+2026-05-19 13:25:02,352 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:25:02,353 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:25:02.353349"
+}
+2026-05-19 13:30:03,085 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:30:03,086 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:30:03.086069"
+}
+2026-05-19 13:35:01,651 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:35:01,660 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:35:01.651693"
+}
+2026-05-19 13:40:03,300 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:40:03,301 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:40:03.301258"
+}
+2026-05-19 13:45:01,706 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:45:01,707 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:45:01.707099"
+}
+2026-05-19 13:50:02,596 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:50:02,597 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:50:02.597128"
+}
+2026-05-19 13:55:02,323 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 13:55:02,323 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T13:55:02.323687"
+}
+2026-05-19 14:00:02,543 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:00:02,544 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:00:02.544267"
+}
+2026-05-19 14:05:02,531 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:05:02,531 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:05:02.531489"
+}
+2026-05-19 14:10:02,462 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:10:02,462 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:10:02.462472"
+}
+2026-05-19 14:15:03,266 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:15:03,267 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:15:03.267117"
+}
+2026-05-19 14:20:02,600 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:20:02,602 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:20:02.602245"
+}
+2026-05-19 14:25:02,362 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:25:02,364 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:25:02.364048"
+}
+2026-05-19 14:30:03,125 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:30:03,131 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:30:03.131693"
+}
+2026-05-19 14:35:02,161 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:35:02,165 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:35:02.165305"
+}
+2026-05-19 14:40:02,465 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:40:02,469 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:40:02.469626"
+}
+2026-05-19 14:45:02,398 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:45:02,399 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:45:02.399032"
+}
+2026-05-19 14:50:02,022 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:50:02,023 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:50:02.023257"
+}
+2026-05-19 14:55:01,946 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 14:55:01,946 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T14:55:01.946896"
+}
+2026-05-19 15:00:01,772 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:00:01,780 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:00:01.780464"
+}
+2026-05-19 15:05:01,669 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:05:01,670 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:05:01.670665"
+}
+2026-05-19 15:10:02,565 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:10:02,565 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:10:02.565772"
+}
+2026-05-19 15:15:02,301 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:15:02,302 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:15:02.302166"
+}
+2026-05-19 15:20:02,329 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:20:02,329 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:20:02.329652"
+}
+2026-05-19 15:25:02,313 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:25:02,313 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:25:02.313627"
+}
+2026-05-19 15:30:02,152 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-19 15:30:02,169 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-19T15:30:02.169010"
+}
+2026-05-19 15:35:01,959 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-19 15:35:03,318 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-19 15:35:03,318 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-19T15:35:02.689625",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": 144959.1
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": 148318.3
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": 151686.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": 155076.35
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": 158455.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": 150446.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": 153650.9
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": 156975.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": 160410.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": 163723.95
+    }
+  ]
+}
+2026-05-19 15:40:01,897 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-19 15:40:03,366 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-19 15:40:03,366 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-19T15:40:02.784660",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": 144959.1
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": 148318.3
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": 151686.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": 155076.35
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": 158455.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": 150446.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": 153650.9
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": 156975.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": 160410.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": 163723.95
+    }
+  ]
+}
+2026-05-19 15:45:02,319 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-19 15:45:03,358 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-19 15:45:03,359 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-19T15:45:02.880899",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": 144959.1
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": 148318.3
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": 151686.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": 155076.35
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": 158455.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": 150446.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": 153650.9
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": 156975.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": 160410.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": 163723.95
+    }
+  ]
+}
+2026-05-19 15:50:01,861 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-19 15:50:03,341 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-19 15:50:03,341 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-19T15:50:02.628208",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": 144959.1
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": 148318.3
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": 151686.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": 155076.35
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": 158455.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": 150446.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": 153650.9
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": 156975.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": 160410.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": 163723.95
+    }
+  ]
+}
+2026-05-19 15:55:02,084 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-19 15:55:04,014 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-19 15:55:04,014 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-19T15:55:03.240462",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": 144959.1
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": 148318.3
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": 151686.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": 155076.35
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": 158455.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": 150446.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": 153650.9
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": 156975.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": 160410.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": 163723.95
+    }
+  ]
+}
+2026-05-20 09:00:02,748 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-20 09:00:04,438 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 09:00:04,439 | INFO     | ✅ Captured 0/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-20T09:00:03.905059",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": null
+    }
+  ]
+}
+2026-05-20 09:05:02,124 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-20 09:05:02,990 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 09:05:02,990 | INFO     | ✅ Captured 0/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-20T09:05:02.435740",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": null
+    }
+  ]
+}
+2026-05-20 09:10:01,523 | INFO     | ATM: 23600 | Expiry: 19-MAY-2026
+2026-05-20 09:10:03,302 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 09:10:03,302 | INFO     | ✅ Captured 0/10 spreads
+{
+  "atm": 23600,
+  "expiry": "19-MAY-2026",
+  "timestamp": "2026-05-20T09:10:02.346340",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23550,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23500,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23450,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23400,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23600,
+      "buy_strike": 23350,
+      "wing_width": 250,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23650,
+      "wing_width": 50,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23700,
+      "wing_width": 100,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23750,
+      "wing_width": 150,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23800,
+      "wing_width": 200,
+      "margin": null
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23600,
+      "buy_strike": 23850,
+      "wing_width": 250,
+      "margin": null
+    }
+  ]
+}
+2026-05-20 09:15:02,089 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:15:02,089 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:15:02.089724"
+}
+2026-05-20 09:20:01,665 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:20:01,667 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:20:01.667536"
+}
+2026-05-20 09:25:02,439 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:25:02,439 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:25:02.439620"
+}
+2026-05-20 09:30:03,500 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:30:03,503 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:30:03.503669"
+}
+2026-05-20 09:35:02,488 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:35:02,488 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:35:02.488407"
+}
+2026-05-20 09:40:02,310 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:40:02,311 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:40:02.311443"
+}
+2026-05-20 09:45:02,380 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:45:02,382 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:45:02.382712"
+}
+2026-05-20 09:50:02,541 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:50:02,544 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:50:02.543968"
+}
+2026-05-20 09:55:02,503 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 09:55:02,506 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T09:55:02.506764"
+}
+2026-05-20 10:00:03,762 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:00:03,768 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:00:03.768926"
+}
+2026-05-20 10:05:01,695 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:05:01,695 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:05:01.695775"
+}
+2026-05-20 10:10:01,569 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:10:01,570 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:10:01.570341"
+}
+2026-05-20 10:15:02,507 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:15:02,507 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:15:02.507648"
+}
+2026-05-20 10:20:02,953 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:20:02,954 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:20:02.954211"
+}
+2026-05-20 10:25:02,039 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:25:02,040 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:25:02.040098"
+}
+2026-05-20 10:30:03,184 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:30:03,184 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:30:03.184921"
+}
+2026-05-20 10:35:02,143 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:35:02,144 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:35:02.144214"
+}
+2026-05-20 10:40:03,189 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:40:03,189 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:40:03.189855"
+}
+2026-05-20 10:45:02,257 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:45:02,257 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:45:02.257943"
+}
+2026-05-20 10:50:02,147 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:50:02,148 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:50:02.148171"
+}
+2026-05-20 10:55:01,690 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 10:55:01,696 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T10:55:01.696060"
+}
+2026-05-20 11:00:04,282 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:00:04,283 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:00:04.283240"
+}
+2026-05-20 11:05:01,970 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:05:01,972 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:05:01.972614"
+}
+2026-05-20 11:10:02,156 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:10:02,158 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:10:02.158534"
+}
+2026-05-20 11:15:02,298 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:15:02,299 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:15:02.299611"
+}
+2026-05-20 11:20:02,225 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:20:02,225 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:20:02.225474"
+}
+2026-05-20 11:25:02,087 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:25:02,093 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:25:02.092982"
+}
+2026-05-20 11:30:02,759 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:30:02,762 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:30:02.762928"
+}
+2026-05-20 11:35:02,089 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:35:02,089 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:35:02.089823"
+}
+2026-05-20 11:40:02,825 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:40:02,826 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:40:02.826179"
+}
+2026-05-20 11:45:03,553 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:45:03,553 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:45:03.553444"
+}
+2026-05-20 11:50:02,919 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:50:02,919 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:50:02.919537"
+}
+2026-05-20 11:55:01,640 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 11:55:01,641 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T11:55:01.641350"
+}
+2026-05-20 12:00:03,023 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:00:03,036 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:00:03.035980"
+}
+2026-05-20 12:05:01,747 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:05:01,750 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:05:01.750572"
+}
+2026-05-20 12:10:02,659 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:10:02,661 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:10:02.661721"
+}
+2026-05-20 12:15:02,692 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:15:02,694 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:15:02.694568"
+}
+2026-05-20 12:20:01,598 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:20:01,605 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:20:01.605866"
+}
+2026-05-20 12:25:02,205 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:25:02,207 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:25:02.207659"
+}
+2026-05-20 12:30:03,343 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:30:03,344 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:30:03.344738"
+}
+2026-05-20 12:35:03,115 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:35:03,119 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:35:03.119111"
+}
+2026-05-20 12:40:02,241 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:40:02,246 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:40:02.246387"
+}
+2026-05-20 12:45:02,519 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:45:02,524 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:45:02.524568"
+}
+2026-05-20 12:50:02,658 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:50:02,664 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:50:02.664562"
+}
+2026-05-20 12:55:03,723 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 12:55:03,732 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T12:55:03.732065"
+}
+2026-05-20 13:00:04,041 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:00:04,050 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:00:04.049884"
+}
+2026-05-20 13:05:02,100 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:05:02,101 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:05:02.101653"
+}
+2026-05-20 13:10:02,314 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:10:02,316 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:10:02.316531"
+}
+2026-05-20 13:15:03,047 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:15:03,048 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:15:03.048364"
+}
+2026-05-20 13:20:02,858 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:20:02,862 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:20:02.862336"
+}
+2026-05-20 13:25:02,360 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:25:02,440 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:25:02.440514"
+}
+2026-05-20 13:30:03,546 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:30:03,589 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:30:03.589322"
+}
+2026-05-20 13:35:02,853 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:35:02,853 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:35:02.853521"
+}
+2026-05-20 13:40:02,568 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:40:02,573 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:40:02.573706"
+}
+2026-05-20 13:45:02,881 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:45:02,881 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:45:02.881301"
+}
+2026-05-20 13:50:03,156 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:50:03,157 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:50:03.156968"
+}
+2026-05-20 13:55:02,427 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 13:55:02,429 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T13:55:02.427407"
+}
+2026-05-20 14:00:01,825 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:00:01,826 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:00:01.826238"
+}
+2026-05-20 14:05:02,109 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:05:02,121 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:05:02.121133"
+}
+2026-05-20 14:10:02,263 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:10:02,264 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:10:02.264003"
+}
+2026-05-20 14:15:02,058 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:15:02,061 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:15:02.059386"
+}
+2026-05-20 14:20:02,047 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:20:02,047 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:20:02.047865"
+}
+2026-05-20 14:25:02,559 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:25:02,565 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:25:02.565740"
+}
+2026-05-20 14:30:02,438 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:30:02,441 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:30:02.441136"
+}
+2026-05-20 14:35:02,604 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:35:02,608 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:35:02.608815"
+}
+2026-05-20 14:40:02,479 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:40:02,488 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:40:02.488502"
+}
+2026-05-20 14:45:02,306 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:45:02,313 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:45:02.312994"
+}
+2026-05-20 14:50:02,866 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:50:02,884 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:50:02.884386"
+}
+2026-05-20 14:55:02,111 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 14:55:02,112 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T14:55:02.112949"
+}
+2026-05-20 15:00:02,808 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:00:02,810 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:00:02.810860"
+}
+2026-05-20 15:05:02,595 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:05:02,598 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:05:02.598252"
+}
+2026-05-20 15:10:02,469 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:10:02,473 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:10:02.473044"
+}
+2026-05-20 15:15:03,151 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:15:03,154 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:15:03.154469"
+}
+2026-05-20 15:21:00,825 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:21:00,834 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:21:00.834337"
+}
+2026-05-20 15:25:02,464 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:25:02,473 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:25:02.473642"
+}
+2026-05-20 15:30:03,639 | ERROR    | ❌ Cannot determine ATM — DuckDB empty?
+2026-05-20 15:30:03,662 | ERROR    | ❌ Error: no_atm
+{
+  "error": "no_atm",
+  "timestamp": "2026-05-20T15:30:03.662079"
+}
+2026-05-20 15:35:02,697 | INFO     | ATM: 23650 | Expiry: 26-MAY-2026
+2026-05-20 15:35:06,773 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 15:35:06,776 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23650,
+  "expiry": "26-MAY-2026",
+  "timestamp": "2026-05-20T15:35:05.249211",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23600,
+      "wing_width": 50,
+      "margin": 146787.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23550,
+      "wing_width": 100,
+      "margin": 149942.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23500,
+      "wing_width": 150,
+      "margin": 153325.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23450,
+      "wing_width": 200,
+      "margin": 156509.6
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23400,
+      "wing_width": 250,
+      "margin": 159716.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23700,
+      "wing_width": 50,
+      "margin": 143869.5
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23750,
+      "wing_width": 100,
+      "margin": 147170.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23800,
+      "wing_width": 150,
+      "margin": 150472.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23850,
+      "wing_width": 200,
+      "margin": 153713.3
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23900,
+      "wing_width": 250,
+      "margin": 157015.95
+    }
+  ]
+}
+2026-05-20 15:40:02,825 | INFO     | ATM: 23650 | Expiry: 26-MAY-2026
+2026-05-20 15:40:05,678 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 15:40:05,679 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23650,
+  "expiry": "26-MAY-2026",
+  "timestamp": "2026-05-20T15:40:05.053573",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23600,
+      "wing_width": 50,
+      "margin": 146787.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23550,
+      "wing_width": 100,
+      "margin": 149942.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23500,
+      "wing_width": 150,
+      "margin": 153325.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23450,
+      "wing_width": 200,
+      "margin": 156509.6
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23400,
+      "wing_width": 250,
+      "margin": 159716.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23700,
+      "wing_width": 50,
+      "margin": 143869.5
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23750,
+      "wing_width": 100,
+      "margin": 147170.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23800,
+      "wing_width": 150,
+      "margin": 150472.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23850,
+      "wing_width": 200,
+      "margin": 153713.3
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23900,
+      "wing_width": 250,
+      "margin": 157015.95
+    }
+  ]
+}
+2026-05-20 15:45:19,992 | INFO     | ATM: 23650 | Expiry: 26-MAY-2026
+2026-05-20 15:45:22,294 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 15:45:22,294 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23650,
+  "expiry": "26-MAY-2026",
+  "timestamp": "2026-05-20T15:45:21.886072",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23600,
+      "wing_width": 50,
+      "margin": 146787.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23550,
+      "wing_width": 100,
+      "margin": 149942.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23500,
+      "wing_width": 150,
+      "margin": 153325.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23450,
+      "wing_width": 200,
+      "margin": 156509.6
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23400,
+      "wing_width": 250,
+      "margin": 159716.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23700,
+      "wing_width": 50,
+      "margin": 143869.5
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23750,
+      "wing_width": 100,
+      "margin": 147170.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23800,
+      "wing_width": 150,
+      "margin": 150472.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23850,
+      "wing_width": 200,
+      "margin": 153713.3
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23900,
+      "wing_width": 250,
+      "margin": 157015.95
+    }
+  ]
+}
+2026-05-20 15:50:03,994 | INFO     | ATM: 23650 | Expiry: 26-MAY-2026
+2026-05-20 15:50:08,143 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 15:50:08,143 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23650,
+  "expiry": "26-MAY-2026",
+  "timestamp": "2026-05-20T15:50:06.834179",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23600,
+      "wing_width": 50,
+      "margin": 146787.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23550,
+      "wing_width": 100,
+      "margin": 149942.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23500,
+      "wing_width": 150,
+      "margin": 153325.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23450,
+      "wing_width": 200,
+      "margin": 156509.6
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23400,
+      "wing_width": 250,
+      "margin": 159716.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23700,
+      "wing_width": 50,
+      "margin": 143869.5
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23750,
+      "wing_width": 100,
+      "margin": 147170.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23800,
+      "wing_width": 150,
+      "margin": 150472.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23850,
+      "wing_width": 200,
+      "margin": 153713.3
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23900,
+      "wing_width": 250,
+      "margin": 157015.95
+    }
+  ]
+}
+2026-05-20 15:55:02,674 | INFO     | ATM: 23650 | Expiry: 26-MAY-2026
+2026-05-20 15:55:03,912 | INFO     | Saved 10 spreads to /home/trading_ceo/brahmand/data/margin_matrix.json
+2026-05-20 15:55:03,912 | INFO     | ✅ Captured 10/10 spreads
+{
+  "atm": 23650,
+  "expiry": "26-MAY-2026",
+  "timestamp": "2026-05-20T15:55:03.528414",
+  "strike_step": 50,
+  "lot_size": 65,
+  "spreads": [
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23600,
+      "wing_width": 50,
+      "margin": 146787.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23550,
+      "wing_width": 100,
+      "margin": 149942.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23500,
+      "wing_width": 150,
+      "margin": 153325.75
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23450,
+      "wing_width": 200,
+      "margin": 156509.6
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23650,
+      "buy_strike": 23400,
+      "wing_width": 250,
+      "margin": 159716.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23700,
+      "wing_width": 50,
+      "margin": 143869.5
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23750,
+      "wing_width": 100,
+      "margin": 147170.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23800,
+      "wing_width": 150,
+      "margin": 150472.4
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23850,
+      "wing_width": 200,
+      "margin": 153713.3
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23650,
+      "buy_strike": 23900,
+      "wing_width": 250,
+      "margin": 157015.95
+    }
+  ]
+}

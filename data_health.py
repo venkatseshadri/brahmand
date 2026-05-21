@@ -20,7 +20,7 @@ from typing import Tuple
 
 V31_DB = Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
 V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
-STATE_FILE = Path("/tmp/data_health_state.json")
+STATE_FILE = Path(__file__).parent / "data" / "data_health_state.json"
 
 # Baseline: expected NULL% for indicators (buffer warmup on first 50 bars)
 BASELINE_NULL_MAX = {

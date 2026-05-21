@@ -148,7 +148,6 @@ if __name__ == "__main__":
         print(f"  Status: {result['status']}")
         print(f"  Close: {result.get('close', 'N/A')}")
         print(f"  Available EMAs: {result.get('available_emas', {})}")
-        print(f"  Thresholds crossed: {result.get('thresholds_crossed', [])}")
 
     print("\n" + "=" * 60)
     print("Final Summary:")

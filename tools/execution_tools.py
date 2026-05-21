@@ -568,7 +568,7 @@ class CancelOrderInput(BaseModel):
     )
 
 
-class CancelOrderTool(BaseTool):
+class CancelBrokerOrderTool(BaseTool):
     name: str = "cancel_order"
     description: str = (
         "Cancel an existing open order via api.cancel_order. Called by the Risk Sentry "

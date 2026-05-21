@@ -109,6 +109,9 @@ class ExecutionReport(BaseModel):
     error: Optional[str] = Field(
         default=None, description="Error message if status is REJECTED"
     )
+    meta_data: Dict = Field(
+        default_factory=dict, description="Additional metadata for audit trail"
+    )
 
 
 class ResearchNote(BaseModel):

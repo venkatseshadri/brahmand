@@ -10,7 +10,7 @@ Usage:
     python kickoff.py                 # manual
     */5 9-15 * * 1-5  python3 kickoff.py >> logs/kickoff_$(date +\\%Y\\%m\\%d).log 2>&1
 
-State tracked in /tmp/brahmand_kickoff.json:
+State tracked in data/brahmand_kickoff.json:
     - pid, last_run, active_trade, trades_today
 """
 
@@ -23,8 +23,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-LOCK_FILE = Path("/tmp/brahmand_kickoff.lock")
-STATE_FILE = Path("/tmp/brahmand_kickoff.json")
+from trade_execution_db import add_active_trade
+
+STATE_DIR = Path(__file__).parent / "data"
+STATE_DIR.mkdir(parents=True, exist_ok=True)
+LOCK_FILE = STATE_DIR / "brahmand_kickoff.lock"
+STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
 
 
 def _log(msg: str):
@@ -51,9 +55,11 @@ def release_lock():
 
 
 def load_state() -> dict:
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
     today = datetime.now().strftime("%Y%m%d")
+    if STATE_FILE.exists():
+        state = json.loads(STATE_FILE.read_text())
+        if state.get("date") == today:
+            return state
     return {
         "date": today,
         "trades_today": 0,
@@ -109,16 +115,18 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
         # Capture TSL history for RL analysis
         if "tsl_history" not in trade:
             trade["tsl_history"] = []
-        trade["tsl_history"].append({
-            "timestamp": datetime.now().isoformat(),
-            "leg": leg_type,
-            "old_sl": old_sl,
-            "new_sl": new_sl,
-            "shift_pct": shift_pct,
-            "lock_ratio": lock_ratio,
-            "current_profit": round(current_profit, 2),
-            "threshold_profit": round(threshold_profit, 2)
-        })
+        trade["tsl_history"].append(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "leg": leg_type,
+                "old_sl": old_sl,
+                "new_sl": new_sl,
+                "shift_pct": shift_pct,
+                "lock_ratio": lock_ratio,
+                "current_profit": round(current_profit, 2),
+                "threshold_profit": round(threshold_profit, 2),
+            }
+        )
 
         _log(
             f"TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} (lock_ratio={lock_ratio})"
@@ -153,41 +161,65 @@ def should_enter(state: dict) -> bool:
 
 
 def enter_trade(state: dict):
-    """Run 5-agent E2E chain. Regime Agent decides entry."""
+    """Run Entry → Regime → Strategy → Contract → Execution → Risk chain.
+    Entry Agent is the first gate — called inline, not from a stale file."""
     from e2e_chain import run_full_chain
 
-    # Capture entry gate output at entry time for pattern logging on exit
-    entry_scores = {}
+    entry_time = now_str()
     try:
-        p = Path("/tmp/entry_check_latest.json")
-        if p.exists():
-            entry_scores = json.loads(p.read_text())
-    except Exception:
-        pass
-
-    try:
-        sig = entry_scores.get("signal") or entry_scores.get("entry_combined_signal")
-        conf = entry_scores.get("confidence", 0) or entry_scores.get(
-            "entry_combined_confidence", 0
-        )
-        trade = run_full_chain(now_str(), entry_signal=sig, entry_confidence=conf)
+        trade = run_full_chain(entry_time)
     except Exception as e:
-        _log(f"Chain failed: {e} — skipping this cycle")
+        _log(f"Chain failed: {e}")
         return state
     if trade is None:
-        _log("Regime: SKIP — no trade entered")
+        _log("  SKIP: Gate rejected")
         return state
     if isinstance(trade, dict) and trade.get("recommendation") == "skip":
-        _log(f"Regime: SKIP — {trade.get('regime', 'unknown')}")
+        _log(f"  SKIP: {trade.get('regime', 'unknown')}")
+        return state
+    if isinstance(trade, dict) and trade.get("recommendation") == "no_go":
+        _log("  SKIP: Entry Agent NO-GO")
         return state
 
+    # Normalize strategy_type: map one-sided strategies to "credit_spread"
+    strategy_normalized = trade.get("strategy_type", "IRON_BUTTERFLY")
+    if "SPREAD" in strategy_normalized or "CREDIT" in strategy_normalized.upper():
+        strategy_display = "credit_spread"
+    elif "BUTTERFLY" in strategy_normalized:
+        strategy_display = "iron_butterfly"
+    else:
+        strategy_display = strategy_normalized.lower()
+
     # Store entry_scores on trade for pattern logging on exit
-    trade["entry_scores"] = entry_scores
-    trade["monitored_since"] = now_str()
+    trade["entry_gate_signal"] = trade.get(
+        "entry_gate_signal", trade.get("entry_scores", {}).get("signal", "UNKNOWN")
+    )
+    trade["monitored_since"] = entry_time
     state["active_trade"] = trade
     state["trades_today"] += 1
+
+    # ALSO write to DuckDB for Risk Monitor (1-min monitoring)
+    try:
+        trade_id = (
+            trade.get("trade_id")
+            or f"TRADE-{datetime.now().strftime('%Y%m%d')}-{state['trades_today']:03d}"
+        )
+        trade["trade_id"] = trade_id
+        add_active_trade(
+            trade_id=trade_id,
+            entry_time=entry_time,
+            strategy=strategy_display,
+            entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
+            legs=trade.get("legs", []),
+            sl=trade.get("sl", {}),
+            tp=trade.get("tp", {}),
+        )
+        _log(f"  ✅ Wrote to DuckDB: {trade_id}")
+    except Exception as e:
+        _log(f"  ⚠️  DuckDB write failed: {e}")
+
     _log(
-        f"ENTERED: {trade['strategy_type']} ({trade['leg_count']} legs) | Net ₹{trade['net_credit']}"
+        f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
     return state
 
@@ -198,20 +230,16 @@ def monitor_trade(state: dict):
     if not trade:
         return state
 
-    # ── Check for MORPH (signal change → add/remove side) ──
-    try:
-        from position_manager import run as pm_run
-        actions = pm_run(trade)
-        if actions:
-            for action in actions:
-                if action["type"] == "MORPH":
-                    _log(f"MORPH: {action['from_type']} → {action['to_type']} ({action['reason']})")
-                    # Execute the morph
-                    from position_manager import execute_action
-                    trade = execute_action(action, trade)
-                    state["active_trade"] = trade
-    except Exception as e:
-        _log(f"Position manager check failed: {str(e)[:80]}")
+    # ── Log monitoring cycle ──
+    entry_time = trade.get("entry_time", "09:30")
+    monitored_since = trade.get("monitored_since", entry_time)
+    mins_open = (
+        datetime.strptime(now_str(), "%H:%M")
+        - datetime.strptime(monitored_since, "%H:%M")
+    ).total_seconds() / 60
+    _log(
+        f"  MONITOR: {trade.get('strategy_type', '?')} | {int(mins_open)}min | Gate: {trade.get('entry_gate_signal', '?')}"
+    )
 
     from duckdb_tool import _connect
 
@@ -241,15 +269,27 @@ def monitor_trade(state: dict):
 
             # Check SL/TP triggers
             if ltp > 0 and trade["sl"].get(t) and ltp >= trade["sl"][t]:
-                _log(f"SL HIT — {leg['tsym']}: LTP={ltp} >= {trade['sl'][t]}")
+                _log(
+                    f"  SL HIT — {leg['tsym']}: LTP={ltp} >= {trade['sl'][t]} [{now_str()}]"
+                )
                 exit_trade(state, "SL_HIT")
                 return state
             elif ltp > 0 and trade["tp"].get(t) and ltp <= trade["tp"][t]:
-                _log(f"TP HIT — {leg['tsym']}: LTP={ltp} <= {trade['tp'][t]}")
+                _log(
+                    f"  TP HIT — {leg['tsym']}: LTP={ltp} <= {trade['tp'][t]} [{now_str()}]"
+                )
                 exit_trade(state, "TP_HIT")
                 return state
     finally:
         con.close()
+
+    # ── Monitoring Crew: Morpher → Shifter ──────────────────────────────
+    if _get_llm_monitor():
+        try:
+            state = _run_monitoring_crew(state)
+        except Exception as e:
+            _log(f"  Monitoring crew failed: {e} — falling back to Python checks")
+            state = _monitor_fallback(state, trade)
 
     # Auto-exit after 45 min if no SL/TP
     mins_open = (
@@ -261,6 +301,149 @@ def monitor_trade(state: dict):
     if mins_open > 45:
         _log(f"Auto-exit after {int(mins_open)} min")
         exit_trade(state, "TIME_EXIT")
+
+    return state
+
+
+def _get_llm_monitor():
+    """Return DeepSeek LLM for monitoring crew or None if unavailable."""
+    try:
+        from crewai import LLM
+
+        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+        if not api_key:
+            return None
+        return LLM(
+            model="deepseek/deepseek-chat",
+            base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
+            api_key=api_key,
+        )
+    except Exception:
+        return None
+
+
+def _run_monitoring_crew(state: dict):
+    """Run Morpher → Shifter monitoring Crew."""
+    import json as _json
+
+    trade = state["active_trade"]
+    llm = _get_llm_monitor()
+
+    from factory import AgentFactory
+    from tools.monitor_tools import MorphCheckTool, ShiftCheckTool
+    from tools.risk_tools import PlaceSLOrderTool, PlaceTPOrderTool, CancelOrderTool
+
+    af = AgentFactory()
+    morph_tool = MorphCheckTool()
+    shift_tool = ShiftCheckTool()
+    sl_tool = PlaceSLOrderTool()
+    tp_tool = PlaceTPOrderTool()
+    cancel_tool = CancelOrderTool()
+
+    morpher = af.create_agent(
+        "morpher_agent", {}, tools=[morph_tool, sl_tool, tp_tool, cancel_tool]
+    )
+    morpher.llm = llm
+    shifter = af.create_agent(
+        "shifter_agent", {}, tools=[shift_tool, sl_tool, tp_tool, cancel_tool]
+    )
+    shifter.llm = llm
+
+    trade_json = _json.dumps(trade, default=str)
+
+    from crewai import Task, Crew, Process
+
+    morph_task = Task(
+        description=(
+            "Check if the position needs to MORPH.\n\n"
+            f"Trade JSON: {trade_json}\n\n"
+            "Call check_for_morph with the trade_json. If morph actions are proposed, "
+            "execute them using place_sl_order/place_tp_order for NEW legs and "
+            "cancel_order for OLD legs. Report what happened."
+        ),
+        expected_output="Morph report with actions executed or 'no action'",
+        agent=morpher,
+    )
+
+    shift_task = Task(
+        description=(
+            "Check if any SELL leg's premium has decayed enough to shift wings.\n\n"
+            f"Trade JSON: {trade_json}\n\n"
+            "Call check_for_shift with the trade_json. If shift proposals are returned, "
+            "execute them: for HEDGE_SHIFT, use place_sl_order/place_tp_order for new hedge "
+            "and cancel_order for old hedge. For SELL_SHIFT, cancel old sell SL/TP and "
+            "place new sell SL/TP. Report what happened."
+        ),
+        expected_output="Shift report with actions executed or 'no action'",
+        agent=shifter,
+        context=[morph_task],
+    )
+
+    crew = Crew(
+        agents=[morpher, shifter],
+        tasks=[morph_task, shift_task],
+        process=Process.sequential,
+        verbose=True,
+    )
+    result = crew.kickoff()
+
+    # ── Log each agent's output ────────────────────────────────────────
+    agent_names = ["Morpher", "Shifter"]
+    if hasattr(result, "tasks_output"):
+        for i, name in enumerate(agent_names):
+            if i < len(result.tasks_output):
+                raw = str(result.tasks_output[i])
+                try:
+                    parsed = (
+                        json.loads(raw[raw.find("{") : raw.rfind("}") + 1])
+                        if "{" in raw
+                        else {}
+                    )
+                    _log(f"  {name}: {json.dumps(parsed)[:300]}")
+                except Exception:
+                    _log(f"  {name} (raw): {raw[:300]}")
+    else:
+        _log(f"  Monitoring Crew result: {str(result)[:400]}")
+
+    return state
+
+
+def _monitor_fallback(state, trade):
+    """Fallback: Python-based morph + shift check when LLM is down."""
+    try:
+        from position_manager import run as pm_run
+
+        actions = pm_run(trade)
+        if actions:
+            for action in actions:
+                if action["type"] == "MORPH":
+                    _log(
+                        f"  MORPH: {action['from_type']} → {action['to_type']} ({action['reason']})"
+                    )
+                    from position_manager import execute_action
+
+                    trade = execute_action(action, trade)
+                    state["active_trade"] = trade
+    except Exception as e:
+        _log(f"  Morph fallback failed: {e}")
+
+    try:
+        from leg_shifter import run_leg_shifter, execute_hedge_shift, execute_sell_shift
+
+        available_margin = trade.get("available_margin", 100000)
+        proposals = run_leg_shifter(trade, available_margin)
+        if proposals.get("hedge_shift"):
+            result = execute_hedge_shift(trade, proposals["hedge_shift"])
+            if result.get("status") == "SUCCESS":
+                state["active_trade"] = trade
+        if proposals.get("sell_shift"):
+            shift = proposals["sell_shift"]
+            if shift.get("status") != "REJECTED":
+                result = execute_sell_shift(trade, shift)
+                if result.get("status") == "SUCCESS":
+                    state["active_trade"] = trade
+    except Exception as e:
+        _log(f"  Shift fallback failed: {e}")
 
     return state
 
@@ -385,13 +568,18 @@ def main():
             return
 
         max_t = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
+
+        # SIMPLE CHECK: Look at in-memory state first (fast)
+        # Risk Monitor keeps DuckDB in sync, so this is sufficient
+        has_active = state["active_trade"] is not None
+
         _log(
-            f"Scheduled run | Active: {state['active_trade'] is not None} | Today: {state['trades_today']}/{max_t}"
+            f"Scheduled run | Active: {has_active} | Today: {state['trades_today']}/{max_t}"
         )
 
-        if state["active_trade"]:
-            # Trade open — just monitor, no agent evaluation
-            monitor_trade(state)
+        if has_active:
+            # Trade open — Risk Monitor has it (1-min cadence), scheduler skips
+            _log("  ✓ Position exists → Risk Monitor monitoring → skipping entry crew")
         elif should_enter(state):
             # No trade, gates passed — run full 5-agent chain
             enter_trade(state)

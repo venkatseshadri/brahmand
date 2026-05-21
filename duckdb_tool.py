@@ -85,6 +85,10 @@ class MarketDataQueryTool(BaseTool):
             "iv": "date, time, iv_current, iv_rank, iv_regime, iv_52w_high, "
             "iv_52w_low, iv_short, iv_long",
             "pcr": "date, time, pcr_total, pcr_atm, sentiment, oi_skew, max_pain_strike",
+            "ema": "date, time, spot, ema_5, ema_20, ema_50",
+            "full_regime": "date, time, spot, atm_strike, india_vix, adx, "
+            "supertrend_direction, st_15min_direction, ema_20, ema_50, "
+            "iv_current, iv_rank, rsi, structure_type, session_phase",
             "all": "*",
         }
 
@@ -200,11 +204,13 @@ class OptionSnapshotQueryTool(BaseTool):
 def get_latest_market_snapshot() -> dict:
     """Convenience: return the most recent market_data row."""
     con = _connect()
-    row = con.execute(
-        "SELECT * FROM market_data ORDER BY timestamp DESC LIMIT 1"
-    ).fetchone()
-    if row:
-        cols = [c[0] for c in con.description]
-        return dict(zip(cols, [str(v) for v in row]))
-    con.close()
-    return {}
+    try:
+        row = con.execute(
+            "SELECT * FROM market_data ORDER BY timestamp DESC LIMIT 1"
+        ).fetchone()
+        if row:
+            cols = [c[0] for c in con.description]
+            return dict(zip(cols, [str(v) for v in row]))
+        return {}
+    finally:
+        con.close()

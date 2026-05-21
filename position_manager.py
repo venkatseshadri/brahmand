@@ -65,10 +65,10 @@ def _get_spot(con, index: str = "NIFTY") -> float:
 
 def _load_entry_signal() -> dict:
     """Read latest entry gate decision from file."""
-    p = Path("/tmp/entry_check_latest.json")
+    p = Path("/home/trading_ceo/antariksh/logs/entry_check_latest.json")
     if p.exists():
         return json.loads(p.read_text())
-    return {"signal": "NEUTRAL", "confidence": 0}
+    return {"signal": "NEUTRAL", "confidence": 0, "score": 0}
 
 
 def _pattern_risk_adjust(trade: dict) -> None:
@@ -217,24 +217,73 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
                     }
                 )
 
-        # ── P3: Signal change → MORPH ──
-        current_position_type = _classify_position(trade)
-        new_signal = sig.get("signal", "NEUTRAL").upper()
-        if (
-            new_signal != current_position_type
-            and trade.get("morph_count", 0) < MAX_MORPHS
-        ):
+        # ── P3: Threshold-based spread control ──
+        # Score > -3.0 → PUT_SPREAD should exist
+        # Score < 3.0 → CALL_SPREAD should exist
+        # Score >= 3.0 → close CALL_SPREAD (threshold override)
+        # Score <= -3.0 → close PUT_SPREAD (threshold override)
+        score = sig.get("score", 0)
+        has_put = _has_put_spread(trade)
+        has_call = _has_call_spread(trade)
+        morph_count = trade.get("morph_count", 0)
+
+        if score >= 3.0 and has_call and morph_count < MAX_MORPHS:
+            # BULLISH: close CALL_SPREAD (threshold override, close at market immediately)
             actions.append(
                 {
                     "type": MORPH,
                     "priority": 3,
-                    "from_type": current_position_type,
-                    "to_type": new_signal,
+                    "from_type": "NEUTRAL",
+                    "to_type": "BULLISH",
                     "legs": legs_data,
-                    "entry_scores": entry_scores or {},
-                    "reason": f"Signal {current_position_type} → {new_signal}",
+                    "score": score,
+                    "threshold_override": True,
+                    "reason": f"Score {score:.2f} >= 3.0: close CALL_SPREAD (threshold override)",
                 }
             )
+        elif score <= -3.0 and has_put and morph_count < MAX_MORPHS:
+            # BEARISH: close PUT_SPREAD (threshold override, close at market immediately)
+            actions.append(
+                {
+                    "type": MORPH,
+                    "priority": 3,
+                    "from_type": "NEUTRAL",
+                    "to_type": "BEARISH",
+                    "legs": legs_data,
+                    "score": score,
+                    "threshold_override": True,
+                    "reason": f"Score {score:.2f} <= -3.0: close PUT_SPREAD (threshold override)",
+                }
+            )
+        elif -3.0 < score < 3.0:
+            # NEUTRAL zone: ensure both spreads exist
+            current_type = _classify_position(trade)
+            if current_type == "BULLISH" and not has_call and morph_count < MAX_MORPHS:
+                # Add CALL_SPREAD
+                actions.append(
+                    {
+                        "type": MORPH,
+                        "priority": 3,
+                        "from_type": "BULLISH",
+                        "to_type": "NEUTRAL",
+                        "legs": legs_data,
+                        "score": score,
+                        "reason": f"Score {score:.2f} in neutral zone: add CALL_SPREAD",
+                    }
+                )
+            elif current_type == "BEARISH" and not has_put and morph_count < MAX_MORPHS:
+                # Add PUT_SPREAD
+                actions.append(
+                    {
+                        "type": MORPH,
+                        "priority": 3,
+                        "from_type": "BEARISH",
+                        "to_type": "NEUTRAL",
+                        "legs": legs_data,
+                        "score": score,
+                        "reason": f"Score {score:.2f} in neutral zone: add PUT_SPREAD",
+                    }
+                )
 
         # ── P3.5: Pattern-driven risk adjustment ──
         _pattern_risk_adjust(trade)
@@ -333,6 +382,16 @@ def _classify_position(trade: dict) -> str:
     if has_ce:
         return "BEARISH"
     return "NEUTRAL"
+
+
+def _has_put_spread(trade: dict) -> bool:
+    """Check if PUT_SPREAD (PE SELL leg) exists."""
+    return any(l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", []))
+
+
+def _has_call_spread(trade: dict) -> bool:
+    """Check if CALL_SPREAD (CE SELL leg) exists."""
+    return any(l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", []))
 
 
 def execute_action(action: dict, trade: dict) -> dict:

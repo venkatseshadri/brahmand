@@ -36,3 +36,1197 @@ UnboundLocalError: cannot access local variable 'state' where it is not associat
 [09:25:02] Scheduled run | Active: True | Today: 1/4
 [09:30:02] Scheduled run | Active: True | Today: 1/4
 [09:30:17] TSL: PE SL ratcheted 101.32 → 62.31 (lock_ratio=0.5)
+[09:40:01] Scheduled run | Active: False | Today: 1/4
+[09:40:14] Chain failed: DuckDB locked by capture after 10 retries — skip this cycle — skipping this cycle
+[09:43:35] Scheduled run | Active: False | Today: 1/4
+[09:43:37]   Regime: sideways → caution
+[09:43:37]   Strategy: PUT_CREDIT_SPREAD wings=150 sl=0.5 tp=0.5
+[09:43:37]   Strategy: PUT_CREDIT_SPREAD wings=150 sl=0.5 tp=0.5
+[09:43:37]   Contracts: NIFTY19MAY26C23750, NIFTY19MAY26P23750, NIFTY19MAY26P23600, NIFTY19MAY26C23900
+[09:43:37]   Execution: net_credit=₹93.25
+[09:43:37]   Risk: 4 orders placed (2 SL + 2 TP)
+[09:43:37] ENTERED: PUT_CREDIT_SPREAD (4 legs) | Net ₹93.25
+[09:45:01] Scheduled run | Active: True | Today: 2/4
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/kickoff.py", line 375, in <module>
+    main()
+  File "/home/trading_ceo/brahmand/kickoff.py", line 363, in main
+    monitor_trade(state)
+  File "/home/trading_ceo/brahmand/kickoff.py", line 188, in monitor_trade
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    raise IOError("DuckDB locked by capture after 10 retries — skip this cycle")
+OSError: DuckDB locked by capture after 10 retries — skip this cycle
+[09:50:01] Scheduled run | Active: True | Today: 2/4
+[09:50:09] TSL: CE SL ratcheted 85.28 → 48.57 (lock_ratio=0.5)
+[09:55:01] Scheduled run | Active: True | Today: 2/4
+[09:55:10] TSL: CE SL ratcheted 48.57 → 44.15 (lock_ratio=0.5)
+[10:00:02] Scheduled run | Active: True | Today: 2/4
+[10:00:11] TSL: CE SL ratcheted 44.15 → 42.12 (lock_ratio=0.5)
+[10:00:11] SL HIT — NIFTY19MAY26P23750: LTP=107.95 >= 103.88
+[10:00:11] EXIT (SL_HIT): P&L ₹-5.5
+2026-05-19 10:00:11,717 | INFO     | Trade→Pattern logged: partial | P&L ₹-5.5
+[10:05:01] Scheduled run | Active: False | Today: 2/4
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Market Regime Detector                                               │
+│                                                                              │
+│  Task: Classify NIFTY regime: {"spot": "23699.25", "india_vix": "18.84",     │
+│  "adx": "13.63939108210391", "supertrend_direction": "bullish",              │
+│  "iv_current": "18.84", "iv_rank": "71.1", "rsi": "51.864622460941746",      │
+│  "pcr_total": "1.19", "sentiment": "bearish", "structure_type": "LL",        │
+│  "session_phase": "early"}. Output JSON:                                     │
+│  {'regime','confidence','recommendation'}                                    │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_market_data executed with result: [
+  {
+    "date": "2026-05-19",
+    "time": "10:05:00",
+    "adx": "13.63939108210391",
+    "supertrend_direction": "bullish",
+    "structure_type": "LL",
+    "session_phase": "early",
+    "atr": "9.6...[0m
+[32mTool query_market_data executed with result: [
+  {
+    "id": "3859",
+    "timestamp": "2026-05-19T10:05:00.016843",
+    "date": "2026-05-19",
+    "time": "10:05:00",
+    "trading_day": "1",
+    "index_name": "NIFTY",
+    "spot": "23699.25",
+    ...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Market Regime Detector                                               │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Now let me analyze the data at 10:05:00, which is the current time:         │
+│                                                                              │
+│  **Current Data (10:05:00):**                                                │
+│  - Spot: 23,699.25                                                           │
+│  - EMA_20: 23,704.86                                                         │
+│  - ADX: 13.64                                                                │
+│  - ST_15min_direction: "bullish"                                             │
+│  - ST_consensus: "bullish"                                                   │
+│  - Structure_type: "LL"                                                      │
+│  - VIX: 18.84                                                                │
+│  - IV Rank: 71.1                                                             │
+│  - Sentiment: "bearish"                                                      │
+│                                                                              │
+│  **Checking conditions:**                                                    │
+│                                                                              │
+│  **TRENDING BULLISH check (all 3 must agree):**                              │
+│  1. st_15min_direction = "bullish" ✅ (bullish)                              │
+│  2. spot > ema_20? 23,699.25 > 23,704.86? ❌ (NO - spot is BELOW EMA_20)     │
+│  3. ADX > 25? 13.64 > 25? ❌ AND st_consensus = "bullish" ✅                 │
+│                                                                              │
+│  **Result: NOT Trending Bullish** (fails conditions 2 and 3)                 │
+│                                                                              │
+│  **TRENDING BEARISH check (all 3 must agree):**                              │
+│  1. st_15min_direction = "bearish"? ❌ (it's "bullish")                      │
+│  2. spot < ema_20? 23,699.25 < 23,704.86? ✅                                 │
+│  3. ADX > 25? ❌ AND st_consensus = "bearish"? ❌                            │
+│                                                                              │
+│  **Result: NOT Trending Bearish**                                            │
+│                                                                              │
+│  **SIDEWAYS check (any of):**                                                │
+│  - ADX < 20? 13.64 < 20 ✅ **YES**                                           │
+│  - st_consensus = "mixed"? No, it's "bullish"                                │
+│  - spot near EMA? Difference = 23,704.86 - 23,699.25 = 5.61. 5.61/23,704.86  │
+│  = 0.024% - within 0.3% ✅ **YES**                                           │
+│                                                                              │
+│  **Result: SIDEWAYS**                                                        │
+│                                                                              │
+│  **Additional Checks:**                                                      │
+│  - VIX = 18.84 > 18 ✅ → degrade confidence by 0.2                           │
+│  - IV Rank = 71.1 < 85 → no caution needed                                   │
+│  - Structure LL + bullish ST? Structure is LL, ST is bullish. The            │
+│  additional check says "structure LL + bearish ST → confirm bearish" and     │
+│  "structure HH + bullish ST → confirm bullish". Structure is LL but ST is    │
+│  bullish (not bearish), so neither extra confirmation applies.               │
+│                                                                              │
+│  **Confidence calculation:**                                                 │
+│  - Base confidence for sideways: ~0.7                                        │
+│  - VIX > 18 degrades by 0.2 → 0.5                                            │
+│  - IV rank 71.1 (< 85) → no caution needed                                   │
+│                                                                              │
+│  **Recommendation:** "caution" due to VIX > 18                               │
+│                                                                              │
+│  Let me refine the confidence more carefully.                                │
+│                                                                              │
+│  Base confidence for Sideways regime with ADX=13.6 (very low): 0.7           │
+│  Penalty: VIX 18.84 > 18 → -0.2                                              │
+│  So confidence = 0.5                                                         │
+│                                                                              │
+│  Since IV Rank 71.1 < 85, recommendation is not "caution" due to IV rank,    │
+│  but VIX > 18 suggests caution.                                              │
+│                                                                              │
+│  Actually, re-reading: "VIX > 18 → degrade confidence by 0.2" and "IV rank   │
+│  > 85 → recommendation = 'caution'". IV rank is 71.1 (< 85), so no caution   │
+│  from IV rank. But since VIX is elevated at 18.84, confidence is degraded.   │
+│                                                                              │
+│  Let me also check: spot near EMA (within 0.3%):                             │
+│  % diff = abs(23699.25 - 23704.86) / 23704.86 = 5.61/23704.86 = 0.024%. Yes  │
+│  within 0.3%.                                                                │
+│                                                                              │
+│  **Final Classification:**                                                   │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "regime": "sideways",                                                     │
+│    "confidence": 0.5,                                                        │
+│    "recommendation": "caution",                                              │
+│    "reason": "ADX at 13.64 (<20) indicates sideways/weak trend. Spot         │
+│  (23699.25) is near EMA_20 (23704.86, within 0.024%). SuperTrend 15-min is   │
+│  bullish but spot is below EMA_20, creating conflict. Structure is LL but    │
+│  ST is bullish (divergent). VIX at 18.84 (>18) degrades confidence.          │
+│  Sentiment is bearish but indicators lack directional conviction."           │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:05:22]   Regime: sideways → caution
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Strategy Architect                                                   │
+│                                                                              │
+│  Task: Regime: {"regime": "sideways", "confidence": 0.5, "recommendation":   │
+│  "caution", "reason": "ADX at 13.64 (<20) indicates sideways/weak trend.     │
+│  Spot (23699.25) is near EMA_20 (23704.86, within 0.024%). SuperTrend        │
+│  15-min is bullish but spot is below EMA_20, creating conflict. Structure    │
+│  is LL but ST is bullish (divergent). VIX at 18.84 (>18) degrades            │
+│  confidence. Sentiment is bearish but indicators lack directional            │
+│  conviction."}. VIX: 18.84. Entry signal from gate: BULLISH (conf=75%).      │
+│  Default: PUT_CREDIT_SPREAD wings=150. BULLISH→PUT_SPREAD,                   │
+│  BEARISH→CALL_SPREAD, NEUTRAL→BUTTERFLY. These can MORPH later via position  │
+│  manager.                                                                    │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_market_data executed with result: [
+  {
+    "date": "2026-05-19",
+    "time": "10:05:00",
+    "adx": "13.63939108210391",
+    "supertrend_direction": "bullish",
+    "structure_type": "LL",
+    "session_phase": "early",
+    "atr": "9.6...[0m
+[32mTool query_market_data executed with result: [
+  {
+    "date": "2026-05-19",
+    "time": "10:05:00",
+    "india_vix": "18.84"
+  },
+  {
+    "date": "2026-05-19",
+    "time": "10:04:00",
+    "india_vix": "18.86"
+  },
+  {
+    "date": "2026-05-19",
+...[0m
+[32mTool query_market_data executed with result: [
+  {
+    "date": "2026-05-19",
+    "time": "10:05:00",
+    "spot": "23699.25",
+    "open_price": "23675.3",
+    "prev_close": "23649.95"
+  },
+  {
+    "date": "2026-05-19",
+    "time": "10:04:00",
+   ...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Strategy Architect                                                   │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Let me analyze the data and apply the mapping rules.                        │
+│                                                                              │
+│  **Current State:**                                                          │
+│  - **Regime**: sideways (ADX 13.64 < 20, spot near EMA)                      │
+│  - **VIX**: 18.84                                                            │
+│  - **Confidence**: 0.5 (low)                                                 │
+│  - **Recommendation**: caution                                               │
+│  - **Gate signal**: BULLISH (75% confidence)                                 │
+│  - **Default wings**: 150                                                    │
+│                                                                              │
+│  **Mapping Decision:**                                                       │
+│                                                                              │
+│  Regime Agent says "sideways" → IRON_BUTTERFLY (4 legs: SELL ATM CE+PE, BUY  │
+│  ATM±200 CE+PE)                                                              │
+│                                                                              │
+│  But the entry gate signal is BULLISH (conf=75%) with default                │
+│  PUT_CREDIT_SPREAD wings=150. The instruction says: "BULLISH→PUT_SPREAD,     │
+│  BEARISH→CALL_SPREAD, NEUTRAL→BUTTERFLY."                                    │
+│                                                                              │
+│  However, the **Regime Agent's classification** is the primary driver per    │
+│  my instructions: "You receive the Regime Agent's classification and decide  │
+│  the trade." The regime is **sideways** → IRON_BUTTERFLY.                    │
+│                                                                              │
+│  **Parameter Adjustments:**                                                  │
+│                                                                              │
+│  - **wing_width**: Default 200. VIX is 18.84 (between 15 and 20), so         │
+│  default 200.                                                                │
+│  - **sl_pct**: Default 0.25. VIX 18.84 > 18 → 0.35.                          │
+│  - **tp_pct**: Default 0.50. No strong trend (ADX < 20), so keep 0.50.       │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "strategy_type": "IRON_BUTTERFLY",                                        │
+│    "leg_count": 4,                                                           │
+│    "wing_width": 200,                                                        │
+│    "sl_pct": 0.35,                                                           │
+│    "tp_pct": 0.50,                                                           │
+│    "reason": "Regime Agent classified regime as 'sideways' (ADX 13.64 < 20,  │
+│  spot 23699.25 within 0.024% of EMA_20). Per mapping, sideways →             │
+│  IRON_BUTTERFLY. VIX at 18.84 (>18) triggers SL adjustment to 0.35.          │
+│  Wing_width kept at 200 (VIX between 15-20). TP remains 0.50 as no strong    │
+│  trend (ADX < 20). Gate signal bullish (75%) conflicts with sideways regime  │
+│  - regime classification takes priority."                                    │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:05:31]   Strategy: IRON_BUTTERFLY wings=200 sl=0.35 tp=0.5
+[10:05:32]   Strategy: IRON_BUTTERFLY wings=200 sl=0.35 tp=0.5
+[10:05:32]   Contracts: NIFTY19MAY26C23700, NIFTY19MAY26P23700, NIFTY19MAY26P23500, NIFTY19MAY26C23900
+[10:05:32]   Execution: net_credit=₹106.2
+[10:05:32]   Risk: 4 orders placed (2 SL + 2 TP)
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: NSE_OPTIONS Execution Specialist                                     │
+│                                                                              │
+│  Task: SIMULATE an Iron Butterfly trade with these fills (DO NOT call        │
+│  broker):                                                                    │
+│  [{'action': 'SELL', 'strike': 23700, 'type': 'CE', 'fill_price': 62.2,      │
+│  'tsym': 'NIFTY19MAY26C23700'}, {'action': 'SELL', 'strike': 23700, 'type':  │
+│  'PE', 'fill_price': 62.25, 'tsym': 'NIFTY19MAY26P23700'}, {'action':        │
+│  'BUY', 'strike': 23500, 'type': 'PE', 'fill_price': 10.6, 'tsym':           │
+│  'NIFTY19MAY26P23500'}, {'action': 'BUY', 'strike': 23900, 'type': 'CE',     │
+│  'fill_price': 7.65, 'tsym': 'NIFTY19MAY26C23900'}]                          │
+│                                                                              │
+│  Produce a JSON TradeSignal with: market, ticker, action, strategy_type,     │
+│  size,                                                                       │
+│  strikes, sl_level, tp_level. Use the actual fill prices from above.         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: NSE_OPTIONS Execution Specialist                                     │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Here's the TradeSignal JSON based on the actual fill prices:                │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "market": "NSE_OPTIONS",                                                  │
+│    "ticker": "NIFTY",                                                        │
+│    "action": "SELL",                                                         │
+│    "strategy_type": "IRON_BUTTERFLY",                                        │
+│    "size": 1,                                                                │
+│    "strikes": {                                                              │
+│      "short_call": 23700,                                                    │
+│      "short_put": 23700,                                                     │
+│      "long_put": 23500,                                                      │
+│      "long_call": 23900                                                      │
+│    },                                                                        │
+│    "sl_level": null,                                                         │
+│    "tp_level": null,                                                         │
+│    "fills": [                                                                │
+│      {"action": "SELL", "strike": 23700, "type": "CE", "fill_price": 62.2,   │
+│  "tsym": "NIFTY19MAY26C23700"},                                              │
+│      {"action": "SELL", "strike": 23700, "type": "PE", "fill_price": 62.25,  │
+│  "tsym": "NIFTY19MAY26P23700"},                                              │
+│      {"action": "BUY", "strike": 23500, "type": "PE", "fill_price": 10.6,    │
+│  "tsym": "NIFTY19MAY26P23500"},                                              │
+│      {"action": "BUY", "strike": 23900, "type": "CE", "fill_price": 7.65,    │
+│  "tsym": "NIFTY19MAY26C23900"}                                               │
+│    ],                                                                        │
+│    "net_credit": 106.2,                                                      │
+│    "max_risk": 93.8,                                                         │
+│    "expiry": "19MAY2026"                                                     │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+│  **Summary of the Iron Butterfly:**                                          │
+│                                                                              │
+│  | Leg | Action | Strike | Type | Fill Price |                               │
+│  |-----|--------|--------|------|------------|                               │
+│  | Short Center (Call) | SELL | 23700 | CE | 62.20 |                         │
+│  | Short Center (Put) | SELL | 23700 | PE | 62.25 |                          │
+│  | Long Wing (Put) | BUY | 23500 | PE | 10.60 |                              │
+│  | Long Wing (Call) | BUY | 23900 | CE | 7.65 |                              │
+│                                                                              │
+│  - **Net Credit Received**: 62.20 + 62.25 − 10.60 − 7.65 = **₹106.20** per   │
+│  lot                                                                         │
+│  - **Max Risk** (width of wing − credit): (200 − 106.20) = **₹93.80** per    │
+│  lot                                                                         │
+│  - **Breakevens**: 23700 ± 106.20 → **23593.80** (lower) / **23806.20**      │
+│  (upper)                                                                     │
+│  - **Max Profit**: Net credit of ₹106.20 at exactly 23700 expiry             │
+│  - **Max Loss**: ₹93.80 if NIFTY moves beyond 23500 or 23900 at expiry       │
+│                                                                              │
+│  This is a dry-run simulation only — no broker calls were made.              │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Risk & Compliance Sentry (The Commander)                             │
+│                                                                              │
+│  Task: You are the Risk Sentry. The Executioner has placed these legs:       │
+│  [{"action": "SELL", "strike": 23700, "type": "CE", "fill_price": 62.2,      │
+│  "tsym": "NIFTY19MAY26C23700"}, {"action": "SELL", "strike": 23700, "type":  │
+│  "PE", "fill_price": 62.25, "tsym": "NIFTY19MAY26P23700"}, {"action":        │
+│  "BUY", "strike": 23500, "type": "PE", "fill_price": 10.6, "tsym":           │
+│  "NIFTY19MAY26P23500"}, {"action": "BUY", "strike": 23900, "type": "CE",     │
+│  "fill_price": 7.65, "tsym": "NIFTY19MAY26C23900"}]                          │
+│                                                                              │
+│  Risk Limits: net_credit=₹106.2, VIX=18.84, spot=23699.25                    │
+│  SL levels (premium × 1.50): {'ce': 83.97, 'pe': 84.04}                      │
+│  TP levels (premium × 0.50): {'ce': 31.1, 'pe': 31.12}                       │
+│  Expiry: 19-MAY-2026                                                         │
+│                                                                              │
+│  STEP 1: Call query_pattern to get 6-TF traffic light pattern +              │
+│  P(UP/DOWN/SIDE) for 15m horizon.                                            │
+│          Use risk_guidance to set SL/TP adaptation: trending → tighten SL,   │
+│  sideways → widen SL.                                                        │
+│  STEP 2: Call monitor_pnl_greeks with these legs to get current P&L +        │
+│  Greeks.                                                                     │
+│  STEP 3: For each SELL leg, call place_sl_order at SL price (from pattern    │
+│  guidance) and place_tp_order at TP price.                                   │
+│  STEP 4: Call tsl_engine with entry_price and current_price for each SELL    │
+│  leg.                                                                        │
+│  STEP 5: If TSL decision=TRAIL, call modify_sl_order with new tsl_level.     │
+│  STEP 6: Output risk_decision JSON with all order_ids, pattern guidance,     │
+│  P&L, and TSL status.                                                        │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_pattern executed with result: {
+  "pattern": "------",
+  "n_samples": 0,
+  "prediction": "SIDE",
+  "confidence": 0,
+  "horizon": "15m",
+  "up_15m": null,
+  "down_15m": null,
+  "side_15m": null,
+  "risk_guidance": {
+    "sl_pct": 0...[0m
+[32mTool monitor_pnl_greeks executed with result: {
+  "timestamp": "2026-05-19T10:05:41.049003",
+  "symbol": "NIFTY",
+  "spot": 23699.25,
+  "vix": 18.84,
+  "position": {
+    "total_legs": 4,
+    "total_units": 260,
+    "mtm_pnl_total": 0.0
+  },
+  "le...[0m
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+[32mTool place_sl_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "SL-NIFTY19MAY26C23700-99-SL_CE_23700",
+  "tsym": "NIFTY19MAY26C23700",
+  "trigger_price": 99.52,
+  "quantity": 65,
+  "type": "SL-LMT",
+  ...[0m
+[32mTool place_tp_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "TP-NIFTY19MAY26C23700-31-TP_CE_23700",
+  "tsym": "NIFTY19MAY26C23700",
+  "limit_price": 31.1,
+  "quantity": 65,
+  "type": "LIMIT",
+  "aud...[0m
+[32mTool place_sl_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "SL-NIFTY19MAY26P23700-99-SL_PE_23700",
+  "tsym": "NIFTY19MAY26P23700",
+  "trigger_price": 99.6,
+  "quantity": 65,
+  "type": "SL-LMT",
+  "...[0m
+[32mTool place_tp_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "TP-NIFTY19MAY26P23700-31-TP_PE_23700",
+  "tsym": "NIFTY19MAY26P23700",
+  "limit_price": 31.12,
+  "quantity": 65,
+  "type": "LIMIT",
+  "au...[0m
+[32mTool tsl_engine executed with result: {
+  "entry_price": 62.2,
+  "current_price": 62.2,
+  "highest_favorable": 62.2,
+  "current_profit": 0.0,
+  "profit_pct": 0.0,
+  "sl_level": 99.52,
+  "tp_level": 31.1,
+  "tsl_level": null,
+  "tsl_active...[0m
+[32mTool tsl_engine executed with result: {
+  "entry_price": 62.25,
+  "current_price": 62.25,
+  "highest_favorable": 62.25,
+  "current_profit": 0.0,
+  "profit_pct": 0.0,
+  "sl_level": 99.6,
+  "tp_level": 31.12,
+  "tsl_level": null,
+  "tsl_act...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Risk & Compliance Sentry (The Commander)                             │
+│                                                                              │
+│  Final Answer:                                                               │
+│  All orders placed, TSL engine shows HOLD (no trailing needed yet at         │
+│  entry). Here is the complete risk decision:                                 │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "market": "NSE_OPTIONS",                                                  │
+│    "ticker": "NIFTY",                                                        │
+│    "strategy": "IRON_BUTTERFLY",                                             │
+│    "expiry": "19MAY2026",                                                    │
+│    "spot": 23699.25,                                                         │
+│    "vix": 18.84,                                                             │
+│    "net_credit": 106.2,                                                      │
+│    "mtm_pnl_total": 0.0,                                                     │
+│    "timestamp": "2026-05-19T10:05:41",                                       │
+│    "greeks": {                                                               │
+│      "delta": 0.0177,                                                        │
+│      "gamma": 0.0105,                                                        │
+│      "vega": 11.13,                                                          │
+│      "theta": -287.34,                                                       │
+│      "wings_delta": 0.0239,                                                  │
+│      "body_delta": -0.0062                                                   │
+│    },                                                                        │
+│    "pattern_guidance": {                                                     │
+│      "6TF_pattern": "------",                                                │
+│      "prediction": "SIDE",                                                   │
+│      "confidence": 0,                                                        │
+│      "bias": "UNCERTAIN",                                                    │
+│      "sl_adjustment_pct": 60,                                                │
+│      "tsl_lock_ratio": 0.3,                                                  │
+│      "guidance": "UNCERTAIN pattern → widened SL to 60% (1.6x entry) to      │
+│  avoid noise-triggered exits"                                                │
+│    },                                                                        │
+│    "sell_legs": {                                                            │
+│      "CE_23700": {                                                           │
+│        "action": "SELL",                                                     │
+│        "entry_price": 62.2,                                                  │
+│        "current_ltp": 62.2,                                                  │
+│        "leg_pnl": 0.0,                                                       │
+│        "sl_price": 99.52,                                                    │
+│        "tp_price": 31.1,                                                     │
+│        "sl_order": {                                                         │
+│          "order_id": "SL-NIFTY19MAY26C23700-99-SL_CE_23700",                 │
+│          "status": "PLACED",                                                 │
+│          "type": "SL-LMT",                                                   │
+│          "trigger_price": 99.52                                              │
+│        },                                                                    │
+│        "tp_order": {                                                         │
+│          "order_id": "TP-NIFTY19MAY26C23700-31-TP_CE_23700",                 │
+│          "status": "PLACED",                                                 │
+│          "type": "LIMIT",                                                    │
+│          "limit_price": 31.1                                                 │
+│        },                                                                    │
+│        "tsl_status": {                                                       │
+│          "active": false,                                                    │
+│          "current_level": null,                                              │
+│          "profit_pct": 0.0,                                                  │
+│          "decision": "HOLD"                                                  │
+│        }                                                                     │
+│      },                                                                      │
+│      "PE_23700": {                                                           │
+│        "action": "SELL",                                                     │
+│        "entry_price": 62.25,                                                 │
+│        "current_ltp": 62.25,                                                 │
+│        "leg_pnl": 0.0,                                                       │
+│        "sl_price": 99.6,                                                     │
+│        "tp_price": 31.12,                                                    │
+│        "sl_order": {                                                         │
+│          "order_id": "SL-NIFTY19MAY26P23700-99-SL_PE_23700",                 │
+│          "status": "PLACED",                                                 │
+│          "type": "SL-LMT",                                                   │
+│          "trigger_price": 99.6                                               │
+│        },                                                                    │
+│        "tp_order": {                                                         │
+│          "order_id": "TP-NIFTY19MAY26P23700-31-TP_PE_23700",                 │
+│          "status": "PLACED",                                                 │
+│          "type": "LIMIT",                                                    │
+│          "limit_price": 31.12                                                │
+│        },                                                                    │
+│        "tsl_status": {                                                       │
+│          "active": false,                                                    │
+│          "current_level": null,                                              │
+│          "profit_pct": 0.0,                                                  │
+│          "decision": "HOLD"                                                  │
+│        }                                                                     │
+│      }                                                                       │
+│    },                                                                        │
+│    "wing_hedges": [                                                          │
+│      {"tsym": "NIFTY19MAY26P23500", "action": "BUY", "entry_price": 10.6,    │
+│  "current_ltp": 10.6, "leg_pnl": 0.0},                                       │
+│      {"tsym": "NIFTY19MAY26C23900", "action": "BUY", "entry_price": 7.65,    │
+│  "current_ltp": 7.65, "leg_pnl": 0.0}                                        │
+│    ],                                                                        │
+│    "risk_summary": {                                                         │
+│      "max_profit": 106.2,                                                    │
+│      "max_loss": 93.8,                                                       │
+│      "breakevens": {"lower": 23593.8, "upper": 23806.2},                     │
+│      "sl_breach_risk": "NONE — both legs at entry price",                    │
+│      "tp_proximity": "NONE — no decay yet",                                  │
+│      "tsl_status": "MONITORING — TSL activates after 25% of TP profit        │
+│  (premium drops by ~7.78 from entry)",                                       │
+│      "pattern_adaptation": "UNCERTAIN/SIDE bias → SL widened to 60% buffer   │
+│  (from default 50%) to prevent premature stop-outs in choppy conditions"     │
+│    },                                                                        │
+│    "monitoring_cycle": "COMPLETE",                                           │
+│    "next_actions": [                                                         │
+│      "Continue monitoring P&L each cycle",                                   │
+│      "When premium decays ~25% of target (~₹7.78), TSL activation will       │
+│  trigger trailing",                                                          │
+│      "OCO lifecycle: if TP fills → CANCEL SL order; if SL fills → CANCEL TP  │
+│  order"                                                                      │
+│    ],                                                                        │
+│    "mode": "DRY_RUN_SIMULATION"                                              │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:05:59]   CrewAI Chain: ✅ context passed
+[10:05:59] ENTERED: IRON_BUTTERFLY (4 legs) | Net ₹106.2
+[10:10:01] Scheduled run | Active: True | Today: 3/4
+[10:10:10] TSL: PE SL ratcheted 84.04 → 51.63 (lock_ratio=0.5)
+[10:15:02] Scheduled run | Active: True | Today: 3/4
+[10:15:10] SL HIT — NIFTY19MAY26C23700: LTP=90.2 >= 83.97
+[10:15:10] EXIT (SL_HIT): P&L ₹-4.1
+2026-05-19 10:15:10,742 | INFO     | Trade→Pattern logged: partial | P&L ₹-4.1
+[10:20:01] Scheduled run | Active: False | Today: 3/4
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Market Regime Detector                                               │
+│                                                                              │
+│  Task: Classify NIFTY regime: {"spot": "23725.7", "india_vix": "18.52",      │
+│  "adx": "16.34822860401332", "supertrend_direction": "bullish",              │
+│  "iv_current": "18.52", "iv_rank": "63.4", "rsi": "54.75640305077138",       │
+│  "pcr_total": "1.183", "sentiment": "bearish", "structure_type": "LL",       │
+│  "session_phase": "early"}. Output JSON:                                     │
+│  {'regime','confidence','recommendation'}                                    │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_market_data executed with result: [
+  {
+    "id": "3874",
+    "timestamp": "2026-05-19T10:20:00.014688",
+    "date": "2026-05-19",
+    "time": "10:20:00",
+    "trading_day": "1",
+    "index_name": "NIFTY",
+    "spot": "23725.7",
+    "...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Market Regime Detector                                               │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Now let me analyze the data from the current time (10:20:00) to classify    │
+│  the regime.                                                                 │
+│                                                                              │
+│  **Current snapshot (10:20:00):**                                            │
+│  - **Spot**: 23725.7                                                         │
+│  - **India VIX**: 18.52 (> 18 → degrade confidence by 0.2)                   │
+│  - **ADX**: 16.35 (< 20 → sideways indicator)                                │
+│  - **SuperTrend 15-min direction**: bullish                                  │
+│  - **SuperTrend consensus**: bullish                                         │
+│  - **EMA 20**: 23734.19                                                      │
+│  - **Spot vs EMA 20**: 23725.7 < 23734.19 (spot below EMA)                   │
+│  - **Structure type**: LL (Lower Low)                                        │
+│  - **IV Rank**: 63.4 (< 85, so no "caution" from IV rank)                    │
+│  - **Sentiment**: bearish                                                    │
+│  - **PCR**: 1.183 (high put-call ratio)                                      │
+│                                                                              │
+│  **Checking TRENDING BULLISH criteria:**                                     │
+│  1. ✅ st_15min_direction = "bullish"                                        │
+│  2. ❌ spot (23725.7) > ema_20 (23734.19)? NO - spot is BELOW EMA            │
+│  3. ❌ ADX (16.35) > 25? NO - ADX is 16.35                                   │
+│                                                                              │
+│  → **Not trending bullish** (2 out of 3 fail)                                │
+│                                                                              │
+│  **Checking TRENDING BEARISH criteria:**                                     │
+│  1. ❌ st_15min_direction = "bearish"? It's "bullish" - FAILS                │
+│  2. ✅ spot (23725.7) < ema_20 (23734.19)? YES                               │
+│  3. ❌ ADX (16.35) > 25 AND st_consensus = "bearish"? ADX is 16.35 (< 20),   │
+│  and st_consensus is "bullish"                                               │
+│                                                                              │
+│  → **Not trending bearish** (2 out of 3 fail)                                │
+│                                                                              │
+│  **Checking SIDEWAYS criteria:**                                             │
+│  - ✅ ADX (16.35) < 20 → SIDEWAYS                                            │
+│  - ❌ st_consensus = "mixed"? It's "bullish"                                 │
+│  - ❌ spot near EMA? Spot is 23725.7, EMA 20 is 23734.19. Diff = 0.036%      │
+│  (within 0.3%) - YES, near EMA.                                              │
+│                                                                              │
+│  → **SIDEWAYS regime confirmed**                                             │
+│                                                                              │
+│  **Additional checks:**                                                      │
+│  - VIX (18.52) > 18 → degrade confidence by 0.2                              │
+│  - IV rank (63.4) < 85 → no "caution"                                        │
+│  - Structure LL + ST bullish → but ADX is low, so no extra bearish           │
+│  confidence here since the ADX doesn't confirm a trend                       │
+│                                                                              │
+│  **Confidence calculation:**                                                 │
+│  Base confidence for sideways: ~0.70 (clear ADX < 20)                        │
+│  VIX > 18: degrade by 0.2 → 0.50                                             │
+│  But also structure is LL with bearish sentiment → some bearish undertone    │
+│                                                                              │
+│  Let me set confidence at **0.50** after VIX degradation.                    │
+│                                                                              │
+│  Recommendation: **caution** (VIX > 18, low ADX, mixed signals with LL       │
+│  structure but bullish ST)                                                   │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "regime": "sideways",                                                     │
+│    "confidence": 0.50,                                                       │
+│    "recommendation": "caution",                                              │
+│    "reason": "ADX (16.35) is below 20 indicating sideways/low-trend          │
+│  environment. Spot (23725.7) is slightly below EMA20 (23734.19) within       │
+│  0.036%, confirming no directional edge. SuperTrend is bullish but ADX is    │
+│  too weak to confirm a trending move. Structure shows LL (lower low) with    │
+│  bearish sentiment, creating mixed signals. VIX at 18.52 > 18 reduces        │
+│  confidence. Low ADX + near-EMA price action + conflicting structure         │
+│  signals suggest a cautious approach."                                       │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:20:22]   Regime: sideways → caution
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Strategy Architect                                                   │
+│                                                                              │
+│  Task: Regime: {"regime": "sideways", "confidence": 0.5, "recommendation":   │
+│  "caution", "reason": "ADX (16.35) is below 20 indicating                    │
+│  sideways/low-trend environment. Spot (23725.7) is slightly below EMA20      │
+│  (23734.19) within 0.036%, confirming no directional edge. SuperTrend is     │
+│  bullish but ADX is too weak to confirm a trending move. Structure shows LL  │
+│  (lower low) with bearish sentiment, creating mixed signals. VIX at 18.52 >  │
+│  18 reduces confidence. Low ADX + near-EMA price action + conflicting        │
+│  structure signals suggest a cautious approach."}. VIX: 18.52. Entry signal  │
+│  from gate: BULLISH (conf=75%). Default: PUT_CREDIT_SPREAD wings=150.        │
+│  BULLISH→PUT_SPREAD, BEARISH→CALL_SPREAD, NEUTRAL→BUTTERFLY. These can       │
+│  MORPH later via position manager.                                           │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_market_data executed with result: [
+  {
+    "id": "3874",
+    "timestamp": "2026-05-19T10:20:00.014688",
+    "date": "2026-05-19",
+    "time": "10:20:00",
+    "trading_day": "1",
+    "index_name": "NIFTY",
+    "spot": "23725.7",
+    "...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Strategy Architect                                                   │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Now let me analyze the data and decide the strategy.                        │
+│                                                                              │
+│  **Key Observations:**                                                       │
+│                                                                              │
+│  1. **Regime from Agent**: "sideways" - ADX (16.35) < 20, indicating low     │
+│  trend environment                                                           │
+│  2. **Entry Signal from Gate**: BULLISH (75% confidence) → Default says      │
+│  PUT_CREDIT_SPREAD                                                           │
+│  3. **VIX**: 18.52 - Between 15 and 20, so wing_width = 200 (default)        │
+│  4. **VIX < 18?** No, VIX = 18.52 > 18... wait, the rule says: VIX < 15 →    │
+│  wing 150, VIX > 20 → wing 250. So 18.52 is between 15-20 → wing_width =     │
+│  200.                                                                        │
+│  5. **VIX > 18?** Yes (18.52 > 18), so sl_pct = 0.35 (instead of default     │
+│  0.25)                                                                       │
+│  6. **Strong trend?** No, ADX is low, so tp_pct = 0.50 (default)             │
+│                                                                              │
+│  Now, the mapping says:                                                      │
+│  - Regime is **sideways** → IRON_BUTTERFLY                                   │
+│  - BUT gate signal is **BULLISH (75%)** → Default says PUT_CREDIT_SPREAD     │
+│  (BULLISH→PUT_SPREAD)                                                        │
+│                                                                              │
+│  The regime mapping is clear: sideways → IRON_BUTTERFLY. However, the        │
+│  instruction says "Entry signal from gate: BULLISH (conf=75%). Default:      │
+│  PUT_CREDIT_SPREAD wings=150. BULLISH→PUT_SPREAD, BEARISH→CALL_SPREAD,       │
+│  NEUTRAL→BUTTERFLY."                                                         │
+│                                                                              │
+│  There's a conflict: Regime says sideways (→ Butterfly), but gate says       │
+│  BULLISH (→ Put Credit Spread). The gate signal has 75% confidence, while    │
+│  the regime has 50% confidence with "caution" recommendation.                │
+│                                                                              │
+│  However, looking more carefully at the ADX (16.35) which is clearly below   │
+│  20, and the market is hugging EMA20 closely (spot 23725.7 vs EMA20          │
+│  23734.19, only 0.036% apart), this confirms sideways/no-directional-edge    │
+│  environment. The BULLISH gate signal is contradicted by the low ADX. Given  │
+│  the regime agent's analysis is more comprehensive, I'll go with             │
+│  **IRON_BUTTERFLY** as per the regime → strategy mapping.                    │
+│                                                                              │
+│  **Final Decision:**                                                         │
+│  - strategy_type: IRON_BUTTERFLY                                             │
+│  - leg_count: 4                                                              │
+│  - wing_width: 200 (VIX 18.52 between 15-20)                                 │
+│  - sl_pct: 0.35 (VIX 18.52 > 18)                                             │
+│  - tp_pct: 0.50 (no strong trend)                                            │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "strategy_type": "IRON_BUTTERFLY",                                        │
+│    "leg_count": 4,                                                           │
+│    "wing_width": 200,                                                        │
+│    "sl_pct": 0.35,                                                           │
+│    "tp_pct": 0.50,                                                           │
+│    "reason": "Regime classified as sideways (ADX 16.35 < 20) with spot at    │
+│  23725.7 hugging EMA20 (23734.19) within 0.036%, confirming no directional   │
+│  edge. VIX at 18.52 is between 15-20, so default wing_width=200 is           │
+│  appropriate. VIX > 18 increases sl_pct to 0.35 for wider protection. No     │
+│  strong trend present (ADX low), so tp_pct stays at default 0.50. Entry      │
+│  signal was BULLISH (75% conf) but low ADX and mixed structure (LL with      │
+│  bearish sentiment) overrides directional bias in favor of neutral iron      │
+│  butterfly."                                                                 │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:20:35]   Strategy: IRON_BUTTERFLY wings=200 sl=0.35 tp=0.5
+[10:20:35]   Strategy: IRON_BUTTERFLY wings=200 sl=0.35 tp=0.5
+[10:20:35]   Contracts: NIFTY19MAY26C23750, NIFTY19MAY26P23750, NIFTY19MAY26P23550, NIFTY19MAY26C23950
+[10:20:35]   Execution: net_credit=₹100.35
+[10:20:35]   Risk: 4 orders placed (2 SL + 2 TP)
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: NSE_OPTIONS Execution Specialist                                     │
+│                                                                              │
+│  Task: SIMULATE an Iron Butterfly trade with these fills (DO NOT call        │
+│  broker):                                                                    │
+│  [{'action': 'SELL', 'strike': 23750, 'type': 'CE', 'fill_price': 42.65,     │
+│  'tsym': 'NIFTY19MAY26C23750'}, {'action': 'SELL', 'strike': 23750, 'type':  │
+│  'PE', 'fill_price': 74.2, 'tsym': 'NIFTY19MAY26P23750'}, {'action': 'BUY',  │
+│  'strike': 23550, 'type': 'PE', 'fill_price': 12.35, 'tsym':                 │
+│  'NIFTY19MAY26P23550'}, {'action': 'BUY', 'strike': 23950, 'type': 'CE',     │
+│  'fill_price': 4.15, 'tsym': 'NIFTY19MAY26C23950'}]                          │
+│                                                                              │
+│  Produce a JSON TradeSignal with: market, ticker, action, strategy_type,     │
+│  size,                                                                       │
+│  strikes, sl_level, tp_level. Use the actual fill prices from above.         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: NSE_OPTIONS Execution Specialist                                     │
+│                                                                              │
+│  Final Answer:                                                               │
+│  Let me analyze this Iron Butterfly trade and produce the JSON TradeSignal   │
+│  with the actual fill prices.                                                │
+│                                                                              │
+│  **Iron Butterfly Structure:**                                               │
+│  - SELL ATM Call and Put (center) = 23750 CE & 23750 PE                      │
+│  - BUY OTM Call (upper wing) = 23950 CE                                      │
+│  - BUY OTM Put (lower wing) = 23550 PE                                       │
+│                                                                              │
+│  **Net Credit Calculation:**                                                 │
+│  - Sell 23750 CE @ 42.65                                                     │
+│  - Sell 23750 PE @ 74.20                                                     │
+│  - Buy 23550 PE @ 12.35                                                      │
+│  - Buy 23950 CE @ 4.15                                                       │
+│                                                                              │
+│  Net Credit = (42.65 + 74.20) - (12.35 + 4.15) = 116.85 - 16.50 =            │
+│  **100.35**                                                                  │
+│                                                                              │
+│  **Max Loss (one side):**                                                    │
+│  - Width of wings = 23750 - 23550 = 200 (PE side) or 23950 - 23750 = 200     │
+│  (CE side)                                                                   │
+│  - Max Loss = 200 - 100.35 = **99.65** (per lot)                             │
+│                                                                              │
+│  **Strike levels for SL/TP:**                                                │
+│  - Short strike ATM = 23750                                                  │
+│  - Breakevens:                                                               │
+│    - Lower BE = 23750 - 100.35 = 23649.65                                    │
+│    - Upper BE = 23750 + 100.35 = 23850.35                                    │
+│                                                                              │
+│  Here's the TradeSignal JSON:                                                │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "market": "NSE_OPTIONS",                                                  │
+│    "ticker": "NIFTY",                                                        │
+│    "action": "ENTER",                                                        │
+│    "strategy_type": "IRON_BUTTERFLY",                                        │
+│    "size": 1,                                                                │
+│    "strikes": {                                                              │
+│      "short_call": 23750,                                                    │
+│      "short_put": 23750,                                                     │
+│      "long_call": 23950,                                                     │
+│      "long_put": 23550                                                       │
+│    },                                                                        │
+│    "fills": {                                                                │
+│      "sell_23750_CE": 42.65,                                                 │
+│      "sell_23750_PE": 74.20,                                                 │
+│      "buy_23550_PE": 12.35,                                                  │
+│      "buy_23950_CE": 4.15                                                    │
+│    },                                                                        │
+│    "net_credit": 100.35,                                                     │
+│    "max_loss": 99.65,                                                        │
+│    "breakevens": {                                                           │
+│      "lower": 23649.65,                                                      │
+│      "upper": 23850.35                                                       │
+│    },                                                                        │
+│    "sl_level": 23850.35,                                                     │
+│    "tp_level": null,                                                         │
+│    "risk_metrics": {                                                         │
+│      "max_profit": 100.35,                                                   │
+│      "max_risk": 99.65,                                                      │
+│      "risk_reward_ratio": 1.01                                               │
+│    }                                                                         │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭────────────────────────────── 🤖 Agent Started ──────────────────────────────╮
+│                                                                              │
+│  Agent: Risk & Compliance Sentry (The Commander)                             │
+│                                                                              │
+│  Task: You are the Risk Sentry. The Executioner has placed these legs:       │
+│  [{"action": "SELL", "strike": 23750, "type": "CE", "fill_price": 42.65,     │
+│  "tsym": "NIFTY19MAY26C23750"}, {"action": "SELL", "strike": 23750, "type":  │
+│  "PE", "fill_price": 74.2, "tsym": "NIFTY19MAY26P23750"}, {"action": "BUY",  │
+│  "strike": 23550, "type": "PE", "fill_price": 12.35, "tsym":                 │
+│  "NIFTY19MAY26P23550"}, {"action": "BUY", "strike": 23950, "type": "CE",     │
+│  "fill_price": 4.15, "tsym": "NIFTY19MAY26C23950"}]                          │
+│                                                                              │
+│  Risk Limits: net_credit=₹100.35, VIX=18.52, spot=23725.7                    │
+│  SL levels (premium × 1.50): {'ce': 57.58, 'pe': 100.17}                     │
+│  TP levels (premium × 0.50): {'ce': 21.32, 'pe': 37.1}                       │
+│  Expiry: 19-MAY-2026                                                         │
+│                                                                              │
+│  STEP 1: Call query_pattern to get 6-TF traffic light pattern +              │
+│  P(UP/DOWN/SIDE) for 15m horizon.                                            │
+│          Use risk_guidance to set SL/TP adaptation: trending → tighten SL,   │
+│  sideways → widen SL.                                                        │
+│  STEP 2: Call monitor_pnl_greeks with these legs to get current P&L +        │
+│  Greeks.                                                                     │
+│  STEP 3: For each SELL leg, call place_sl_order at SL price (from pattern    │
+│  guidance) and place_tp_order at TP price.                                   │
+│  STEP 4: Call tsl_engine with entry_price and current_price for each SELL    │
+│  leg.                                                                        │
+│  STEP 5: If TSL decision=TRAIL, call modify_sl_order with new tsl_level.     │
+│  STEP 6: Output risk_decision JSON with all order_ids, pattern guidance,     │
+│  P&L, and TSL status.                                                        │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[32mTool query_pattern executed with result: {
+  "pattern": "------",
+  "n_samples": 0,
+  "prediction": "SIDE",
+  "confidence": 0,
+  "horizon": "15m",
+  "up_15m": null,
+  "down_15m": null,
+  "side_15m": null,
+  "risk_guidance": {
+    "sl_pct": 0...[0m
+[32mTool monitor_pnl_greeks executed with result: {
+  "timestamp": "2026-05-19T10:20:44.938720",
+  "symbol": "NIFTY",
+  "spot": 23725.7,
+  "vix": 18.52,
+  "position": {
+    "total_legs": 4,
+    "total_units": 260,
+    "mtm_pnl_total": 0.0
+  },
+  "leg...[0m
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+Connected to Shoonya (Finvasia) (https://api.shoonya.com/NorenWClientAPI/)
+[32mTool place_sl_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "SL-NIFTY19MAY26C23750-68-SL_CE_19MAY23750",
+  "tsym": "NIFTY19MAY26C23750",
+  "trigger_price": 68.24,
+  "quantity": 65,
+  "type": "SL-LMT...[0m
+[32mTool place_tp_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "TP-NIFTY19MAY26C23750-21-TP_CE_19MAY23750",
+  "tsym": "NIFTY19MAY26C23750",
+  "limit_price": 21.32,
+  "quantity": 65,
+  "type": "LIMIT",
+...[0m
+[32mTool place_sl_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "SL-NIFTY19MAY26P23750-118-SL_PE_19MAY23750",
+  "tsym": "NIFTY19MAY26P23750",
+  "trigger_price": 118.72,
+  "quantity": 65,
+  "type": "SL-L...[0m
+[32mTool place_tp_order executed with result: {
+  "status": "PLACED",
+  "mode": "SIMULATION",
+  "order_id": "TP-NIFTY19MAY26P23750-37-TP_PE_19MAY23750",
+  "tsym": "NIFTY19MAY26P23750",
+  "limit_price": 37.1,
+  "quantity": 65,
+  "type": "LIMIT",
+ ...[0m
+[32mTool tsl_engine executed with result: {
+  "entry_price": 42.65,
+  "current_price": 42.65,
+  "highest_favorable": 42.65,
+  "current_profit": 0.0,
+  "profit_pct": 0.0,
+  "sl_level": 68.24,
+  "tp_level": 21.32,
+  "tsl_level": null,
+  "tsl_ac...[0m
+[32mTool tsl_engine executed with result: {
+  "entry_price": 74.2,
+  "current_price": 74.2,
+  "highest_favorable": 74.2,
+  "current_profit": 0.0,
+  "profit_pct": 0.0,
+  "sl_level": 118.72,
+  "tp_level": 37.1,
+  "tsl_level": null,
+  "tsl_activ...[0m
+╭─────────────────────────── ✅ Agent Final Answer ────────────────────────────╮
+│                                                                              │
+│  Agent: Risk & Compliance Sentry (The Commander)                             │
+│                                                                              │
+│  Final Answer:                                                               │
+│  All conditions met. SL/TP orders placed, TSL engine shows HOLD (no          │
+│  adjustment needed). Delivering the risk decision JSON.                      │
+│                                                                              │
+│  ```json                                                                     │
+│  {                                                                           │
+│    "risk_decision": {                                                        │
+│      "timestamp": "2026-05-19T10:20:44",                                     │
+│      "market": "NSE_OPTIONS",                                                │
+│      "ticker": "NIFTY",                                                      │
+│      "strategy": "IRON_BUTTERFLY",                                           │
+│      "expiry": "19MAY2026",                                                  │
+│      "status": "MONITORING_ACTIVE",                                          │
+│      "pattern_guidance": {                                                   │
+│        "pattern_6tf": "------",                                              │
+│        "horizon": "15m",                                                     │
+│        "bias": "UNCERTAIN",                                                  │
+│        "confidence": 0,                                                      │
+│        "sl_adjustment": "WIDENED_SL",                                        │
+│        "sl_pct": 0.6,                                                        │
+│        "tsl_lock_ratio": 0.3,                                                │
+│        "reasoning": "No historical pattern data available; bias=UNCERTAIN →  │
+│  widened SL to 60% buffer (default 50% → adjusted to 60%) to avoid noise     │
+│  triggering premature exit. TSL lock ratio reduced to 0.3 for gradual        │
+│  locking."                                                                   │
+│      },                                                                      │
+│      "position_summary": {                                                   │
+│        "net_credit": 100.35,                                                 │
+│        "spot": 23725.7,                                                      │
+│        "vix": 18.52,                                                         │
+│        "mtm_pnl": 0.0,                                                       │
+│        "greeks": {                                                           │
+│          "delta": -0.2295,                                                   │
+│          "gamma": 0.010517,                                                  │
+│          "vega": 10.96,                                                      │
+│          "theta": -277.27                                                    │
+│        }                                                                     │
+│      },                                                                      │
+│      "sell_legs": [                                                          │
+│        {                                                                     │
+│          "leg": "CE_23750",                                                  │
+│          "tsym": "NIFTY19MAY26C23750",                                       │
+│          "entry_price": 42.65,                                               │
+│          "current_ltp": 42.65,                                               │
+│          "sl_price": 68.24,                                                  │
+│          "tp_price": 21.32,                                                  │
+│          "sl_order_id": "SL-NIFTY19MAY26C23750-68-SL_CE_19MAY23750",         │
+│          "tp_order_id": "TP-NIFTY19MAY26C23750-21-TP_CE_19MAY23750",         │
+│          "tsl_active": false,                                                │
+│          "tsl_level": null,                                                  │
+│          "decision": "HOLD",                                                 │
+│          "sl_triggered": false,                                              │
+│          "tp_triggered": false                                               │
+│        },                                                                    │
+│        {                                                                     │
+│          "leg": "PE_23750",                                                  │
+│          "tsym": "NIFTY19MAY26P23750",                                       │
+│          "entry_price": 74.2,                                                │
+│          "current_ltp": 74.2,                                                │
+│          "sl_price": 118.72,                                                 │
+│          "tp_price": 37.1,                                                   │
+│          "sl_order_id": "SL-NIFTY19MAY26P23750-118-SL_PE_19MAY23750",        │
+│          "tp_order_id": "TP-NIFTY19MAY26P23750-37-TP_PE_19MAY23750",         │
+│          "tsl_active": false,                                                │
+│          "tsl_level": null,                                                  │
+│          "decision": "HOLD",                                                 │
+│          "sl_triggered": false,                                              │
+│          "tp_triggered": false                                               │
+│        }                                                                     │
+│      ],                                                                      │
+│      "buy_legs": [                                                           │
+│        {                                                                     │
+│          "leg": "PE_23550",                                                  │
+│          "tsym": "NIFTY19MAY26P23550",                                       │
+│          "action": "BUY",                                                    │
+│          "entry_price": 12.35,                                               │
+│          "status": "HEDGE_NO_SLTP"                                           │
+│        },                                                                    │
+│        {                                                                     │
+│          "leg": "CE_23950",                                                  │
+│          "tsym": "NIFTY19MAY26C23950",                                       │
+│          "action": "BUY",                                                    │
+│          "entry_price": 4.15,                                                │
+│          "status": "HEDGE_NO_SLTP"                                           │
+│        }                                                                     │
+│      ],                                                                      │
+│      "tsl_monitoring": {                                                     │
+│        "ce_tsl_status": "INACTIVE (profit 0.0% — need 50% of TP profit to    │
+│  activate. TP profit target = (42.65-21.32)=21.33. Activation at 50% of TP   │
+│  = ₹10.66 profit, i.e., price ≤ 31.99)",                                     │
+│        "pe_tsl_status": "INACTIVE (profit 0.0% — need 50% of TP profit to    │
+│  activate. TP profit target = (74.2-37.1)=37.1. Activation at 50% of TP =    │
+│  ₹18.55 profit, i.e., price ≤ 55.65)"                                        │
+│      },                                                                      │
+│      "risk_limits": {                                                        │
+│        "max_loss_per_lot": 99.65,                                            │
+│        "breakeven_lower": 23649.65,                                          │
+│        "breakeven_upper": 23850.35,                                          │
+│        "sl_ce_trigger": 68.24,                                               │
+│        "sl_pe_trigger": 118.72,                                              │
+│        "tp_ce_trigger": 21.32,                                               │
+│        "tp_pe_trigger": 37.1                                                 │
+│      },                                                                      │
+│      "next_actions": [                                                       │
+│        "MONITOR: Run monitor_pnl_greeks next cycle to detect P&L changes",   │
+│        "TSL_READY: When CE price ≤ 31.99, activate trailing stop-loss for    │
+│  23750 CE",                                                                  │
+│        "TSL_READY: When PE price ≤ 55.65, activate trailing stop-loss for    │
+│  23750 PE",                                                                  │
+│        "OCO_LIFECYCLE: If TP fills → CANCEL opposite SL order. If SL fills   │
+│  → CANCEL opposite TP order."                                                │
+│      ]                                                                       │
+│    }                                                                         │
+│  }                                                                           │
+│  ```                                                                         │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+[10:21:03]   CrewAI Chain: ✅ context passed
+[10:21:03] ENTERED: IRON_BUTTERFLY (4 legs) | Net ₹100.35
+[10:25:02] Scheduled run | Active: True | Today: 4/4
+[10:25:12] TSL: PE SL ratcheted 100.17 → 63.61 (lock_ratio=0.5)
+[10:30:02] Scheduled run | Active: True | Today: 4/4
+[10:30:15] TSL: PE SL ratcheted 63.61 → 58.56 (lock_ratio=0.5)
+[10:35:01] Scheduled run | Active: True | Today: 4/4
+[10:35:12] SL HIT — NIFTY19MAY26P23750: LTP=59.85 >= 58.56
+[10:35:12] EXIT (SL_HIT): P&L ₹5.65
+2026-05-19 10:35:12,717 | INFO     | Trade→Pattern logged: partial | P&L ₹5.65
+[10:40:01] Scheduled run | Active: False | Today: 4/4
+[10:45:01] Scheduled run | Active: False | Today: 4/4
+[10:50:01] Scheduled run | Active: False | Today: 4/4
+[10:55:01] Scheduled run | Active: False | Today: 4/4
+[11:00:01] Scheduled run | Active: False | Today: 4/4
+[11:05:01] Scheduled run | Active: False | Today: 4/4
+[11:10:02] Scheduled run | Active: False | Today: 4/4
+[11:15:01] Scheduled run | Active: False | Today: 4/4
+[11:20:01] Scheduled run | Active: False | Today: 4/4
+[11:25:01] Scheduled run | Active: False | Today: 4/4
+[11:30:01] Scheduled run | Active: False | Today: 4/4
+[11:35:01] Scheduled run | Active: False | Today: 4/4
+[11:40:02] Scheduled run | Active: False | Today: 4/4
+[11:45:02] Scheduled run | Active: False | Today: 4/4
+[11:50:02] Scheduled run | Active: False | Today: 4/4
+[11:55:02] Scheduled run | Active: False | Today: 4/4
+[12:00:02] Scheduled run | Active: False | Today: 4/4
+[12:05:01] Scheduled run | Active: False | Today: 4/4
+[12:10:02] Scheduled run | Active: False | Today: 4/4
+[12:15:01] Scheduled run | Active: False | Today: 4/4
+[12:20:02] Scheduled run | Active: False | Today: 4/4
+[12:25:01] Scheduled run | Active: False | Today: 4/4
+[12:30:03] Scheduled run | Active: False | Today: 4/4
+[12:35:01] Scheduled run | Active: False | Today: 4/4
+[12:40:01] Scheduled run | Active: False | Today: 4/4
+[12:45:02] Scheduled run | Active: False | Today: 4/4
+[12:50:02] Scheduled run | Active: False | Today: 4/4
+[12:55:02] Scheduled run | Active: False | Today: 4/4
+[13:00:01] Scheduled run | Active: False | Today: 4/4
+[13:05:02] Scheduled run | Active: False | Today: 4/4
+[13:10:01] Scheduled run | Active: False | Today: 4/4
+[13:15:01] Scheduled run | Active: False | Today: 4/4
+[13:20:01] Scheduled run | Active: False | Today: 4/4
+[13:25:01] Scheduled run | Active: False | Today: 4/4
+[13:30:02] Scheduled run | Active: False | Today: 4/4
+[13:35:01] Scheduled run | Active: False | Today: 4/4
+[13:40:02] Scheduled run | Active: False | Today: 4/4
+[13:45:01] Scheduled run | Active: False | Today: 4/4
+[13:50:02] Scheduled run | Active: False | Today: 4/4
+[13:55:01] Scheduled run | Active: False | Today: 4/4
+[14:00:01] Scheduled run | Active: False | Today: 4/4
+[14:05:01] Scheduled run | Active: False | Today: 4/4
+[14:10:02] Scheduled run | Active: False | Today: 4/4
+[14:15:02] Scheduled run | Active: False | Today: 4/4
+[14:20:01] Scheduled run | Active: False | Today: 4/4
+[14:25:02] Scheduled run | Active: False | Today: 4/4
+[14:30:01] Scheduled run | Active: False | Today: 4/4
+[14:35:01] Scheduled run | Active: False | Today: 4/4
+[14:40:01] Scheduled run | Active: False | Today: 4/4
+[14:45:01] Scheduled run | Active: False | Today: 4/4
+[14:50:01] Scheduled run | Active: False | Today: 4/4
+[14:55:01] Scheduled run | Active: False | Today: 4/4
+[15:00:01] Scheduled run | Active: False | Today: 4/4
+[15:05:01] Scheduled run | Active: False | Today: 4/4
+[15:10:02] Scheduled run | Active: False | Today: 4/4
+[15:15:02] Scheduled run | Active: False | Today: 4/4
+[15:20:01] Scheduled run | Active: False | Today: 4/4
+[15:25:02] Scheduled run | Active: False | Today: 4/4
+[15:30:01] Market closed — exiting
+[15:35:01] Market closed — exiting
+[15:40:01] Market closed — exiting
+[15:45:01] Market closed — exiting
+[15:50:01] Market closed — exiting
+[15:55:01] Market closed — exiting
