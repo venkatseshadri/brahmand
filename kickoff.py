@@ -20,8 +20,10 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
+load_dotenv()
 
 from trade_execution_db import add_active_trade
 
@@ -517,8 +519,8 @@ def run_pm(state: dict):
     try:
         from chromadb_tool import QueryChromaDBTool, StoreResearchNoteTool
         from duckdb_tool import MarketDataQueryTool, OptionSnapshotQueryTool
-        from factory import AgentFactory, LLM
-        from crewai import Task, Crew, Process
+        from factory import AgentFactory
+        from crewai import Task, Crew, Process, LLM
         from persistence import get_today_date_int
 
         af = AgentFactory()
