@@ -109,18 +109,32 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
     # ── Build tools ────────────────────────────────────────────────────
     from tools.entry_gate_tools import QueryTrendEMA, QueryTrafficLight
-    from tools.chain_tools import ResolveOptionContractsTool, ExecutePaperTradeTool
+    from tools.chain_tools import (
+        ResolveOptionContractsTool,
+        ExecutePaperTradeTool,
+        PlaceEntryOrdersTool,
+        PlaceSLTPOrdersTool,
+    )
 
     trend_tool = QueryTrendEMA()
     tl_tool = QueryTrafficLight()
     contract_tool = ResolveOptionContractsTool()
     execution_tool = ExecutePaperTradeTool()
+    entry_orders_tool = PlaceEntryOrdersTool()
+    sl_tp_orders_tool = PlaceSLTPOrdersTool()
 
-    # Risk tools
-    from tools.risk_tools import PlaceSLOrderTool, PlaceTPOrderTool
+    # Risk tools (still needed for monitoring phase: morph/shift operations)
+    from tools.risk_tools import (
+        PlaceSLOrderTool,
+        PlaceTPOrderTool,
+        CancelOrderTool,
+        ModifySLOrderTool,
+    )
 
     sl_tool = PlaceSLOrderTool()
     tp_tool = PlaceTPOrderTool()
+    cancel_tool = CancelOrderTool()
+    modify_sl_tool = ModifySLOrderTool()
 
     # ── Build agents ───────────────────────────────────────────────────
     try:
@@ -144,16 +158,24 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 "ticker": "NIFTY",
                 "mock_mode": "paper",
             },
-            tools=[execution_tool],
+            tools=[execution_tool, entry_orders_tool],
         )
         execution_agent.llm = llm
 
         risk_agent = af.create_agent(
             "risk_agent",
             variables={"market_type": "NIFTY", "ticker": "NIFTY", "mock_mode": "paper"},
-            tools=[sl_tool, tp_tool],
+            tools=[sl_tp_orders_tool],  # Entry phase: ONLY use centralized order routing
         )
         risk_agent.llm = llm
+
+        # Order Agent (routes orders through centralized hub)
+        order_agent = af.create_agent(
+            "order_agent",
+            variables={"market_type": "NIFTY", "ticker": "NIFTY"},
+            tools=[entry_orders_tool, sl_tp_orders_tool],
+        )
+        order_agent.llm = llm
     except KeyError as e:
         _log(f"  ⚠ Agent factory: {e}")
         return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
@@ -251,18 +273,29 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Task 5: Execution Agent ────────────────────────────────────────
     execution_task = Task(
         description=(
-            "Build and save the paper trade.\n\n"
-            "Parse Contract Agent's output for resolved contracts.\n"
-            "Parse Strategy Agent's output for strategy_type, wing_width, sl_pct, tp_pct.\n"
-            f"Constants: spot={spot}, atm={atm}, vix={vix}, expiry={expiry}, entry_time={entry_time}.\n\n"
-            "Call execute_paper_trade(contracts_json, strategy_type, entry_time, "
+            "Build the trade and route entry orders via the centralized Order Agent.\n\n"
+            "STEP 1: Parse Contract Agent's output for resolved contracts (tsym, ltp, strike, action).\n"
+            "STEP 2: Parse Strategy Agent's output for strategy_type, wing_width, sl_pct, tp_pct.\n"
+            f"STEP 3: Call execute_paper_trade(contracts_json, strategy_type, entry_time, "
             f"spot={spot}, atm={atm}, vix={vix}, expiry='{expiry}', "
-            "wing_width, sl_pct, tp_pct).\n\n"
-            "Verify: net_credit > 0, SL > LTP on every SELL leg, TP < LTP on every SELL leg.\n"
-            "Flag any issues but proceed — this is paper trading.\n\n"
-            "Output the trade dict returned by the tool."
+            "wing_width, sl_pct, tp_pct) to build trade dict.\n"
+            "  This calculates net_credit, SL/TP levels, and returns the complete trade.\n\n"
+            "VERIFICATION: Check the trade dict from execute_paper_trade:\n"
+            "  ✓ net_credit > 0 (strategy generates premium)\n"
+            "  ✓ SL > LTP on every SELL leg (SL is above current price)\n"
+            "  ✓ TP < LTP on every SELL leg (TP is below current price)\n"
+            "  ✓ leg_count matches strategy (2 for spreads, 4 for butterfly)\n\n"
+            "STEP 4: Hand off ALL entry legs to Order Agent via place_entry_orders(legs).\n"
+            "  CRITICAL: Call place_entry_orders with the legs from the trade dict.\n"
+            "  The Order Agent inside place_entry_orders will:\n"
+            "    - PAPER mode: save to order_ledger.json, return order_ids\n"
+            "    - LIVE mode:  forward to Shoonya API, return broker order_ids\n"
+            "  Return value: {trade_id, entry_orders: [order_ids], status, mode}\n\n"
+            "STEP 5: Extract trade_id from place_entry_orders result.\n"
+            "  Pass trade_id to Risk Agent (in next task context) for SL/TP routing.\n\n"
+            "Output the complete trade dict with entry_order_results (trade_id + order_ids)."
         ),
-        expected_output="Trade dict with legs, net_credit, sl, tp",
+        expected_output="Trade dict with legs, net_credit, sl, tp, trade_id, and entry_orders routed via Order Agent",
         agent=execution_agent,
         context=[strategy_task, contract_task],
     )
@@ -270,17 +303,26 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Task 6: Risk Agent ─────────────────────────────────────────────
     risk_task = Task(
         description=(
-            "Place SL and TP orders for every SELL leg.\n\n"
-            "Parse Execution Agent's output for the trade dict.\n"
-            "For EACH SELL leg: call place_sl_order and place_tp_order.\n\n"
-            "SL orders trigger when option price RISES (short option losing money).\n"
-            "TP orders trigger when option price FALLS (premium decay = profit).\n"
-            "BUY legs (hedges) get NO orders — held to expiry.\n\n"
-            f"Risk limits: max loss per spread = (wing_width - net_credit) * 65.\n"
-            "PAPER MODE — all orders go to state.db with status=MOCK.\n\n"
-            "Output: confirmation with order IDs placed."
+            "ENTRY PHASE: Place all SL and TP orders via the centralized Order Agent.\n\n"
+            "YOUR ONLY TOOL: place_sl_tp_orders (routes through Order Agent hub)\n\n"
+            "STEP 1: Parse Execution Agent's output to extract:\n"
+            "  - trade_id (from the execution output)\n"
+            "  - legs (array of leg dicts with tsym, action, strike, type, quantity, sl, tp)\n\n"
+            "STEP 2: Call place_sl_tp_orders(trade_id=<trade_id>, legs=<legs>)\n"
+            "  This is the ONLY way to place SL/TP orders in entry phase.\n"
+            "  The Order Agent inside place_sl_tp_orders will:\n"
+            "    - PAPER mode: save to order_ledger.json\n"
+            "    - LIVE mode:  forward to Shoonya API\n\n"
+            "MECHANICS (for reference — Order Agent handles):\n"
+            "  - SELL legs (center): get SL (buy trigger when price rises) + TP (buy limit when price falls)\n"
+            "  - BUY legs (hedges): get NO orders — held to expiry\n"
+            "  - SL = entry_premium × (1 + sl_pct). TP = entry_premium × (1 - tp_pct)\n\n"
+            "CRITICAL: Do NOT call place_sl_order or place_tp_order directly.\n"
+            "Only call place_sl_tp_orders. All orders route through the centralized hub.\n\n"
+            f"Risk limits: max loss per spread = (wing_width - net_credit) * 65.\n\n"
+            "Output: confirmation JSON with sl_order_ids and tp_order_ids from the Order Agent."
         ),
-        expected_output="Risk confirmation with SL/TP order IDs",
+        expected_output="Risk confirmation with SL/TP order IDs routed via Order Agent",
         agent=risk_agent,
         context=[execution_task],
     )
