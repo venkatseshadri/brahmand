@@ -72,15 +72,41 @@ def save_state(state: dict):
 
 
 def has_active_trade() -> bool:
-    """Check if there's an active trade in state file."""
+    """Check if there's an active trade in state file OR order ledger."""
     state = load_state()
-    return state.get("active_trade") is not None and state["active_trade"].get("status") == "OPEN"
+    active_in_state = state.get("active_trade") is not None and (
+        isinstance(state["active_trade"], dict)
+        and state["active_trade"].get("status") == "OPEN"
+    )
+    if active_in_state:
+        return True
+
+    # Fallback: check order_ledger for any ACTIVE trades today
+    try:
+        from order_agent import get_active_trades
+
+        return len(get_active_trades()) > 0
+    except Exception:
+        return False
 
 
 def get_active_trade() -> dict:
-    """Get active trade from state file."""
+    """Get active trade from state file, else from order ledger."""
     state = load_state()
-    return state.get("active_trade") or {}
+    trade = state.get("active_trade")
+    if trade and isinstance(trade, dict) and trade.get("status") in ("OPEN", "ACTIVE"):
+        return trade
+
+    # Fallback: get first active trade from order ledger
+    try:
+        from order_agent import get_active_trades
+
+        active = get_active_trades()
+        if active:
+            return active[0]
+    except Exception:
+        pass
+    return {}
 
 
 def check_sl_tp_triggers(trade: dict) -> dict:
@@ -103,7 +129,7 @@ def check_sl_tp_triggers(trade: dict) -> dict:
 
             ltp = float(row[0] or 0) if row else 0
 
-            if ltp > 5000:  # Sanity check
+            if ltp > 5000 or ltp <= 0:  # Sanity checks
                 continue
 
             # Check SL
@@ -154,6 +180,25 @@ def close_trade_and_cleanup(trade: dict, reason: str, ltp: float):
         save_state(state)
         _log(f"  ✅ Updated state for {entry_time}")
 
+    # Also update order ledger
+    trade_id = trade.get("trade_id")
+    if trade_id:
+        try:
+            from order_agent import update_trade
+
+            update_trade(
+                trade_id,
+                {
+                    "status": "CLOSED",
+                    "exit_time": datetime.now().isoformat(),
+                    "exit_reason": reason,
+                    "exit_price": ltp,
+                    "final_pnl": final_pnl,
+                },
+            )
+        except Exception as e:
+            _log(f"  ⚠️ Failed to update order ledger: {e}")
+
 
 def main():
     """Main risk monitor loop."""
@@ -181,7 +226,9 @@ def main():
             else:
                 # entry_time is HH:MM format, use today's date
                 h, m = map(int, str(entry_time).split(":"))
-                entry_dt = datetime.now().replace(hour=h, minute=m, second=0, microsecond=0)
+                entry_dt = datetime.now().replace(
+                    hour=h, minute=m, second=0, microsecond=0
+                )
             open_mins = int((datetime.now() - entry_dt).total_seconds() / 60)
             _log(f"  {strategy} | Entry: {entry_time} | Open: {open_mins}m")
         except Exception as e:
@@ -198,6 +245,7 @@ def main():
     except Exception as e:
         _log(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
     finally:

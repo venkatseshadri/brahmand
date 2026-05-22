@@ -26,14 +26,16 @@ STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 
 def _connect() -> duckdb.DuckDBPyConnection:
-    """Open read-only DuckDB connection. Retries if writer holds lock."""
-    for attempt in range(10):
+    """Open read-only DuckDB connection with concurrent access."""
+    for attempt in range(30):
         try:
-            return duckdb.connect(str(VARAH_DATA), read_only=True)
+            con = duckdb.connect(str(VARAH_DATA), read_only=True)
+            con.execute("PRAGMA enable_progress_bar=false")
+            return con
         except Exception:
-            if attempt < 9:
-                time.sleep(1)
-    raise IOError("DuckDB locked by capture after 10 retries — skip this cycle")
+            if attempt < 29:
+                time.sleep(0.5)
+    raise IOError("DuckDB locked by capture after 30 retries — skip this cycle")
 
 
 class MarketDataQueryInput(BaseModel):
