@@ -112,7 +112,11 @@ def get_active_trade() -> dict:
 def check_sl_tp_triggers(trade: dict) -> dict:
     """Check if SL or TP is hit. Returns {hit: bool, reason: str, leg: dict}."""
     expiry = trade.get("expiry", "")
-    con = _connect()
+    try:
+        con = _connect()
+    except IOError:
+        _log("  ⚠️ DuckDB locked — skipping SL/TP check this cycle")
+        return {"hit": False}
 
     try:
         for leg in trade.get("legs", []):
