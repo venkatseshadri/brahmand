@@ -171,7 +171,9 @@ def enter_trade(state: dict):
     try:
         trade = run_full_chain(entry_time)
     except Exception as e:
-        _log(f"Chain failed: {e}")
+        from logger import log_exception
+
+        log_exception(get_logger("kickoff"), e, "Chain failed")
         return state
     if trade is None:
         _log("  SKIP: Gate rejected")
@@ -200,10 +202,10 @@ def enter_trade(state: dict):
 
     # Initialize monitoring phase tracking for postmortem analysis
     trade["monitoring_events"] = {
-        "tsl_adjustments": [],      # TSL ratchet history
-        "morph_actions": [],        # Signal reversal actions
-        "shift_actions": [],        # Premium decay shifts
-        "mtm_checks": [],           # P&L snapshots during monitoring
+        "tsl_adjustments": [],  # TSL ratchet history
+        "morph_actions": [],  # Signal reversal actions
+        "shift_actions": [],  # Premium decay shifts
+        "mtm_checks": [],  # P&L snapshots during monitoring
     }
 
     state["active_trade"] = trade
@@ -546,7 +548,7 @@ def run_pm(state: dict):
                 api_key=os.environ["DEEPSEEK_API_KEY"],
             )
 
-        trades_summary = json.dumps(state['all_trades'], default=str)[:3000]
+        trades_summary = json.dumps(state["all_trades"], default=str)[:3000]
         task = Task(
             description=(
                 f"POST-MORTEM ANALYSIS for {len(state['all_trades'])} trades today.\n\n"
