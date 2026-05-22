@@ -231,6 +231,33 @@ def enter_trade(state: dict):
     except Exception as e:
         _log(f"  ⚠️  DuckDB write failed: {e}")
 
+    # ALSO write to order_ledger.json (single source of truth for active trades)
+    try:
+        from order_agent import create_trade
+
+        legs = trade.get("legs", [])
+        if isinstance(legs, str):
+            legs = eval(legs)
+        sl = trade.get("sl", {})
+        if isinstance(sl, str):
+            sl = eval(sl)
+        tp = trade.get("tp", {})
+        if isinstance(tp, str):
+            tp = eval(tp)
+        create_trade(
+            trade_id=trade.get("trade_id", trade_id),
+            strategy_type=strategy_display,
+            net_credit=float(trade.get("net_credit", 0)),
+            legs=legs,
+            sl=sl,
+            tp=tp,
+            entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
+            entry_confidence=float(trade.get("entry_confidence", 0)),
+        )
+        _log(f"  ✅ Wrote to order ledger: {trade.get('trade_id', trade_id)}")
+    except Exception as e:
+        _log(f"  ⚠️  Order ledger write failed: {e}")
+
     _log(
         f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
