@@ -82,7 +82,7 @@ def now_str():
 def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> None:
     """Ratchet SL downward as option decays (favorable for SELL).
 
-    TSL activates when current profit >= 25% of max TP profit.
+    TSL activates when current profit >= 50% of max TP profit.
     Then locks portion of every favorable tick past the threshold (lock_ratio from pattern or default 0.5).
     Only ratchets SL DOWN (never up) — locks in gains.
     """
@@ -96,14 +96,14 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
     current_profit = entry_price - ltp  # current profit per share
 
     # TSL not yet active
-    if current_profit < max_profit * 0.25:
+    if current_profit < max_profit * 0.50:
         return
 
     # Lock ratio can be overridden by pattern adaptation (from risk agent)
     lock_ratio = trade.get("tsl_lock_ratio", 0.5)
 
-    # Lock portion of every favorable move past the 25% threshold
-    threshold_profit = max_profit * 0.25
+    # Lock portion of every favorable move past the 50% threshold
+    threshold_profit = max_profit * 0.50
     excess = current_profit - threshold_profit
     locked_profit = threshold_profit + (excess * lock_ratio)
     new_sl = round(entry_price - locked_profit, 2)
