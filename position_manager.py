@@ -386,12 +386,16 @@ def _classify_position(trade: dict) -> str:
 
 def _has_put_spread(trade: dict) -> bool:
     """Check if PUT_SPREAD (PE SELL leg) exists."""
-    return any(l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", []))
+    return any(
+        l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", [])
+    )
 
 
 def _has_call_spread(trade: dict) -> bool:
     """Check if CALL_SPREAD (CE SELL leg) exists."""
-    return any(l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", []))
+    return any(
+        l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", [])
+    )
 
 
 def execute_action(action: dict, trade: dict) -> dict:
@@ -456,22 +460,24 @@ def execute_action(action: dict, trade: dict) -> dict:
                 # Add SELL CE and BUY CE (protection)
                 sell_ce_fill = 40.0  # Estimate
                 buy_ce_fill = 30.0
-                trade["legs"].extend([
-                    {
-                        "action": "SELL",
-                        "strike": atm,
-                        "type": "CE",
-                        "fill_price": sell_ce_fill,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
-                    },
-                    {
-                        "action": "BUY",
-                        "strike": atm + WING_BUTTERFLY,
-                        "type": "CE",
-                        "fill_price": buy_ce_fill,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_BUTTERFLY}C",
-                    },
-                ])
+                trade["legs"].extend(
+                    [
+                        {
+                            "action": "SELL",
+                            "strike": atm,
+                            "type": "CE",
+                            "fill_price": sell_ce_fill,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
+                        },
+                        {
+                            "action": "BUY",
+                            "strike": atm + WING_BUTTERFLY,
+                            "type": "CE",
+                            "fill_price": buy_ce_fill,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_BUTTERFLY}C",
+                        },
+                    ]
+                )
                 trade["sl"]["ce"] = round(sell_ce_fill * (1 + SL_PCT), 2)
                 trade["tp"]["ce"] = round(sell_ce_fill * (1 - TP_PCT), 2)
 
@@ -483,22 +489,24 @@ def execute_action(action: dict, trade: dict) -> dict:
                 # Add SELL PE and BUY PE (protection)
                 sell_pe_fill = 40.0
                 buy_pe_fill = 30.0
-                trade["legs"].extend([
-                    {
-                        "action": "SELL",
-                        "strike": atm,
-                        "type": "PE",
-                        "fill_price": sell_pe_fill,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
-                    },
-                    {
-                        "action": "BUY",
-                        "strike": atm - WING_BUTTERFLY,
-                        "type": "PE",
-                        "fill_price": buy_pe_fill,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_BUTTERFLY}P",
-                    },
-                ])
+                trade["legs"].extend(
+                    [
+                        {
+                            "action": "SELL",
+                            "strike": atm,
+                            "type": "PE",
+                            "fill_price": sell_pe_fill,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
+                        },
+                        {
+                            "action": "BUY",
+                            "strike": atm - WING_BUTTERFLY,
+                            "type": "PE",
+                            "fill_price": buy_pe_fill,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_BUTTERFLY}P",
+                        },
+                    ]
+                )
                 trade["sl"]["pe"] = round(sell_pe_fill * (1 + SL_PCT), 2)
                 trade["tp"]["pe"] = round(sell_pe_fill * (1 - TP_PCT), 2)
 
@@ -559,22 +567,24 @@ def execute_action(action: dict, trade: dict) -> dict:
             atm = _get_atm_from_legs(legs)
             expiry = trade.get("expiry", "")
             if atm > 0 and expiry:
-                trade["legs"].extend([
-                    {
-                        "action": "SELL",
-                        "strike": atm,
-                        "type": "CE",
-                        "fill_price": 40.0,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
-                    },
-                    {
-                        "action": "BUY",
-                        "strike": atm + WING_SPREAD,
-                        "type": "CE",
-                        "fill_price": 30.0,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_SPREAD}C",
-                    },
-                ])
+                trade["legs"].extend(
+                    [
+                        {
+                            "action": "SELL",
+                            "strike": atm,
+                            "type": "CE",
+                            "fill_price": 40.0,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm}C",
+                        },
+                        {
+                            "action": "BUY",
+                            "strike": atm + WING_SPREAD,
+                            "type": "CE",
+                            "fill_price": 30.0,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_SPREAD}C",
+                        },
+                    ]
+                )
                 trade["sl"]["ce"] = round(40.0 * (1 + SL_PCT), 2)
                 trade["tp"]["ce"] = round(40.0 * (1 - TP_PCT), 2)
 
@@ -598,22 +608,24 @@ def execute_action(action: dict, trade: dict) -> dict:
             atm = _get_atm_from_legs(legs)
             expiry = trade.get("expiry", "")
             if atm > 0 and expiry:
-                trade["legs"].extend([
-                    {
-                        "action": "SELL",
-                        "strike": atm,
-                        "type": "PE",
-                        "fill_price": 40.0,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
-                    },
-                    {
-                        "action": "BUY",
-                        "strike": atm - WING_SPREAD,
-                        "type": "PE",
-                        "fill_price": 30.0,
-                        "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_SPREAD}P",
-                    },
-                ])
+                trade["legs"].extend(
+                    [
+                        {
+                            "action": "SELL",
+                            "strike": atm,
+                            "type": "PE",
+                            "fill_price": 40.0,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm}P",
+                        },
+                        {
+                            "action": "BUY",
+                            "strike": atm - WING_SPREAD,
+                            "type": "PE",
+                            "fill_price": 30.0,
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_SPREAD}P",
+                        },
+                    ]
+                )
                 trade["sl"]["pe"] = round(40.0 * (1 + SL_PCT), 2)
                 trade["tp"]["pe"] = round(40.0 * (1 - TP_PCT), 2)
 
@@ -628,19 +640,96 @@ def _get_atm_from_legs(legs: list) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    # Quick test
+# ── Bridge: Order Ledger → Risk Agent Crew ────────────────────────────────
+
+
+def run_bridge():
+    """Read active trades from order_ledger (DuckDB), dispatch to risk_agent_crew.
+
+    This is the entry point for the 1-min cron. It replaces the old kickoff-driven
+    monitoring loop. The CrewAI risk agent (LLM) decides morph/roll/SL/TP/exit.
+    When LLM is unavailable, falls back to deterministic P1-P7.
+    """
     import sys
 
     sys.path.insert(0, str(Path(__file__).parent))
-    from kickoff import load_state
 
-    state = load_state()
-    t = state.get("active_trade")
-    if t:
-        actions = run(t)
-        print(f"\nPosition Manager ({len(actions)} actions):")
-        for a in actions:
-            print(f"  P{a['priority']}: {a['type']:12s} — {a['reason']}")
+    try:
+        from trade_execution_db import get_active_trades as ledger_get_active
+
+        trades = ledger_get_active()
+    except Exception as e:
+        print(f"[{now_str()}] POSITION MANAGER: Ledger read failed → {e}")
+        return
+
+    if not trades:
+        return  # No active trades — silent
+
+    for trade in trades:
+        trade_id = trade.get("trade_id", "?")
+        print(
+            f"[{now_str()}] PM: Evaluating trade {trade_id} ({trade.get('strategy', '?')})"
+        )
+
+        # ── Try LLM path first ──
+        try:
+            from risk_agent_crew import evaluate_trade as llm_evaluate
+
+            result = llm_evaluate(trade)
+            if result.get("status") == "ok":
+                print(f"  ✅ LLM: {str(result.get('result', ''))[:120]}")
+            elif result.get("error"):
+                print(
+                    f"  ⚠️  LLM failed: {result['error'][:80]} → falling back to P1-P7"
+                )
+                # Fallback: deterministic check
+                actions = run(trade)
+                for action in actions:
+                    execute_action(action, trade)
+                print(f"  🔄 P1-P7 fallback: {len(actions)} actions")
+        except ImportError:
+            print(f"  ⚠️  risk_agent_crew not available → P1-P7 fallback")
+            actions = run(trade)
+            for action in actions:
+                execute_action(action, trade)
+        except Exception as e:
+            print(f"  ❌ LLM exception: {e} → P1-P7 fallback")
+            actions = run(trade)
+            for action in actions:
+                execute_action(action, trade)
+
+
+if __name__ == "__main__":
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).parent))
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--bridge",
+        action="store_true",
+        help="Bridge mode: read ledger → dispatch to risk_agent_crew",
+    )
+    parser.add_argument(
+        "--test", action="store_true", help="Test mode: run P1-P7 on kickoff JSON state"
+    )
+    args = parser.parse_args()
+
+    if args.bridge:
+        run_bridge()
+    elif args.test:
+        from kickoff import load_state
+
+        state = load_state()
+        t = state.get("active_trade")
+        if t:
+            actions = run(t)
+            print(f"\nPosition Manager ({len(actions)} actions):")
+            for a in actions:
+                print(f"  P{a['priority']}: {a['type']:12s} — {a['reason']}")
+        else:
+            print("No active trade")
     else:
-        print("No active trade")
+        run_bridge()  # Default: bridge mode

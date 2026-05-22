@@ -87,26 +87,29 @@ def add_active_trade(
     entry_gate_signal: str,
     legs: List[Dict],
     sl: Dict,
-    tp: Dict
+    tp: Dict,
 ):
     """Record a new active trade."""
     init_db()
     conn = duckdb.connect(str(DB_PATH))
 
     try:
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO active_trades
             (trade_id, entry_time, strategy, entry_gate_signal, legs, sl, tp, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVE')
-        """, [
-            trade_id,
-            entry_time,
-            strategy,
-            entry_gate_signal,
-            json.dumps(legs),
-            json.dumps(sl),
-            json.dumps(tp)
-        ])
+        """,
+            [
+                trade_id,
+                entry_time,
+                strategy,
+                entry_gate_signal,
+                json.dumps(legs),
+                json.dumps(sl),
+                json.dumps(tp),
+            ],
+        )
         conn.commit()
     finally:
         conn.close()
@@ -127,15 +130,17 @@ def get_active_trades() -> List[Dict]:
 
         trades = []
         for row in result:
-            trades.append({
-                "trade_id": row[0],
-                "entry_time": row[1],
-                "strategy": row[2],
-                "legs": json.loads(row[3]) if row[3] else [],
-                "sl": json.loads(row[4]) if row[4] else {},
-                "tp": json.loads(row[5]) if row[5] else {},
-                "status": row[6]
-            })
+            trades.append(
+                {
+                    "trade_id": row[0],
+                    "entry_time": row[1],
+                    "strategy": row[2],
+                    "legs": json.loads(row[3]) if row[3] else [],
+                    "sl": json.loads(row[4]) if row[4] else {},
+                    "tp": json.loads(row[5]) if row[5] else {},
+                    "status": row[6],
+                }
+            )
         return trades
     finally:
         conn.close()
@@ -145,7 +150,7 @@ def close_trade(
     trade_id: str,
     close_reason: str,
     entry_pnl: Optional[float] = None,
-    final_pnl: Optional[float] = None
+    final_pnl: Optional[float] = None,
 ):
     """Mark trade as closed and archive to history."""
     init_db()
@@ -155,7 +160,7 @@ def close_trade(
         # Get active trade details
         row = conn.execute(
             "SELECT entry_time, strategy, legs FROM active_trades WHERE trade_id = ?",
-            [trade_id]
+            [trade_id],
         ).fetchone()
 
         if not row:
@@ -165,31 +170,34 @@ def close_trade(
 
         # Calculate duration
         from datetime import datetime
+
         entry_dt = datetime.fromisoformat(str(entry_time))
         close_dt = datetime.now()
         duration_mins = int((close_dt - entry_dt).total_seconds() / 60)
 
         # Insert into history
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO trade_history
             (trade_id, entry_time, close_time, strategy, close_reason, entry_pnl, final_pnl, duration_mins, legs)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, [
-            trade_id,
-            entry_time,
-            close_dt.isoformat(),
-            strategy,
-            close_reason,
-            entry_pnl,
-            final_pnl,
-            duration_mins,
-            legs_json
-        ])
+        """,
+            [
+                trade_id,
+                entry_time,
+                close_dt.isoformat(),
+                strategy,
+                close_reason,
+                entry_pnl,
+                final_pnl,
+                duration_mins,
+                legs_json,
+            ],
+        )
 
         # Mark as closed in active
         conn.execute(
-            "UPDATE active_trades SET status = 'CLOSED' WHERE trade_id = ?",
-            [trade_id]
+            "UPDATE active_trades SET status = 'CLOSED' WHERE trade_id = ?", [trade_id]
         )
 
         conn.commit()
@@ -203,25 +211,28 @@ def log_monitor_action(
     current_ltp: Dict,
     current_pnl: float,
     action_taken: Optional[str] = None,
-    note: str = ""
+    note: str = "",
 ):
     """Log a monitoring check."""
     init_db()
     conn = duckdb.connect(str(DB_PATH))
 
     try:
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO monitoring_log
             (trade_id, monitored_at, current_ltp, current_pnl, action_taken, note)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, [
-            trade_id,
-            datetime.now().isoformat(),
-            json.dumps(current_ltp),
-            current_pnl,
-            action_taken,
-            note
-        ])
+        """,
+            [
+                trade_id,
+                datetime.now().isoformat(),
+                json.dumps(current_ltp),
+                current_pnl,
+                action_taken,
+                note,
+            ],
+        )
         conn.commit()
     finally:
         conn.close()
@@ -237,5 +248,34 @@ def has_active_trades() -> bool:
             "SELECT COUNT(*) FROM active_trades WHERE status = 'ACTIVE'"
         ).fetchone()
         return result[0] > 0 if result else False
+    finally:
+        conn.close()
+
+
+def update_active_trade(
+    trade_id: str, legs: List[Dict] = None, sl: Dict = None, tp: Dict = None
+):
+    """Update active trade legs/SL/TP after morph or roll."""
+    init_db()
+    conn = duckdb.connect(str(DB_PATH))
+
+    try:
+        if legs is not None:
+            conn.execute(
+                "UPDATE active_trades SET legs = ? WHERE trade_id = ?",
+                [json.dumps(legs), trade_id],
+            )
+        if sl is not None:
+            conn.execute(
+                "UPDATE active_trades SET sl = ? WHERE trade_id = ?",
+                [json.dumps(sl), trade_id],
+            )
+        if tp is not None:
+            conn.execute(
+                "UPDATE active_trades SET tp = ? WHERE trade_id = ?",
+                [json.dumps(tp), trade_id],
+            )
+        conn.commit()
+        return True
     finally:
         conn.close()

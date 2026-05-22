@@ -146,8 +146,17 @@ def is_market_hours() -> bool:
 
 def should_enter(state: dict) -> bool:
     """Gate entry: no active trade, below max, cooldown. Regime check next."""
+    # Check both JSON state AND order_ledger (DuckDB)
     if state["active_trade"] is not None:
         return False
+    try:
+        from trade_execution_db import has_active_trades as ledger_has_active
+
+        if ledger_has_active():
+            _log("  SKIP: Active trade in order_ledger (not in JSON — syncing)")
+            return False
+    except Exception:
+        pass  # DuckDB might be locked — proceed with JSON check only
     max_trades = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
     if state["trades_today"] >= max_trades:
         return False
