@@ -33,6 +33,7 @@ MULTIPLIERS = {p: round(2 / (p + 1), 8) for p in PERIODS}
 
 # ── Internal helpers ────────────────────────────────────────
 
+
 def _state_file(tf: str, period: int) -> Path:
     return EMA_BASE_DIR / tf / f"ema_{period}.json"
 
@@ -67,6 +68,7 @@ def _save(tf: str, period: int, state: dict):
 
 # ── Public API ──────────────────────────────────────────────
 
+
 def update_ema(close: float, tf: str, periods: list = None):
     """
     Feed a closed candle's close price for a given timeframe.
@@ -81,6 +83,10 @@ def update_ema(close: float, tf: str, periods: list = None):
         periods = PERIODS
 
     close = float(close)
+
+    # Sanity check: reject obviously wrong prices (NIFTY range ~15k-50k)
+    if close < 15000 or close > 50000:
+        return
 
     for period in periods:
         state = _load(tf, period)
