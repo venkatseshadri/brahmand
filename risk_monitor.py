@@ -109,14 +109,47 @@ def get_active_trade() -> dict:
     return {}
 
 
+# CSV LTP source (no DuckDB lock) — written by data_capture_v3.1 every minute
+OPTIONS_CSV = Path("/home/trading_ceo/data/csv")
+
+
+def _get_ltp_from_csv(strike: int, option_type: str, expiry: str = None) -> float:
+    """Read latest option LTP from daily options CSV (no DuckDB lock needed)."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    csv_path = OPTIONS_CSV / f"{today}_options.csv"
+    if not csv_path.exists():
+        return 0
+
+    try:
+        # Read file from end to find latest matching row faster
+        with open(csv_path) as f:
+            lines = f.readlines()
+        # Scan in reverse for latest match
+        ot = option_type.upper()
+        s = str(strike)
+        for line in reversed(lines):
+            parts = line.strip().split(",")
+            if len(parts) < 8:
+                continue
+            # CSV: timestamp,date,expiry_label,expiry_date,strike,strike_offset,option_type,ltp,...
+            if parts[4] == s and parts[6] == ot:
+                # expiry filter if provided (index 3)
+                if expiry and parts[3] != expiry:
+                    continue
+                return float(parts[7])
+    except Exception:
+        pass
+    return 0
+
+
 def check_sl_tp_triggers(trade: dict) -> dict:
-    """Check if SL or TP is hit. Returns {hit: bool, reason: str, leg: dict}."""
+    """Check if SL or TP is hit. Uses daily options CSV (no DuckDB lock)."""
     expiry = trade.get("expiry", "")
     try:
         con = _connect()
+        _use_duckdb = True
     except IOError:
-        _log("  ⚠️ DuckDB locked — skipping SL/TP check this cycle")
-        return {"hit": False}
+        _use_duckdb = False
 
     try:
         for leg in trade.get("legs", []):
@@ -124,14 +157,21 @@ def check_sl_tp_triggers(trade: dict) -> dict:
                 continue
 
             t = leg["type"].lower()
-            row = con.execute(
-                "SELECT ltp FROM option_snapshots "
-                "WHERE expiry_date = ? AND strike = ? AND option_type = ? "
-                "AND tsym IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
-                (expiry, leg["strike"], leg["type"]),
-            ).fetchone()
+            strike = leg["strike"]
 
-            ltp = float(row[0] or 0) if row else 0
+            if _use_duckdb:
+                row = con.execute(
+                    "SELECT ltp FROM option_snapshots "
+                    "WHERE expiry_date = ? AND strike = ? AND option_type = ? "
+                    "AND tsym IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
+                    (expiry, strike, leg["type"]),
+                ).fetchone()
+                ltp = float(row[0] or 0) if row else 0
+            else:
+                ltp = _get_ltp_from_csv(strike, leg["type"], expiry)
+                if ltp <= 0:
+                    _log(f"  ⚠️ No CSV LTP for {strike}{leg['type']} (expiry={expiry})")
+                    continue
 
             if ltp > 5000 or ltp <= 0:  # Sanity checks
                 continue
@@ -139,17 +179,22 @@ def check_sl_tp_triggers(trade: dict) -> dict:
             # Check SL
             sl = trade.get("sl", {}).get(t)
             if sl and ltp >= sl:
-                _log(f"🔴 SL HIT — {leg.get('tsym', '?')}: LTP={ltp} >= SL={sl}")
+                _log(
+                    f"🔴 SL HIT — {leg.get('tsym', strike)}{leg['type']}: LTP={ltp} >= SL={sl}"
+                )
                 return {"hit": True, "reason": "SL_HIT", "leg": leg, "ltp": ltp}
 
             # Check TP
             tp = trade.get("tp", {}).get(t)
             if tp and ltp <= tp:
-                _log(f"🟢 TP HIT — {leg.get('tsym', '?')}: LTP={ltp} <= TP={tp}")
+                _log(
+                    f"🟢 TP HIT — {leg.get('tsym', strike)}{leg['type']}: LTP={ltp} <= TP={tp}"
+                )
                 return {"hit": True, "reason": "TP_HIT", "leg": leg, "ltp": ltp}
 
     finally:
-        con.close()
+        if _use_duckdb:
+            con.close()
 
     return {"hit": False}
 
