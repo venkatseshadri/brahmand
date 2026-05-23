@@ -79,6 +79,38 @@ def send_telegram_notification(message: str):
 
 
 # ============================================================================
+# PATTERN DIRECTION DERIVATION
+# ============================================================================
+
+
+def _derive_direction(pattern: dict) -> str:
+    """Derive predicted market direction from pattern family + trigger_conditions."""
+    family = pattern.get("family", "").lower()
+    trigger = pattern.get("trigger_conditions", {})
+    name = pattern.get("pattern_name", "").upper()
+
+    if family == "supertrend":
+        if (
+            "adx" in trigger
+            and isinstance(trigger.get("adx"), dict)
+            and trigger["adx"].get("min", 0) >= 25
+        ):
+            return "DOWN"
+        return "DOWN"
+    elif family == "pcr":
+        return "DOWN"
+    elif family == "volatility":
+        if "SPIKE" in name or "ALERT" in name:
+            return "DOWN"
+        return "SIDEWAYS"
+    elif family == "ema":
+        if "RSI" in name:
+            return "SIDEWAYS"
+        return "SIDEWAYS"
+    return "NEUTRAL"
+
+
+# ============================================================================
 # CHROMA DB INTEGRATION
 # ============================================================================
 
@@ -105,12 +137,16 @@ def store_approved_patterns_in_chromadb(
             if not summary or summary.approval_status != "APPROVED":
                 continue
 
+            # Derive predicted direction from pattern family + trigger_conditions
+            predicted_direction = _derive_direction(pattern)
+
             # Create record for ChromaDB
             record = {
                 "pattern_id": pattern_id,
                 "pattern_name": pattern.get("pattern_name"),
                 "family": pattern.get("family"),
                 "discovery_date": datetime.now().isoformat(),
+                "predicted_direction": predicted_direction,
                 "backtest_results": {
                     "total_matches": summary.total_matches,
                     "win_rate": summary.overall_win_rate,
@@ -135,6 +171,8 @@ def store_approved_patterns_in_chromadb(
                         "date": datetime.now().strftime("%Y-%m-%d"),
                         "win_rate": f"{summary.overall_win_rate:.1%}",
                         "family": pattern.get("family"),
+                        "predicted_direction": predicted_direction,
+                        "hit_rate": summary.overall_win_rate,
                     }
                 ],
             )

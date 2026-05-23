@@ -21,14 +21,14 @@ import chromadb
 
 @dataclass
 class EntrySignal:
-    """Entry signal with confidence and metadata"""
-    entry: bool  # True = ENTRY, False = NO ENTRY
-    confidence: float  # 0.0 to 1.0
-    traffic_light: str  # "GREEN", "YELLOW", "RED"
-    direction: str  # "LONG", "SHORT", or "NEUTRAL"
-    matching_patterns: List[str]  # Pattern names that triggered
-    target_points: int  # Expected move magnitude
-    recommended_size: float  # Position size scaled by confidence
+    entry: bool
+    confidence: float
+    traffic_light: str  # RED, YELLOW, GREEN
+    direction: str  # LONG, SHORT, NEUTRAL
+    matching_patterns: List[str]
+    pattern_quality: Dict[str, float]  # pattern_name → hit_rate
+    target_points: int
+    recommended_size: float
     timestamp: str
 
 
@@ -49,7 +49,7 @@ class EntryAgent:
             "supertrend": 0.87,
             "pcr": 0.72,
             "ema": 0.77,
-            "volatility": 0.68
+            "volatility": 0.68,
         }
 
         self.load_patterns_from_chromadb()
@@ -64,26 +64,38 @@ class EntryAgent:
             results = collection.get()
 
             for pattern_id, document, metadata in zip(
-                results.get('ids', []),
-                results.get('documents', []),
-                results.get('metadatas', [])
+                results.get("ids", []),
+                results.get("documents", []),
+                results.get("metadatas", []),
             ):
                 try:
                     # Parse pattern data
-                    pattern_data = json.loads(document) if isinstance(document, str) else document
+                    pattern_data = (
+                        json.loads(document) if isinstance(document, str) else document
+                    )
 
                     pattern = {
                         "pattern_id": pattern_id,
                         "pattern_name": pattern_data.get("pattern_name", pattern_id),
                         "family": pattern_data.get("family", "unknown"),
                         "weight": self.family_weights.get(
-                            pattern_data.get("family"),
-                            0.5
+                            pattern_data.get("family"), 0.5
                         ),
-                        "trigger_conditions": pattern_data.get("trigger_conditions", {}),
+                        "trigger_conditions": pattern_data.get(
+                            "trigger_conditions", {}
+                        ),
                         "expected_move": pattern_data.get("expected_move", 50),
                         "backtest_results": pattern_data.get("backtest_results", {}),
-                        "active": pattern_data.get("entry_agent_config", {}).get("active", True),
+                        "active": pattern_data.get("entry_agent_config", {}).get(
+                            "active", True
+                        ),
+                        "predicted_direction": pattern_data.get(
+                            "predicted_direction",
+                            metadata.get("predicted_direction", "NEUTRAL")
+                            if metadata
+                            else "NEUTRAL",
+                        ),
+                        "hit_rate": metadata.get("hit_rate", 0.5) if metadata else 0.5,
                     }
 
                     if pattern["active"]:
@@ -114,30 +126,34 @@ class EntryAgent:
                 traffic_light="RED",
                 direction="NEUTRAL",
                 matching_patterns=[],
+                pattern_quality={},
                 target_points=0,
                 recommended_size=0.0,
-                timestamp=current_candle.get("timestamp", "")
+                timestamp=current_candle.get("timestamp", ""),
             )
 
         # Step 1: Check which patterns match current candle state
         matching_patterns = []
         pattern_scores = {}
+        pattern_quality = {}
 
         for pattern in self.patterns:
             if self._pattern_matches(current_candle, pattern):
                 matching_patterns.append(pattern["pattern_name"])
-                pattern_scores[pattern["pattern_id"]] = 1.0
+                hit_rate = pattern.get("hit_rate", 0.5)
+                pattern_scores[pattern["pattern_id"]] = hit_rate
+                pattern_quality[pattern["pattern_name"]] = hit_rate
 
-        # Step 2: Calculate weighted confidence
+        # Step 2: Calculate weighted confidence (hit_rate-scaled, not flat)
         confidence = self._calculate_confidence(pattern_scores)
 
         # Step 3: Determine traffic light status
         traffic_light = self._get_traffic_light(confidence)
 
-        # Step 4: Generate entry signal
+        # Step 4: Determine direction from matched patterns' stored predicted_direction
         entry = confidence > 0.70
-        direction = self._determine_direction(matching_patterns)
-        target_points = self._calculate_target(matching_patterns)
+        direction = self._determine_direction_from_patterns(matching_patterns)
+        target_points = self._calculate_target_from_patterns(matching_patterns)
         recommended_size = self._scale_position_size(confidence)
 
         return EntrySignal(
@@ -146,9 +162,10 @@ class EntryAgent:
             traffic_light=traffic_light,
             direction=direction,
             matching_patterns=matching_patterns,
+            pattern_quality=pattern_quality,
             target_points=target_points,
             recommended_size=recommended_size,
-            timestamp=current_candle.get("timestamp", "")
+            timestamp=current_candle.get("timestamp", ""),
         )
 
     def _pattern_matches(self, candle: Dict, pattern: Dict) -> bool:
@@ -226,6 +243,46 @@ class EntryAgent:
             return "YELLOW"
         else:
             return "RED"
+
+    def _determine_direction_from_patterns(self, matching_patterns: List[str]) -> str:
+        """Determine trade direction from stored predicted_direction in matched patterns."""
+        if not matching_patterns:
+            return "NEUTRAL"
+
+        directions = []
+        for name in matching_patterns:
+            for pattern in self.patterns:
+                if pattern["pattern_name"] == name:
+                    d = pattern.get("predicted_direction", "NEUTRAL")
+                    if d != "NEUTRAL":
+                        directions.append(d)
+                    break
+
+        if not directions:
+            return "NEUTRAL"
+        down_count = sum(1 for d in directions if d == "DOWN")
+        up_count = sum(1 for d in directions if d == "UP")
+        if down_count > up_count:
+            return "SHORT"
+        if up_count > down_count:
+            return "LONG"
+        return "NEUTRAL"
+
+    def _calculate_target_from_patterns(self, matching_patterns: List[str]) -> int:
+        """Calculate target points from matched patterns' avg_move."""
+        if not matching_patterns:
+            return 0
+        moves = []
+        for name in matching_patterns:
+            for pattern in self.patterns:
+                if pattern["pattern_name"] == name:
+                    bt = pattern.get("backtest_results", {})
+                    avg_move = bt.get(
+                        "avg_move_magnitude", pattern.get("expected_move", 50)
+                    )
+                    moves.append(avg_move)
+                    break
+        return int(sum(moves) / len(moves)) if moves else 0
 
     def _determine_direction(self, matching_patterns: List[str]) -> str:
         """
@@ -333,17 +390,21 @@ if __name__ == "__main__":
         },
     ]
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("ENTRY AGENT LIVE SIGNAL TEST")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     for candle in example_candles:
         signal = agent.entry_check(candle)
 
         print(f"📊 {candle['timestamp']}")
-        print(f"   Market: SPOT={candle['spot']}, ADX={candle['adx']}, "
-              f"PCR={candle['pcr_total']:.2f}, VIX={candle['india_vix']:.1f}")
-        print(f"   ├─ Patterns matched: {signal.matching_patterns if signal.matching_patterns else 'None'}")
+        print(
+            f"   Market: SPOT={candle['spot']}, ADX={candle['adx']}, "
+            f"PCR={candle['pcr_total']:.2f}, VIX={candle['india_vix']:.1f}"
+        )
+        print(
+            f"   ├─ Patterns matched: {signal.matching_patterns if signal.matching_patterns else 'None'}"
+        )
         print(f"   ├─ Confidence: {signal.confidence:.2%}")
         print(f"   ├─ Traffic Light: {signal.traffic_light}")
         print(f"   ├─ Entry: {'YES ✓' if signal.entry else 'NO ✗'}")

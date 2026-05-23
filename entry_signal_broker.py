@@ -39,11 +39,11 @@ load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('/tmp/entry_signal_broker.log'),
-        logging.StreamHandler()
-    ]
+        logging.FileHandler("/tmp/entry_signal_broker.log"),
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # TELEGRAM NOTIFICATIONS
 # ============================================================================
+
 
 def send_telegram_signal(signal: EntrySignal, market_context: Dict):
     """Send entry signal to Telegram"""
@@ -72,11 +73,11 @@ def send_telegram_signal(signal: EntrySignal, market_context: Dict):
 🚦 Traffic Light: {signal.traffic_light}
 
 Market Context:
-├─ SPOT: {market_context.get('spot', 'N/A')}
-├─ ADX: {market_context.get('adx', 'N/A')}
-├─ PCR: {market_context.get('pcr_total', 'N/A'):.2f}
-├─ VIX: {market_context.get('india_vix', 'N/A'):.1f}
-└─ Patterns: {', '.join(signal.matching_patterns)}
+├─ SPOT: {market_context.get("spot", "N/A")}
+├─ ADX: {market_context.get("adx", "N/A")}
+├─ PCR: {market_context.get("pcr_total", "N/A"):.2f}
+├─ VIX: {market_context.get("india_vix", "N/A"):.1f}
+└─ Patterns: {", ".join(signal.matching_patterns)}
 
 Entry Rules:
 ├─ Target: {signal.target_points}+ pts
@@ -90,7 +91,7 @@ Ready to execute ✓
         payload = {
             "chat_id": telegram_chat_id,
             "text": message,
-            "parse_mode": "Markdown"
+            "parse_mode": "Markdown",
         }
 
         response = requests.post(url, json=payload)
@@ -107,10 +108,14 @@ Ready to execute ✓
 # MARKET DATA ACCESS
 # ============================================================================
 
+
 class MarketDataFeed:
     """Access real-time or historical market data"""
 
-    def __init__(self, db_path: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"):
+    def __init__(
+        self,
+        db_path: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
+    ):
         self.db_path = db_path
         self.db = duckdb.connect(db_path, read_only=True)
 
@@ -135,7 +140,9 @@ class MarketDataFeed:
             logger.error(f"Error fetching latest candle: {e}")
             return None
 
-    def get_candle_at_time(self, timestamp: str, index_name: str = "NIFTY") -> Optional[Dict]:
+    def get_candle_at_time(
+        self, timestamp: str, index_name: str = "NIFTY"
+    ) -> Optional[Dict]:
         """Get candle at specific timestamp"""
         try:
             result = self.db.execute(f"""
@@ -180,6 +187,7 @@ class MarketDataFeed:
 # ENTRY SIGNAL BROKER
 # ============================================================================
 
+
 class EntrySignalBroker:
     """Main broker that monitors and publishes entry signals"""
 
@@ -190,9 +198,9 @@ class EntrySignalBroker:
         self.signals_generated = 0
         self.signals_file = "/tmp/entry_signals.jsonl"
 
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info("ENTRY SIGNAL BROKER INITIALIZED")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info(f"Patterns loaded: {len(self.entry_agent.patterns)}")
         for pattern in self.entry_agent.patterns:
             logger.info(f"  - {pattern['pattern_name']} ({pattern['family']})")
@@ -217,8 +225,10 @@ class EntrySignalBroker:
             "adx": candle.get("adx"),
             "spot": candle.get("spot"),
             "matching_patterns": signal.matching_patterns,
+            "pattern_quality": signal.pattern_quality,  # pattern_name → hit_rate
             "pattern_confidence": signal.confidence,
-            "vix_weight": 0.15,  # Configurable weights
+            "predicted_direction": signal.direction,  # LONG/SHORT/NEUTRAL from patterns
+            "vix_weight": 0.15,
             "pcr_weight": 0.10,
             "pattern_weight": 0.10,
         }
@@ -272,18 +282,24 @@ class EntrySignalBroker:
 
                 # Log every check
                 logger.info(f"📊 {current_timestamp}")
-                logger.info(f"   Market: SPOT={candle.get('spot')}, "
-                           f"ADX={candle.get('adx'):.1f}, "
-                           f"PCR={candle.get('pcr_total', 0):.2f}, "
-                           f"VIX={candle.get('india_vix', 0):.1f}")
-                logger.info(f"   Confidence: {signal.confidence:.0%}, TL: {signal.traffic_light}")
+                logger.info(
+                    f"   Market: SPOT={candle.get('spot')}, "
+                    f"ADX={candle.get('adx'):.1f}, "
+                    f"PCR={candle.get('pcr_total', 0):.2f}, "
+                    f"VIX={candle.get('india_vix', 0):.1f}"
+                )
+                logger.info(
+                    f"   Confidence: {signal.confidence:.0%}, TL: {signal.traffic_light}"
+                )
 
                 # Publish signal if entry triggered
                 if signal.entry:
                     self.signals_generated += 1
                     logger.info(f"   🟢 ENTRY SIGNAL #{self.signals_generated} ✓")
                     logger.info(f"      Direction: {signal.direction}")
-                    logger.info(f"      Patterns: {', '.join(signal.matching_patterns)}")
+                    logger.info(
+                        f"      Patterns: {', '.join(signal.matching_patterns)}"
+                    )
                     logger.info(f"      Target: {signal.target_points}+ pts")
                     logger.info(f"      Size: {signal.recommended_size:.0%}")
 
@@ -306,7 +322,7 @@ class EntrySignalBroker:
     def run_backtest(self, date: str):
         """Backtest signals on historical data for a specific date"""
         logger.info(f"\n📅 BACKTESTING SIGNALS FOR {date}")
-        logger.info("="*70 + "\n")
+        logger.info("=" * 70 + "\n")
 
         candles = self.market_feed.get_candles_for_date(date)
         if not candles:
@@ -323,17 +339,23 @@ class EntrySignalBroker:
             if signal.entry:
                 signals_on_date += 1
                 logger.info(f"🟢 SIGNAL #{signals_on_date}: {candle['timestamp']}")
-                logger.info(f"   Confidence: {signal.confidence:.0%}, TL: {signal.traffic_light}")
-                logger.info(f"   Direction: {signal.direction}, Target: {signal.target_points}+ pts")
+                logger.info(
+                    f"   Confidence: {signal.confidence:.0%}, TL: {signal.traffic_light}"
+                )
+                logger.info(
+                    f"   Direction: {signal.direction}, Target: {signal.target_points}+ pts"
+                )
                 logger.info(f"   Patterns: {', '.join(signal.matching_patterns)}")
                 logger.info(f"   Position Size: {signal.recommended_size:.0%}")
                 logger.info("")
 
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info(f"BACKTEST SUMMARY FOR {date}")
         logger.info(f"Total signals: {signals_on_date}")
         logger.info(f"Candles processed: {len(candles)}")
-        logger.info(f"Signal frequency: 1 per {len(candles)//max(1, signals_on_date)} candles")
+        logger.info(
+            f"Signal frequency: 1 per {len(candles) // max(1, signals_on_date)} candles"
+        )
 
     def run_test_mode(self):
         """Test mode: simulate with recent market data"""
@@ -360,11 +382,11 @@ class EntrySignalBroker:
                     "spot": market_context.get("spot"),
                     "adx": market_context.get("adx"),
                     "pcr_total": market_context.get("pcr_total"),
-                    "india_vix": market_context.get("india_vix")
-                }
+                    "india_vix": market_context.get("india_vix"),
+                },
             }
 
-            with open(self.signals_file, 'a') as f:
+            with open(self.signals_file, "a") as f:
                 f.write(json.dumps(signal_record) + "\n")
 
         except Exception as e:
@@ -375,22 +397,19 @@ class EntrySignalBroker:
 # CLI
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(description="Entry Signal Broker")
     parser.add_argument(
         "--live",
         action="store_true",
-        help="Run live signal monitoring (9:15 AM - 3:30 PM)"
+        help="Run live signal monitoring (9:15 AM - 3:30 PM)",
     )
     parser.add_argument(
-        "--backtest",
-        type=str,
-        help="Backtest on specific date (YYYY-MM-DD)"
+        "--backtest", type=str, help="Backtest on specific date (YYYY-MM-DD)"
     )
     parser.add_argument(
-        "--test",
-        action="store_true",
-        help="Test mode: simulate with recent data"
+        "--test", action="store_true", help="Test mode: simulate with recent data"
     )
 
     args = parser.parse_args()
