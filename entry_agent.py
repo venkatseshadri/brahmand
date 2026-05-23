@@ -55,6 +55,15 @@ class EntryAgent:
         self.load_patterns_from_chromadb()
         self.log(f"✓ Entry Agent initialized with {len(self.patterns)} patterns")
 
+    def _parse_win_rate(self, win_rate_str: str) -> float:
+        """Convert win_rate string ('100.0%') to float (1.0)"""
+        try:
+            if isinstance(win_rate_str, str):
+                return float(win_rate_str.rstrip('%')) / 100.0
+            return float(win_rate_str)
+        except Exception:
+            return 0.5
+
     def load_patterns_from_chromadb(self):
         """Load approved patterns from ChromaDB"""
         try:
@@ -95,7 +104,7 @@ class EntryAgent:
                             if metadata
                             else "NEUTRAL",
                         ),
-                        "hit_rate": metadata.get("hit_rate", 0.5) if metadata else 0.5,
+                        "hit_rate": self._parse_win_rate(metadata.get("win_rate", "50%")) if metadata else 0.5,
                     }
 
                     if pattern["active"]:
