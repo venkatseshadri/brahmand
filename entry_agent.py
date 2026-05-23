@@ -160,7 +160,7 @@ class EntryAgent:
         traffic_light = self._get_traffic_light(confidence)
 
         # Step 4: Determine direction from matched patterns' stored predicted_direction
-        entry = confidence > 0.70
+        entry = confidence >= 0.75  # MEDIUM gate: filters worst 25% of low-confidence setups
         direction = self._determine_direction_from_patterns(matching_patterns)
         target_points = self._calculate_target_from_patterns(matching_patterns)
         recommended_size = self._scale_position_size(confidence)
@@ -245,11 +245,11 @@ class EntryAgent:
         return confidence
 
     def _get_traffic_light(self, confidence: float) -> str:
-        """Map confidence score to traffic light color"""
+        """Map confidence score to traffic light color (MEDIUM gate: >= 0.75)"""
         if confidence >= 0.85:
             return "GREEN"
-        elif confidence >= 0.70:
-            return "YELLOW"
+        elif confidence >= 0.75:
+            return "YELLOW"  # MEDIUM threshold: entries on 0.75-0.84 (scaled position)
         else:
             return "RED"
 
