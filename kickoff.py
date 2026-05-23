@@ -38,6 +38,25 @@ from logger import get_logger, agent_log, chain_summary, log_exception
 _log = get_logger("kickoff").info
 _err = get_logger("kickoff").error
 
+# Monitoring events log (structured JSONL)
+MONITORING_EVENTS_FILE = Path(__file__).parent / "logs" / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
+MONITORING_EVENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+
+def _log_monitoring_event(event_type: str, trade_id: str, **details):
+    """Log a structured monitoring event (JSONL format)."""
+    try:
+        event = {
+            "timestamp": datetime.now().isoformat(),
+            "event_type": event_type,
+            "trade_id": trade_id,
+            **details
+        }
+        with open(MONITORING_EVENTS_FILE, "a") as f:
+            f.write(json.dumps(event) + "\n")
+    except Exception as e:
+        _err(f"Failed to log monitoring event: {e}")
+
 
 def acquire_lock() -> bool:
     if LOCK_FILE.exists():
@@ -82,7 +101,7 @@ def now_str():
 def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> None:
     """Ratchet SL downward as option decays (favorable for SELL).
 
-    TSL activates when current profit >= 50% of max TP profit.
+    TSL activates when current profit >= threshold (default 33% of max TP profit).
     Then locks portion of every favorable tick past the threshold (lock_ratio from pattern or default 0.5).
     Only ratchets SL DOWN (never up) — locks in gains.
     """
@@ -95,15 +114,27 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
     max_profit = entry_price - tp  # full TP profit per share
     current_profit = entry_price - ltp  # current profit per share
 
+    # TSL activation threshold (configurable, default 0.33 = 33% of max profit)
+    # Can be overridden by pattern: trade.get("tsl_activation_threshold", 0.33)
+    tsl_activation_threshold = trade.get("tsl_activation_threshold", 0.33)
+    threshold_profit = max_profit * tsl_activation_threshold
+
     # TSL not yet active
-    if current_profit < max_profit * 0.50:
+    if current_profit < threshold_profit:
+        # Log why TSL didn't activate (once per leg)
+        if not trade.get("_tsl_inactive_logged", {}).get(t):
+            if trade.get("_tsl_inactive_logged") is None:
+                trade["_tsl_inactive_logged"] = {}
+            trade["_tsl_inactive_logged"][t] = True
+            _log(
+                f"  TSL {leg_type}: Inactive (need {threshold_profit:.2f}pt, have {current_profit:.2f}pt) | Threshold: {tsl_activation_threshold*100:.0f}% of max"
+            )
         return
 
     # Lock ratio can be overridden by pattern adaptation (from risk agent)
     lock_ratio = trade.get("tsl_lock_ratio", 0.5)
 
-    # Lock portion of every favorable move past the 50% threshold
-    threshold_profit = max_profit * 0.50
+    # Lock portion of every favorable move past the activation threshold
     excess = current_profit - threshold_profit
     locked_profit = threshold_profit + (excess * lock_ratio)
     new_sl = round(entry_price - locked_profit, 2)
@@ -117,21 +148,32 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
         # Capture TSL history for RL analysis
         if "tsl_history" not in trade:
             trade["tsl_history"] = []
-        trade["tsl_history"].append(
-            {
-                "timestamp": datetime.now().isoformat(),
-                "leg": leg_type,
-                "old_sl": old_sl,
-                "new_sl": new_sl,
-                "shift_pct": shift_pct,
-                "lock_ratio": lock_ratio,
-                "current_profit": round(current_profit, 2),
-                "threshold_profit": round(threshold_profit, 2),
-            }
-        )
+        tsl_record = {
+            "timestamp": datetime.now().isoformat(),
+            "leg": leg_type,
+            "old_sl": old_sl,
+            "new_sl": new_sl,
+            "shift_pct": shift_pct,
+            "lock_ratio": lock_ratio,
+            "current_profit": round(current_profit, 2),
+            "threshold_profit": round(threshold_profit, 2),
+        }
+        trade["tsl_history"].append(tsl_record)
 
         _log(
-            f"TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} (lock_ratio={lock_ratio})"
+            f"  TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} ({shift_pct}% favorable) [LTP={ltp:.2f}]"
+        )
+        # Log to structured event log
+        _log_monitoring_event(
+            "TSL_ADJUSTMENT",
+            trade.get("trade_id", "unknown"),
+            leg=leg_type,
+            old_sl=old_sl,
+            new_sl=new_sl,
+            shift_pct=shift_pct,
+            ltp=ltp,
+            current_profit=round(current_profit, 2),
+            lock_ratio=lock_ratio
         )
 
 
@@ -279,21 +321,34 @@ def monitor_trade(state: dict):
     if not trade:
         return state
 
-    # ── Log monitoring cycle ──
+    # ── Log monitoring cycle entry ──
     entry_time = trade.get("entry_time", "09:30")
     monitored_since = trade.get("monitored_since", entry_time)
     mins_open = (
         datetime.strptime(now_str(), "%H:%M")
         - datetime.strptime(monitored_since, "%H:%M")
     ).total_seconds() / 60
+
+    trade_id = trade.get("trade_id", "unknown")
+    strategy = trade.get("strategy_type", "?")
+
     _log(
-        f"  MONITOR: {trade.get('strategy_type', '?')} | {int(mins_open)}min | Gate: {trade.get('entry_gate_signal', '?')}"
+        f"\n[MONITOR-CYCLE] {trade_id} | {strategy} | {int(mins_open)}min | {now_str()}"
+    )
+    _log_monitoring_event(
+        "MONITOR_CYCLE_START",
+        trade_id,
+        strategy=strategy,
+        mins_open=int(mins_open),
+        entry_gate_signal=trade.get('entry_gate_signal', '?'),
+        current_signal=trade.get('signal', '?')
     )
 
     from duckdb_tool import _connect
 
     expiry = trade.get("expiry", "")
     con = _connect()
+    legs_snapshot = []  # Collect leg data for cycle snapshot
     try:
         for leg in trade["legs"]:
             if leg["action"] != "SELL":
@@ -311,34 +366,80 @@ def monitor_trade(state: dict):
             if ltp > 5000:
                 continue
 
-            # Apply TSL adjustment before SL/TP check
             fill = leg.get("fill_price", ltp)
+            profit = round(fill - ltp, 2) if ltp > 0 else 0  # For short: fill > ltp = profit
+
+            legs_snapshot.append({
+                "tsym": leg.get("tsym", "?"),
+                "strike": leg["strike"],
+                "type": leg["type"],
+                "ltp": ltp,
+                "fill_price": fill,
+                "profit": profit,
+                "sl": trade["sl"].get(t),
+                "tp": trade["tp"].get(t)
+            })
+
+            # Apply TSL adjustment before SL/TP check
             if ltp > 0:
                 _apply_tsl(trade, leg["type"], fill, ltp)
 
             # Check SL/TP triggers
             if ltp > 0 and trade["sl"].get(t) and ltp >= trade["sl"][t]:
                 _log(
-                    f"  SL HIT — {leg['tsym']}: LTP={ltp} >= {trade['sl'][t]} [{now_str()}]"
+                    f"  ✓ SL HIT — {leg['tsym']}: LTP={ltp} >= SL={trade['sl'][t]} [{now_str()}]"
+                )
+                _log_monitoring_event(
+                    "SL_HIT",
+                    trade_id,
+                    leg_type=leg["type"],
+                    ltp=ltp,
+                    sl=trade["sl"][t],
+                    profit=profit
                 )
                 exit_trade(state, "SL_HIT")
                 return state
             elif ltp > 0 and trade["tp"].get(t) and ltp <= trade["tp"][t]:
                 _log(
-                    f"  TP HIT — {leg['tsym']}: LTP={ltp} <= {trade['tp'][t]} [{now_str()}]"
+                    f"  ✓ TP HIT — {leg['tsym']}: LTP={ltp} <= TP={trade['tp'][t]} [{now_str()}]"
+                )
+                _log_monitoring_event(
+                    "TP_HIT",
+                    trade_id,
+                    leg_type=leg["type"],
+                    ltp=ltp,
+                    tp=trade["tp"][t],
+                    profit=profit
                 )
                 exit_trade(state, "TP_HIT")
                 return state
     finally:
         con.close()
 
+    # Log cycle snapshot with leg details
+    total_profit = sum(leg["profit"] for leg in legs_snapshot)
+    _log(f"  Price snapshot: {' | '.join([f'{leg['tsym']}={leg['ltp']:.2f}' for leg in legs_snapshot])}")
+    _log(f"  Profit snapshot: {total_profit:.2f} (Open: {int(mins_open)}min)")
+    _log_monitoring_event(
+        "CYCLE_SNAPSHOT",
+        trade_id,
+        legs=legs_snapshot,
+        total_profit=total_profit,
+        minutes_open=int(mins_open)
+    )
+
     # ── Monitoring Crew: Morpher → Shifter ──────────────────────────────
     if _get_llm_monitor():
         try:
+            _log("  Checking MORPH/SHIFT eligibility...")
             state = _run_monitoring_crew(state)
         except Exception as e:
-            _log(f"  Monitoring crew failed: {e} — falling back to Python checks")
+            _log(f"  ⚠ Monitoring crew failed: {e} — falling back to Python checks")
+            _log_monitoring_event("MONITORING_CREW_ERROR", trade_id, error=str(e))
             state = _monitor_fallback(state, trade)
+    else:
+        _log("  ⚠ LLM unavailable — skipping MORPH/SHIFT checks")
+        _log_monitoring_event("LLM_UNAVAILABLE", trade_id)
 
     # Auto-exit after 45 min if no SL/TP
     mins_open = (
@@ -348,8 +449,13 @@ def monitor_trade(state: dict):
         )
     ).total_seconds() / 60
     if mins_open > 45:
-        _log(f"Auto-exit after {int(mins_open)} min")
+        _log(f"  ⏰ Auto-exit after {int(mins_open)} min")
+        _log_monitoring_event("TIME_EXIT", trade_id, minutes_open=int(mins_open))
         exit_trade(state, "TIME_EXIT")
+
+    # Log cycle end
+    _log(f"[MONITOR-CYCLE-END] {trade_id} | Duration: {int(mins_open)}min | {now_str()}\n")
+    _log_monitoring_event("MONITOR_CYCLE_END", trade_id, cycle_duration=int(mins_open))
 
     return state
 
@@ -376,6 +482,7 @@ def _run_monitoring_crew(state: dict):
     import json as _json
 
     trade = state["active_trade"]
+    trade_id = trade.get("trade_id", "unknown")
     llm = _get_llm_monitor()
 
     from factory import AgentFactory
@@ -388,6 +495,16 @@ def _run_monitoring_crew(state: dict):
     sl_tool = PlaceSLOrderTool()
     tp_tool = PlaceTPOrderTool()
     cancel_tool = CancelOrderTool()
+
+    # Pre-monitoring state
+    pre_signal = trade.get("signal", "?")
+    _log_monitoring_event(
+        "PRE_MORPH_STATE",
+        trade_id,
+        signal=pre_signal,
+        position_type=trade.get("position_type", "?"),
+        morph_count=len(trade.get("morphs", []))
+    )
 
     morpher = af.create_agent(
         "morpher_agent", {}, tools=[morph_tool, sl_tool, tp_tool, cancel_tool]
@@ -436,23 +553,56 @@ def _run_monitoring_crew(state: dict):
     )
     result = crew.kickoff()
 
-    # ── Log each agent's output ────────────────────────────────────────
+    # ── Log each agent's output with structured events ────────────────────────
     agent_names = ["Morpher", "Shifter"]
+    agent_event_types = ["MORPH_DECISION", "SHIFT_DECISION"]
+
     if hasattr(result, "tasks_output"):
-        for i, name in enumerate(agent_names):
+        for i, (name, event_type) in enumerate(zip(agent_names, agent_event_types)):
             if i < len(result.tasks_output):
                 raw = str(result.tasks_output[i])
                 try:
+                    # Try to parse JSON from output
                     parsed = (
                         json.loads(raw[raw.find("{") : raw.rfind("}") + 1])
                         if "{" in raw
                         else {}
                     )
-                    _log(f"  {name}: {json.dumps(parsed)[:300]}")
-                except Exception:
-                    _log(f"  {name} (raw): {raw[:300]}")
+
+                    # Check for action markers
+                    action_taken = "no_action" not in raw.lower() and ("executed" in raw.lower() or "success" in raw.lower())
+
+                    _log(f"  [{name.upper()}] {'✓ ACTION' if action_taken else '○ NO-ACTION'} | {json.dumps(parsed)[:250]}")
+
+                    # Log detailed event
+                    _log_monitoring_event(
+                        event_type,
+                        trade_id,
+                        action_taken=action_taken,
+                        raw_output=raw[:500],
+                        parsed_output=parsed
+                    )
+                except Exception as e:
+                    _log(f"  [{name.upper()}] {raw[:250]}")
+                    _log_monitoring_event(
+                        event_type,
+                        trade_id,
+                        error=str(e),
+                        raw_output=raw[:500]
+                    )
     else:
         _log(f"  Monitoring Crew result: {str(result)[:400]}")
+        _log_monitoring_event(
+            "MONITORING_CREW_RESULT",
+            trade_id,
+            result=str(result)[:500]
+        )
+
+    # Post-monitoring state
+    post_signal = state.get("active_trade", {}).get("signal", "?")
+    if post_signal != pre_signal:
+        _log(f"  ⚠ SIGNAL CHANGED: {pre_signal} → {post_signal}")
+        _log_monitoring_event("SIGNAL_CHANGE", trade_id, pre_signal=pre_signal, post_signal=post_signal)
 
     return state
 

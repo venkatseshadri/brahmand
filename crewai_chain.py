@@ -11,8 +11,10 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
+load_dotenv()
 
 from factory import AgentFactory, ToolFactory
 from persistence import save_execution_report

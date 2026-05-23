@@ -26,8 +26,10 @@ import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
+load_dotenv()
 
 from duckdb_tool import (
     MarketDataQueryTool,

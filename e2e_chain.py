@@ -18,8 +18,10 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
+load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
@@ -108,7 +110,13 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     # ── Build tools ────────────────────────────────────────────────────
-    from tools.entry_gate_tools import QueryTrendEMA, QueryTrafficLight
+    from tools.entry_gate_tools import (
+        QueryTrendEMA,
+        QueryTrafficLight,
+        CheckActiveSpreads,
+        EvaluateNotUpRejection,
+        EvaluateNotDownRejection,
+    )
     from tools.chain_tools import (
         ResolveOptionContractsTool,
         ExecutePaperTradeTool,
@@ -118,6 +126,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
     trend_tool = QueryTrendEMA()
     tl_tool = QueryTrafficLight()
+    position_check_tool = CheckActiveSpreads()
+    not_up_rejection_tool = EvaluateNotUpRejection()
+    not_down_rejection_tool = EvaluateNotDownRejection()
     contract_tool = ResolveOptionContractsTool()
     execution_tool = ExecutePaperTradeTool()
     entry_orders_tool = PlaceEntryOrdersTool()
@@ -138,8 +149,17 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
     # ── Build agents ───────────────────────────────────────────────────
     try:
-        entry_agent = af.create_agent("entry_agent", {}, tools=[trend_tool, tl_tool])
-        entry_agent.llm = llm
+        not_up_entry_agent = af.create_agent(
+            "not_up_entry_agent", {},
+            tools=[position_check_tool, not_up_rejection_tool]
+        )
+        not_up_entry_agent.llm = llm
+
+        not_down_entry_agent = af.create_agent(
+            "not_down_entry_agent", {},
+            tools=[position_check_tool, not_down_rejection_tool]
+        )
+        not_down_entry_agent.llm = llm
 
         regime_agent = af.create_agent("regime_agent", {}, tools=[market_tool])
         regime_agent.llm = llm
@@ -153,10 +173,12 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         execution_agent = af.create_agent(
             "execution_agent",
             variables={
-                "market_type": "NIFTY",
+                "market_type": "NIFTY",  # Phase 1: NIFTY/SENSEX (no selection). Phase 2+: receives asset from Asset Selector Agent
                 "strategy_type": "deterministic",
                 "ticker": "NIFTY",
                 "mock_mode": "paper",
+                "phase": "1",  # Phase 1 (NIFTY only), Phase 2+ (multi-asset, receives asset from upstream)
+                "role": "dumb_executor",  # Does NOT make decisions. All decisions upstream.
             },
             tools=[execution_tool, entry_orders_tool],
         )
@@ -183,76 +205,83 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     expiry = snap.get("expiry_weekly", "")
     from crewai import Task, Crew, Process
 
-    # ── Task 1: Entry Agent ────────────────────────────────────────────
-    entry_task = Task(
+    # ── Task 1a: NOT_UP Entry Agent (CALL_SPREAD gate) ─────────────────
+    not_up_entry_task = Task(
         description=(
-            "Evaluate whether NOW is a valid entry moment for NIFTY.\n\n"
-            "STEP 1: Call query_trend_ema(NIFTY) to get the Trend signal.\n"
-            "STEP 2: Call query_traffic_light(NIFTY) to get the Traffic Light signal.\n"
-            "STEP 3: Apply the combine rules as described in your backstory:\n"
-            "  - Both BULLISH → GO, SELL_PUT, confidence × 1.0\n"
-            "  - Both BEARISH → GO, SELL_CALL, confidence × 1.0\n"
-            "  - One BULLISH/BEARISH + NEUTRAL → GO, 0.75x confidence\n"
-            "  - Both NEUTRAL → GO, IRON_BUTTERFLY, 0.5x confidence\n"
-            "  - BULLISH vs BEARISH conflict → NO-GO, NONE\n\n"
-            "IMPORTANT: Return ONLY valid JSON with these exact fields:\n"
-            '{"go": true/false, "signal": "BULLISH"|"BEARISH"|"NEUTRAL", '
-            '"confidence": 0-100, "suggested_trade": "SELL_PUT"|"SELL_CALL"|'
-            '"IRON_BUTTERFLY"|"NONE", "reasoning": "..."}'
+            "Independently evaluate if market rejects upside (bearish pressure).\n\n"
+            "Your sole job: Decide whether to PLACE CALL_SPREAD.\n\n"
+            "STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.\n"
+            "STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.\n"
+            "STEP 3: Apply NOT_UP rejection logic:\n"
+            "  - Both BEARISH → go:true, confidence 90%\n"
+            "  - One BEARISH + one NEUTRAL → go:true, confidence 60%\n"
+            "  - Both NEUTRAL or any BULLISH → go:false\n\n"
+            "IMPORTANT: Return ONLY valid JSON:\n"
+            '{"go": true/false, "signal": "NOT_UP", "confidence": 0-100, '
+            '"trend_signal": "BEARISH"|"NEUTRAL"|"BULLISH", '
+            '"traffic_light_signal": "BEARISH"|"NEUTRAL"|"BULLISH", '
+            '"reasoning": "why market rejects upside or not"}'
         ),
-        expected_output="Entry decision JSON with go, signal, confidence, suggested_trade",
-        agent=entry_agent,
+        expected_output="NOT_UP entry decision JSON with go flag",
+        agent=not_up_entry_agent,
+    )
+
+    # ── Task 1b: NOT_DOWN Entry Agent (PUT_SPREAD gate) ────────────────
+    not_down_entry_task = Task(
+        description=(
+            "Independently evaluate if market rejects downside (bullish pressure).\n\n"
+            "Your sole job: Decide whether to PLACE PUT_SPREAD.\n\n"
+            "STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.\n"
+            "STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.\n"
+            "STEP 3: Apply NOT_DOWN rejection logic:\n"
+            "  - Both BULLISH → go:true, confidence 90%\n"
+            "  - One BULLISH + one NEUTRAL → go:true, confidence 60%\n"
+            "  - Both NEUTRAL or any BEARISH → go:false\n\n"
+            "IMPORTANT: Return ONLY valid JSON:\n"
+            '{"go": true/false, "signal": "NOT_DOWN", "confidence": 0-100, '
+            '"trend_signal": "BULLISH"|"NEUTRAL"|"BEARISH", '
+            '"traffic_light_signal": "BULLISH"|"NEUTRAL"|"BEARISH", '
+            '"reasoning": "why market rejects downside or not"}'
+        ),
+        expected_output="NOT_DOWN entry decision JSON with go flag",
+        agent=not_down_entry_agent,
     )
 
     # ── Task 2: Regime Agent ───────────────────────────────────────────
     regime_task = Task(
         description=(
-            "Classify the NIFTY market regime.\n\n"
-            "The Entry Agent's decision is in your context. Parse the JSON to get: "
-            "go (bool), signal (BULLISH/BEARISH/NEUTRAL), confidence (0-100). "
-            "This is ground truth.\n\n"
-            "ONE TOOL CALL ONLY: Call query_market_data(query_type='full_regime') "
-            "to get spot, EMA_20, st_15min_direction, ADX, VIX, and regime indicators.\n\n"
-            "VALIDATE the Entry Agent's signal:\n"
-            "- BULLISH: spot > EMA_20 and st_15min_direction = 'bullish'\n"
-            "- BEARISH: spot < EMA_20 and st_15min_direction = 'bearish'\n"
-            "- NEUTRAL: ADX < 25 and spot near EMA\n\n"
-            "ADDITIONAL: VIX > 18 → recommendation='caution'. IV rank > 85 → 'caution'.\n"
-            "ADX < 25 → regime='sideways', ADX > 25 → regime='trending_bullish/bearish'.\n\n"
-            "Output ONLY valid JSON:\n"
-            '{"regime": "trending_bullish"|"trending_bearish"|"sideways", '
-            '"confidence": 0.0-1.0, "recommendation": "enter"|"caution"|"skip", '
-            '"vix": 0.0, "entry_signal": "BULLISH"|"BEARISH"|"NEUTRAL", "reason": "..."}\n\n'
-            "CRITICAL: Preserve Entry Agent's signal as entry_signal. Include VIX in output."
+            "Get market regime data (VIX, ADX) for parameter optimization.\n\n"
+            "ONE TOOL CALL: query_market_data(query_type='full_regime') to fetch VIX, ADX, ADX direction.\n\n"
+            "OUTPUT only valid JSON:\n"
+            '{"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution", "reason": "..."}'
         ),
-        expected_output="Regime JSON with entry_signal preserved + vix for Strategy",
+        expected_output="Regime JSON with VIX and ADX",
         agent=regime_agent,
-        context=[entry_task],
+        context=[],
     )
 
-    # ── Task 3: Strategy Agent ─────────────────────────────────────────
+    # ── Task 3: Strategy Agent (sequential execution - one spread per cycle) ────────────────────
     strategy_task = Task(
         description=(
-            "Select strategy based on context from previous agents.\n\n"
-            "Parse the Entry Agent's output to get entry_signal (BULLISH/BEARISH/NEUTRAL).\n"
-            "Parse the Regime Agent's output to get VIX and ADX for parameter optimization.\n\n"
-            "ENTRY_SIGNAL → STRATEGY MAPPING:\n"
-            "- BULLISH → PUT_SPREAD (2 legs: sell ATM PE + buy ATM-ww PE)\n"
-            "- BEARISH → CALL_SPREAD (2 legs: sell ATM CE + buy ATM+ww CE)\n"
-            "- NEUTRAL → IRON_BUTTERFLY (4 legs: sell ATM CE+PE + buy ATM±ww CE+PE)\n\n"
-            "PARAMETERS (from Regime VIX and ADX):\n"
-            "- wing_width: 200 default, 150 if VIX < 15, 250 if VIX > 20\n"
-            "- sl_pct: 0.25 default, 0.35 if VIX > 18\n"
-            "- tp_pct: 0.50 default, 0.40 if ADX > 30, 0.55 if ADX < 20\n"
-            "- If VIX/ADX missing from Regime, call query_market_data to get them.\n\n"
-            "Strategy type NEVER changes based on regime — entry_signal is final.\n\n"
-            "Output ONLY valid JSON:\n"
-            '{"strategy_type": "PUT_SPREAD"|"CALL_SPREAD"|"IRON_BUTTERFLY", '
-            '"wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50, "reason": "..."}'
+            "Dual-Entry Sequential Execution: Pick ONE spread to execute this cycle.\n\n"
+            "STEP 1: Parse both entry decisions from context:\n"
+            "  - NOT_UP decision: go=true/false → execute CALL_SPREAD if true\n"
+            "  - NOT_DOWN decision: go=true/false → execute PUT_SPREAD if true\n\n"
+            "STEP 2: SEQUENTIAL LOGIC (one spread per cycle):\n"
+            "  IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)\n"
+            "  ELSE IF go_put_spread=true: output PUT_SPREAD parameters (this cycle)\n"
+            "  ELSE: return {\"skip\": true} [should not reach here]\n\n"
+            "STEP 3: Optimize parameters from Regime data (VIX, ADX):\n"
+            "  - wing_width: 200 default, 150 if VIX<15, 250 if VIX>20\n"
+            "  - sl_pct: 0.25 default, 0.35 if VIX>18\n"
+            "  - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20\n\n"
+            "OUTPUT JSON (one of):\n"
+            '{"strategy_type": "CALL_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}\n'
+            'OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}'
         ),
-        expected_output="Strategy JSON",
+        expected_output="CALL_SPREAD or PUT_SPREAD parameters (sequential execution)",
         agent=strategy_agent,
-        context=[entry_task, regime_task],
+        context=[not_up_entry_task, not_down_entry_task, regime_task],
     )
 
     # ── Task 4: Contract Agent ─────────────────────────────────────────
@@ -273,7 +302,15 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Task 5: Execution Agent ────────────────────────────────────────
     execution_task = Task(
         description=(
-            "Build the trade and route entry orders via the centralized Order Agent.\n\n"
+            "═══ PHASE 1 (Current): NIFTY/SENSEX Options ═══\n"
+            "YOU ARE A DUMB EXECUTOR. All decisions are made upstream.\n\n"
+            "UPSTREAM DECISIONS (already made):\n"
+            "  ✓ Entry Agent: Is there a signal? → YES\n"
+            "  ✓ Regime Agent: What's the regime? → Sideways\n"
+            "  ✓ Strategy Agent: What to trade? → CALL_SPREAD (wing_width=200, sl=0.25, tp=0.50)\n"
+            "  ✓ Contract Agent: What contracts? → Resolved tsyms + ltps\n"
+            "  ✓ Asset (Phase 1): NIFTY (only option in Phase 1)\n\n"
+            "YOUR JOB:\n"
             "STEP 1: Parse Contract Agent's output for resolved contracts (tsym, ltp, strike, action).\n"
             "STEP 2: Parse Strategy Agent's output for strategy_type, wing_width, sl_pct, tp_pct.\n"
             f"STEP 3: Call execute_paper_trade(contracts_json, strategy_type, entry_time, "
@@ -293,9 +330,28 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "  Return value: {trade_id, entry_orders: [order_ids], status, mode}\n\n"
             "STEP 5: Extract trade_id from place_entry_orders result.\n"
             "  Pass trade_id to Risk Agent (in next task context) for SL/TP routing.\n\n"
-            "Output the complete trade dict with entry_order_results (trade_id + order_ids)."
+            "Output the complete trade dict with entry_order_results (trade_id + order_ids).\n\n"
+            "═══ PHASE 2+ (Future): Multi-Asset Expansion ═══\n"
+            "YOU REMAIN A DUMB EXECUTOR. Architecture changes UPSTREAM, not here.\n\n"
+            "NEW UPSTREAM WORKFLOW:\n"
+            "  1. Entry Agent → Regime Agent → Strategy Agent → [NEW] Asset Selector Agent\n"
+            "  2. Asset Selector Agent: queries ChromaDB for best asset\n"
+            "     Output: {asset_class: 'NIFTY'|'Reliance'|'Crude'|'BTC', confidence, position_size}\n"
+            "  3. Contract Agent: resolves contracts for picked asset\n"
+            "  4. YOU receive: {asset_class, contracts, strategy_type, wing_width, sl_pct, tp_pct}\n"
+            "  5. YOU execute: same logic as Phase 1, just different assets\n\n"
+            "YOUR CODE STAYS IDENTICAL:\n"
+            "  - execute_paper_trade() works for any asset (NIFTY, Reliance, Crude, BTC)\n"
+            "  - place_entry_orders() works for any asset\n"
+            "  - You don't care which asset — just build + route\n\n"
+            "YOU DO NOT:\n"
+            "  ❌ Query historical win rates\n"
+            "  ❌ Decide which asset to trade\n"
+            "  ❌ Optimize parameters\n"
+            "  ❌ Check liquidity\n"
+            "  ❌ Make any decisions"
         ),
-        expected_output="Trade dict with legs, net_credit, sl, tp, trade_id, and entry_orders routed via Order Agent",
+        expected_output="Trade dict with legs, net_credit, sl, tp, trade_id, entry_orders",
         agent=execution_agent,
         context=[strategy_task, contract_task],
     )
@@ -327,20 +383,88 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         context=[execution_task],
     )
 
-    # ── Run full 6-agent sequential Crew ───────────────────────────────
+    # ── ENTRY GATE: Run dual Entry Agents sequentially (deterministic check) ─────────
+    entry_crew = Crew(
+        agents=[not_up_entry_agent, not_down_entry_agent, regime_agent],
+        tasks=[not_up_entry_task, not_down_entry_task, regime_task],
+        process=Process.sequential,
+        verbose=False,
+    )
     try:
-        crew = Crew(
+        entry_result = entry_crew.kickoff()
+    except Exception as e:
+        _log(f"  Entry Crew failed: {e}")
+        return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+
+    # Parse dual Entry Agents output
+    not_up_decision = {}
+    not_down_decision = {}
+    regime = {}
+    if hasattr(entry_result, "tasks_output"):
+        try:
+            not_up_decision = _parse_json_output(str(entry_result.tasks_output[0]))  # NOT_UP agent
+            not_down_decision = _parse_json_output(str(entry_result.tasks_output[1]))  # NOT_DOWN agent
+            regime = _parse_json_output(str(entry_result.tasks_output[2])) if len(entry_result.tasks_output) > 2 else {}  # Regime
+        except Exception as e:
+            _err(f"Entry gate parse failed: {e}")
+            return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+
+    agent_log(_agent, "NotUpEntry_Agent", not_up_decision)
+    agent_log(_agent, "NotDownEntry_Agent", not_down_decision)
+
+    # ── ENTRY GATE: Check both agents' decisions ─────────────────────────
+    go_call_spread = not_up_decision.get("go", False)
+    go_put_spread = not_down_decision.get("go", False)
+
+    _log(
+        f"  Entry Agents: NOT_UP={go_call_spread} ({not_up_decision.get('confidence', 0)}%) | "
+        f"NOT_DOWN={go_put_spread} ({not_down_decision.get('confidence', 0)}%)"
+    )
+
+    # Block if BOTH reject (no opportunity)
+    if not go_call_spread and not go_put_spread:
+        _log("  Entry Agents: Both NO-GO (no trade opportunity)")
+        return {
+            "recommendation": "no_go",
+            "not_up_decision": not_up_decision,
+            "not_down_decision": not_down_decision,
+        }
+
+    # Regime gate (validates the rejection signals)
+    if regime.get("recommendation") == "caution":
+        _log(f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}")
+        # Still allow entry on caution, just log it
+
+    _log(
+        f"  Regime: {regime.get('regime')} (VIX={regime.get('vix', '?')}) → {regime.get('recommendation')}"
+    )
+
+    # ── Determine which spread to execute (if both go, regime preferences one) ─────────────────────
+    # For now: execute both if both are true (iron butterfly on same cycle)
+    # If only one is true: execute that one (PUT_SPREAD or CALL_SPREAD)
+    # If both false: abort (already handled above)
+
+    entry_decision = {
+        "go_call_spread": go_call_spread,
+        "go_put_spread": go_put_spread,
+        "not_up_signal": not_up_decision.get("signal"),
+        "not_up_confidence": not_up_decision.get("confidence", 0),
+        "not_down_signal": not_down_decision.get("signal"),
+        "not_down_confidence": not_down_decision.get("confidence", 0),
+        "regime": regime.get("regime"),
+        "vix": regime.get("vix", 0),
+    }
+
+    # ── NOW run remaining agents (Strategy, Contract, Execution, Risk) ─────────
+    try:
+        full_crew = Crew(
             agents=[
-                entry_agent,
-                regime_agent,
                 strategy_agent,
                 contract_agent,
                 execution_agent,
                 risk_agent,
             ],
             tasks=[
-                entry_task,
-                regime_task,
                 strategy_task,
                 contract_task,
                 execution_task,
@@ -348,15 +472,16 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             ],
             process=Process.sequential,
             verbose=True,
+            context=[not_up_entry_task, not_down_entry_task, regime_task],  # Pass dual entry + regime context
         )
-        result = crew.kickoff()
+        result = full_crew.kickoff()
     except Exception as e:
-        _log(f"  Crew pipeline failed: {e}")
+        _log(f"  Strategy/Execution Crew failed: {e}")
         return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
-    # ── Log each agent's output for troubleshooting ─────────────────────
-    agent_names = ["Entry", "Regime", "Strategy", "Contract", "Execution", "Risk"]
-    parsed_outputs = [{}, {}, {}, {}, {}, {}]
+    # ── Log remaining agent outputs ─────────────────────────────────────
+    agent_names = ["Strategy", "Contract", "Execution", "Risk"]
+    parsed_outputs = [{}, {}, {}, {}]
     if hasattr(result, "tasks_output"):
         for i, name in enumerate(agent_names):
             if i < len(result.tasks_output):
@@ -370,45 +495,19 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     else:
         raw_str = str(result)
         _err(f"Crew raw output (no tasks_output): {raw_str[:500]}")
-        try:
-            parsed_outputs[5] = _parse_json_output(raw_str)
-        except Exception:
-            pass
 
-    entry_decision = parsed_outputs[0]
-    regime = parsed_outputs[1]
-    strategy = parsed_outputs[2]
-    contracts_data = parsed_outputs[3]
-    trade = parsed_outputs[4]
-    risk_confirmation = parsed_outputs[5]
+    strategy = parsed_outputs[0]
+    contracts_data = parsed_outputs[1]
+    trade = parsed_outputs[2]
+    risk_confirmation = parsed_outputs[3]
 
-    # ── Entry gate: NO-GO stops everything ─────────────────────────────
-    if not entry_decision.get("go", False):
-        _log(
-            f"  Entry Agent: NO-GO | {entry_decision.get('signal')} "
-            f"{entry_decision.get('confidence')}% | {entry_decision.get('reasoning', '?')}"
-        )
-        return {"recommendation": "no_go", "entry_decision": entry_decision}
-
-    _log(
-        f"  Entry Agent: GO | {entry_decision.get('signal')} "
-        f"{entry_decision.get('confidence')}% | → {entry_decision.get('suggested_trade')}"
-    )
-
-    # ── Regime gate ────────────────────────────────────────────────────
-    if regime.get("recommendation") == "skip":
-        _log(f"  Regime: SKIP — {regime.get('reason', '?')}")
-        return regime
-
-    _log(f"  Regime: {regime.get('regime')} → {regime.get('recommendation')}")
-
-    # ── Strategy ───────────────────────────────────────────────────────
+    # ── Strategy summary ────────────────────────────────────────────────
     ww = strategy.get("wing_width", 200)
     sl_p = strategy.get("sl_pct", 0.25)
     tp_p = strategy.get("tp_pct", 0.50)
     stype = strategy.get("strategy_type", "IRON_BUTTERFLY")
     regime_entry_signal = regime.get("entry_signal") or entry_decision.get(
-        "signal", "NEUTRAL"
+        "signal", "NOT_UP"
     )
 
     _log(
@@ -458,10 +557,9 @@ def _deterministic_fallback(entry_time, spot, atm, vix, adx, snap):
         return {"recommendation": "no_go", "entry_decision": decision}
 
     stype = {
-        "BULLISH": "PUT_SPREAD",
-        "BEARISH": "CALL_SPREAD",
-        "NEUTRAL": "IRON_BUTTERFLY",
-    }.get(decision["signal"], "IRON_BUTTERFLY")
+        "NOT_UP": "CALL_SPREAD",
+        "NOT_DOWN": "PUT_SPREAD",
+    }.get(decision["signal"], "CALL_SPREAD")
 
     return {
         "entry_decision": decision,
