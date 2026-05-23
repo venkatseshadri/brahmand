@@ -197,6 +197,32 @@ class EntrySignalBroker:
         for pattern in self.entry_agent.patterns:
             logger.info(f"  - {pattern['pattern_name']} ({pattern['family']})")
 
+    def get_full_context(self, index: str = "NIFTY") -> dict:
+        """
+        Get market context (VIX, PCR, ADX) and research pattern matches.
+        Used by entry_check.py to apply market context adjustments.
+        """
+        candle = self.market_feed.get_latest_candle(index)
+        if not candle:
+            return {}
+
+        # Check which research patterns match
+        signal = self.entry_agent.entry_check(candle)
+
+        return {
+            "timestamp": candle.get("timestamp"),
+            "vix": candle.get("india_vix"),
+            "pcr_total": candle.get("pcr_total"),
+            "pcr_atm": candle.get("pcr_atm"),
+            "adx": candle.get("adx"),
+            "spot": candle.get("spot"),
+            "matching_patterns": signal.matching_patterns,
+            "pattern_confidence": signal.confidence,
+            "vix_weight": 0.15,  # Configurable weights
+            "pcr_weight": 0.10,
+            "pattern_weight": 0.10,
+        }
+
     def check_market_hours(self) -> bool:
         """Check if current time is within trading hours (9:15 AM - 3:30 PM)"""
         now = datetime.now()
