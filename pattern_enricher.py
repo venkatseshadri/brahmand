@@ -30,6 +30,23 @@ logger = logging.getLogger("PatternEnricher")
 
 V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
 
+
+def _v4_connect(read_only: bool = False, retries: int = 10, backoff: float = 0.3):
+    """Open V4_DB with retry. The v4 aggregator also writes this file, so an
+    open can transiently hit DuckDB's single-writer lock — back off and retry
+    instead of losing the write."""
+    import duckdb
+
+    last = None
+    for _ in range(retries):
+        try:
+            return duckdb.connect(str(V4_DB), read_only=read_only)
+        except Exception as e:
+            last = e
+            time.sleep(backoff)
+    raise IOError(f"V4_DB lock not cleared after {retries} retries: {last}")
+
+
 # TF order: highest TF first (daily → 5m)
 TF_ORDER = [
     (1440, "1440m"),
@@ -82,7 +99,8 @@ def init_pattern_table(db):
 
 
 def get_latest_bar_per_tf(db, index: str = "NIFTY", max_age_min: int = 30) -> dict:
-    """Get latest bar for each TF within the last N minutes."""
+    """Get latest bar for each TF. When a TF bar doesn't exist yet (partial candle),
+    approximate from lower-TF bars instead of returning no data."""
     bars = {}
     for tf_min, tf_label in TF_ORDER:
         row = db.execute(
@@ -100,7 +118,60 @@ def get_latest_bar_per_tf(db, index: str = "NIFTY", max_age_min: int = 30) -> di
                 "low": row[3],
                 "close": row[4],
             }
+        elif tf_min > 1:
+            # Partial candle: aggregate from 1-min bars within the expected TF window
+            partial = _compute_partial_candle(db, index, tf_min)
+            if partial:
+                bars[tf_label] = partial
     return bars
+
+
+def _compute_partial_candle(db, index: str, tf_min: int) -> dict:
+    """Build a partial TF candle from 1-min bars within the last {tf_min} minutes.
+    Returns None if no 1-min bars exist."""
+    row = db.execute(
+        """SELECT MIN(timestamp), MAX(timestamp), COUNT(*)
+           FROM market_data_multitf
+           WHERE index_name = ? AND timeframe_min = 1
+           ORDER BY timestamp DESC""",
+        (index,),
+    ).fetchone()
+    if not row or not row[2]:
+        return None
+
+    count = row[2]
+    if count == 0:
+        return None
+
+    # Get the last {tf_min} 1-min bars (or however many exist, up to tf_min)
+    limit = min(tf_min, count)
+    rows = db.execute(
+        """SELECT open, high, low, close, timestamp
+           FROM market_data_multitf
+           WHERE index_name = ? AND timeframe_min = 1
+           ORDER BY timestamp DESC LIMIT ?""",
+        (index, limit),
+    ).fetchall()
+
+    if not rows:
+        return None
+
+    # Aggregate: open from oldest bar (last in DESC), close from newest
+    opens = [r[0] for r in rows if r[0] is not None]
+    highs = [r[1] for r in rows if r[1] is not None]
+    lows = [r[2] for r in rows if r[2] is not None]
+    closes = [r[3] for r in rows if r[3] is not None]
+
+    if not opens or not closes:
+        return None
+
+    return {
+        "timestamp": rows[0][4],  # newest bar's timestamp
+        "open": opens[-1],  # oldest bar's open
+        "high": max(highs),
+        "low": min(lows),
+        "close": closes[0],  # newest bar's close
+    }
 
 
 def compute_pattern(bars: dict) -> str:
@@ -183,11 +254,11 @@ def compute_forward_outcomes(db, timestamp: str, index: str, spot: float) -> dic
     return outcomes
 
 
-def enrich_bars(db, index: str = "NIFTY", limit: int = 500):
-    """Enrich the last N bars with pattern + outcomes."""
+def enrich_bars(db, index: str = "NIFTY", limit: int = 500, force: bool = False):
+    """Enrich the last N bars with pattern + outcomes.
+    If force=True, recompute existing rows (partial candle fix)."""
     init_pattern_table(db)
 
-    # Get timestamps for the latest 5m bars
     timestamps = db.execute(
         """SELECT DISTINCT timestamp FROM market_data_multitf
            WHERE index_name = ? AND timeframe_min = 5
@@ -197,37 +268,31 @@ def enrich_bars(db, index: str = "NIFTY", limit: int = 500):
 
     enriched = 0
     for (ts,) in timestamps:
-        # Check if already enriched
-        exists = db.execute(
-            "SELECT 1 FROM market_data_patterns WHERE timestamp = ? AND index_name = ?",
-            (ts, index),
-        ).fetchone()
-        if exists:
+        if not force:
+            exists = db.execute(
+                "SELECT 1 FROM market_data_patterns WHERE timestamp = ? AND index_name = ?",
+                (ts, index),
+            ).fetchone()
+            if exists:
+                continue
+
+        bars = get_latest_bar_per_tf(db, index)
+        if len(bars) < 3:
             continue
 
-        # Get bars at this timestamp for all TFs
-        spot = None
-        bars = {}
-        for tf_min, tf_label in TF_ORDER:
-            row = db.execute(
-                """SELECT open, high, low, close FROM market_data_multitf
-                   WHERE index_name = ? AND timeframe_min = ? AND timestamp = ? LIMIT 1""",
-                (index, tf_min, ts),
-            ).fetchone()
-            if row:
-                bars[tf_label] = {
-                    "open": row[0],
-                    "high": row[1],
-                    "low": row[2],
-                    "close": row[3],
-                }
-                spot = row[3] if spot is None else spot  # use 5m close as spot
-
-        if not spot or len(bars) < 3:
+        # Use 5m close as spot (most recent TF that always exists)
+        spot = bars.get("5m", {}).get("close") or bars.get("15m", {}).get("close")
+        if not spot:
             continue
 
         pattern = compute_pattern(bars)
         outcomes = compute_forward_outcomes(db, ts, index, spot)
+
+        if force:
+            db.execute(
+                "DELETE FROM market_data_patterns WHERE timestamp = ? AND index_name = ?",
+                (ts, index),
+            )
 
         db.execute(
             """INSERT OR IGNORE INTO market_data_patterns
@@ -294,7 +359,7 @@ def log_trade_pattern(trade: dict) -> bool:
     import duckdb
 
     try:
-        db = duckdb.connect(str(V4_DB))
+        db = _v4_connect()
         init_trade_outcomes_table(db)
 
         entry_time = trade.get("entry_time", trade.get("monitored_since", ""))
@@ -307,7 +372,11 @@ def log_trade_pattern(trade: dict) -> bool:
 
         es = trade.get("entry_scores", {})
         trend_sig = es.get("trend_signal") or es.get("entry_trend_signal") or "?"
-        tl_sig = es.get("traffic_light_signal") or es.get("entry_traffic_light_signal") or "?"
+        tl_sig = (
+            es.get("traffic_light_signal")
+            or es.get("entry_traffic_light_signal")
+            or "?"
+        )
         conf = es.get("confidence", 0) or es.get("entry_combined_confidence", 0)
 
         # ── Look up pattern by querying raw bars at nearest timestamp ──
@@ -389,6 +458,11 @@ def main():
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--limit", type=int, default=500)
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Recompute existing rows (partial candle fix)",
+    )
     args = parser.parse_args()
 
     import duckdb
@@ -401,7 +475,7 @@ def main():
         while True:
             try:
                 # Create fresh connection for each cycle to avoid lock conflicts
-                db = duckdb.connect(str(V4_DB))
+                db = _v4_connect()
                 enrich_bars(db, limit=50)
                 db.close()
             except Exception as e:
@@ -409,7 +483,7 @@ def main():
             time.sleep(300)
     else:
         db = duckdb.connect(str(V4_DB))
-        enrich_bars(db, limit=args.limit)
+        enrich_bars(db, limit=args.limit, force=args.force)
         db.close()
 
 
