@@ -46,6 +46,7 @@ def _get_llm():
         model="deepseek/deepseek-chat",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=api_key,
+        temperature=0,
     )
 
 
@@ -56,6 +57,104 @@ def _parse_json_output(raw: str) -> dict:
     if s >= 0 and e > s:
         return json.loads(raw[s:e])
     return {}
+
+
+def _recompute_gate(decision: dict, gate_type: str) -> dict:
+    """Recompute the deterministic gate output from agent's trend+TL signals.
+    Returns (expected_go, expected_confidence). Used for provenance check.
+    """
+    t_sig = decision.get("trend_signal", "NEUTRAL").upper()
+    t_conf = decision.get("trend_confidence", 50)
+    tl_sig = decision.get("traffic_light_signal", "NEUTRAL").upper()
+    tl_conf = decision.get("traffic_light_confidence", 50)
+
+    go = False
+    confidence = 0
+
+    if gate_type == "NOT_UP":
+        if t_sig == "BEARISH" and tl_sig == "BEARISH":
+            go = True
+            confidence = round((t_conf + tl_conf) / 2)
+        elif (t_sig == "BEARISH" and tl_sig == "NEUTRAL") or (
+            t_sig == "NEUTRAL" and tl_sig == "BEARISH"
+        ):
+            go = True
+            confidence = round(max(t_conf if t_sig == "BEARISH" else tl_conf, 0) * 0.67)
+        elif t_sig == "BULLISH" or tl_sig == "BULLISH":
+            go = False
+            confidence = 0
+        else:
+            go = False
+            confidence = 0
+    else:  # NOT_DOWN
+        if t_sig == "BULLISH" and tl_sig == "BULLISH":
+            go = True
+            confidence = round((t_conf + tl_conf) / 2)
+        elif (t_sig == "BULLISH" and tl_sig == "NEUTRAL") or (
+            t_sig == "NEUTRAL" and tl_sig == "BULLISH"
+        ):
+            go = True
+            confidence = round(max(t_conf if t_sig == "BULLISH" else tl_conf, 0) * 0.67)
+        elif t_sig == "BEARISH" or tl_sig == "BEARISH":
+            go = False
+            confidence = 0
+        else:
+            go = False
+            confidence = 0
+
+    return {"go": go, "confidence": confidence}
+
+
+def _verify_provenance(decision: dict, gate_type: str) -> bool:
+    """Verify agent decision numbers match deterministic gate recomputation.
+    Returns True if clean, False if hallucination detected (patches decision)."""
+    expected = _recompute_gate(decision, gate_type)
+
+    violations = []
+    if decision.get("go") != expected["go"]:
+        violations.append(f"go agent={decision.get('go')} expected={expected['go']}")
+        decision["go"] = expected["go"]  # clamp to truth
+    if decision.get("confidence", 0) != expected["confidence"]:
+        violations.append(
+            f"confidence agent={decision.get('confidence')} expected={expected['confidence']}"
+        )
+        decision["confidence"] = expected["confidence"]  # clamp to truth
+
+    if violations:
+        _err(
+            f"PROVENANCE VIOLATION [{gate_type}]: {', '.join(violations)}  "
+            f"trend={decision.get('trend_signal')}/{decision.get('trend_confidence')}% "
+            f"tl={decision.get('traffic_light_signal')}/{decision.get('traffic_light_confidence')}% "
+            f"— CLAMPED to deterministic values"
+        )
+        return False
+    return True
+
+
+def _get_research_consensus() -> str:
+    """Load ChromaDB research patterns and return consensus direction.
+    Returns BULLISH, BEARISH, NEUTRAL, or UNKNOWN if ChromaDB unavailable."""
+    try:
+        from entry_agent import EntryAgent
+
+        ea = EntryAgent()
+        if not ea.patterns:
+            return "UNKNOWN"
+
+        directions = [p.get("predicted_direction", "NEUTRAL") for p in ea.patterns]
+        bull = sum(1 for d in directions if d == "BULLISH")
+        bear = sum(1 for d in directions if d == "BEARISH")
+        neutral = sum(1 for d in directions if d == "NEUTRAL")
+
+        if neutral >= len(directions) * 0.5:
+            return "NEUTRAL"
+        elif bull > bear:
+            return "BULLISH"
+        elif bear > bull:
+            return "BEARISH"
+        return "NEUTRAL"
+    except Exception:
+        return "UNKNOWN"
 
 
 def run_sequential_crew(entry_time: str) -> dict | None:
@@ -150,14 +249,14 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Build agents ───────────────────────────────────────────────────
     try:
         not_up_entry_agent = af.create_agent(
-            "not_up_entry_agent", {},
-            tools=[position_check_tool, not_up_rejection_tool]
+            "not_up_entry_agent", {}, tools=[position_check_tool, not_up_rejection_tool]
         )
         not_up_entry_agent.llm = llm
 
         not_down_entry_agent = af.create_agent(
-            "not_down_entry_agent", {},
-            tools=[position_check_tool, not_down_rejection_tool]
+            "not_down_entry_agent",
+            {},
+            tools=[position_check_tool, not_down_rejection_tool],
         )
         not_down_entry_agent.llm = llm
 
@@ -187,7 +286,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         risk_agent = af.create_agent(
             "risk_agent",
             variables={"market_type": "NIFTY", "ticker": "NIFTY", "mock_mode": "paper"},
-            tools=[sl_tp_orders_tool],  # Entry phase: ONLY use centralized order routing
+            tools=[
+                sl_tp_orders_tool
+            ],  # Entry phase: ONLY use centralized order routing
         )
         risk_agent.llm = llm
 
@@ -268,18 +369,23 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "  - NOT_UP decision: go=true/false → execute CALL_SPREAD if true\n"
             "  - NOT_DOWN decision: go=true/false → execute PUT_SPREAD if true\n\n"
             "STEP 2: SEQUENTIAL LOGIC (one spread per cycle):\n"
-            "  IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)\n"
+            "  IF BOTH go_call_spread AND go_put_spread are true:\n"
+            "    → Market is sideways (both sides valid). Output IRON_BUTTERFLY.\n"
+            "    → Use IRON_BUTTERFLY with wing_width optimization from Regime (VIX) data.\n"
+            "  ELSE IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)\n"
             "  ELSE IF go_put_spread=true: output PUT_SPREAD parameters (this cycle)\n"
-            "  ELSE: return {\"skip\": true} [should not reach here]\n\n"
+            '  ELSE: return {"skip": true}\n\n'
             "STEP 3: Optimize parameters from Regime data (VIX, ADX):\n"
             "  - wing_width: 200 default, 150 if VIX<15, 250 if VIX>20\n"
             "  - sl_pct: 0.25 default, 0.35 if VIX>18\n"
-            "  - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20\n\n"
+            "  - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20\n"
+            "  - IRON_BUTTERFLY gets same wing_width optimization\n\n"
             "OUTPUT JSON (one of):\n"
             '{"strategy_type": "CALL_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}\n'
-            'OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}'
+            'OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}\n'
+            'OR {"strategy_type": "IRON_BUTTERFLY", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}'
         ),
-        expected_output="CALL_SPREAD or PUT_SPREAD parameters (sequential execution)",
+        expected_output="CALL_SPREAD, PUT_SPREAD, or IRON_BUTTERFLY parameters",
         agent=strategy_agent,
         context=[not_up_entry_task, not_down_entry_task, regime_task],
     )
@@ -402,9 +508,61 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     regime = {}
     if hasattr(entry_result, "tasks_output"):
         try:
-            not_up_decision = _parse_json_output(str(entry_result.tasks_output[0]))  # NOT_UP agent
-            not_down_decision = _parse_json_output(str(entry_result.tasks_output[1]))  # NOT_DOWN agent
-            regime = _parse_json_output(str(entry_result.tasks_output[2])) if len(entry_result.tasks_output) > 2 else {}  # Regime
+            not_up_decision = _parse_json_output(
+                str(entry_result.tasks_output[0])
+            )  # NOT_UP agent
+            not_down_decision = _parse_json_output(
+                str(entry_result.tasks_output[1])
+            )  # NOT_DOWN agent
+            regime = (
+                _parse_json_output(str(entry_result.tasks_output[2]))
+                if len(entry_result.tasks_output) > 2
+                else {}
+            )  # Regime
+
+            # Provenance guard: clamp hallucinated numbers to deterministic tool values
+            _verify_provenance(not_up_decision, "NOT_UP") if not_up_decision else None
+            _verify_provenance(
+                not_down_decision, "NOT_DOWN"
+            ) if not_down_decision else None
+
+            # ── Research Override: research is macro regime, trend+TL is micro timing ──
+            research_consensus = _get_research_consensus()
+            if research_consensus == "NEUTRAL":
+                t_sig = not_up_decision.get("trend_signal", "").upper()
+                tl_sig = not_up_decision.get("traffic_light_signal", "").upper()
+
+                # Consensus signal: are trend and TL in agreement?
+                trend_bull = t_sig == "BULLISH"
+                trend_bear = t_sig == "BEARISH"
+                tl_bull = tl_sig == "BULLISH"
+                tl_bear = tl_sig == "BEARISH"
+                conflict = (trend_bull and tl_bear) or (trend_bear and tl_bull)
+                both_neutral = t_sig == "NEUTRAL" and tl_sig == "NEUTRAL"
+
+                # Override when neither gate has a useful signal:
+                # - Both NEUTRAL: no direction at all → Iron Butterfly
+                # - Conflict: mixed signals → market uncertain → Iron Butterfly
+                if both_neutral or conflict:
+                    not_up_decision["go"] = True
+                    not_up_decision["confidence"] = 40 if conflict else 50
+                    not_down_decision["go"] = True
+                    not_down_decision["confidence"] = 40 if conflict else 50
+                    reason = (
+                        f"Research NEUTRAL → sideways market "
+                        f"(trend={t_sig}, TL={tl_sig}, {'conflict' if conflict else 'both neutral'}) "
+                        f"→ IRON_BUTTERFLY"
+                    )
+                    not_up_decision["reasoning"] = reason
+                    not_down_decision["reasoning"] = reason
+                    _log(f"  Research Override: {reason}")
+
+                if not regime:
+                    regime = {
+                        "recommendation": "enter",
+                        "reason": "Research consensus NEUTRAL (sideways)",
+                    }
+
         except Exception as e:
             _err(f"Entry gate parse failed: {e}")
             return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
@@ -432,7 +590,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
     # Regime gate (validates the rejection signals)
     if regime.get("recommendation") == "caution":
-        _log(f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}")
+        _log(
+            f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}"
+        )
         # Still allow entry on caution, just log it
 
     _log(
@@ -472,7 +632,11 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             ],
             process=Process.sequential,
             verbose=True,
-            context=[not_up_entry_task, not_down_entry_task, regime_task],  # Pass dual entry + regime context
+            context=[
+                not_up_entry_task,
+                not_down_entry_task,
+                regime_task,
+            ],  # Pass dual entry + regime context
         )
         result = full_crew.kickoff()
     except Exception as e:
@@ -703,27 +867,57 @@ def run_full_chain(
     init_db()
 
     crew_result = run_sequential_crew(entry_time)
+
+    def _audit_entry_check(outcome: str, **extra):
+        # Audit every entry-gate evaluation (GO and rejections) to the
+        # structured monitoring JSONL. Lazy import avoids circular import.
+        try:
+            from kickoff import _log_monitoring_event
+
+            ed = (crew_result or {}).get("entry_decision", {})
+            rg = (crew_result or {}).get("regime", {})
+            _log_monitoring_event(
+                "ENTRY_CHECK",
+                "NO_TRADE",
+                entry_time=entry_time,
+                outcome=outcome,
+                signal=ed.get("signal"),
+                confidence=ed.get("confidence"),
+                go=ed.get("go"),
+                regime=rg.get("regime"),
+                regime_recommendation=rg.get("recommendation"),
+                vix=rg.get("vix"),
+                **extra,
+            )
+        except Exception:
+            pass
+
     if crew_result is None:
+        _audit_entry_check("crew_none")
         return None
 
     # Check entry gate
     if crew_result.get("recommendation") == "no_go":
+        _audit_entry_check("no_go")
         _log("  Entry gate: NO-GO — aborting")
         return None
 
     # Check regime gate
     regime = crew_result.get("regime", {})
     if regime.get("recommendation") == "skip":
+        _audit_entry_check("regime_skip")
         _log("  Regime gate: SKIP — aborting")
         return regime
 
     # Extract trade from Execution Agent's output
     trade = crew_result.get("trade", {})
     if not trade:
+        _audit_entry_check("no_trade_returned")
         _log("  Execution: no trade returned — aborting")
         return None
 
     entry_decision = crew_result.get("entry_decision", {})
+    _audit_entry_check("go")
 
     # Attach ALL agent outputs for postmortem analysis
     # ── Entry Agent ────────────────────────────────────────

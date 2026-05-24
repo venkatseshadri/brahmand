@@ -39,20 +39,24 @@ _log = get_logger("kickoff").info
 _err = get_logger("kickoff").error
 
 # Monitoring events log (structured JSONL)
-MONITORING_EVENTS_FILE = Path(__file__).parent / "logs" / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
-MONITORING_EVENTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+MONITORING_EVENTS_DIR = Path(__file__).parent / "logs"
+MONITORING_EVENTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _log_monitoring_event(event_type: str, trade_id: str, **details):
     """Log a structured monitoring event (JSONL format)."""
     try:
+        events_file = (
+            MONITORING_EVENTS_DIR
+            / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
+        )
         event = {
             "timestamp": datetime.now().isoformat(),
             "event_type": event_type,
             "trade_id": trade_id,
-            **details
+            **details,
         }
-        with open(MONITORING_EVENTS_FILE, "a") as f:
+        with open(events_file, "a") as f:
             f.write(json.dumps(event) + "\n")
     except Exception as e:
         _err(f"Failed to log monitoring event: {e}")
@@ -127,7 +131,7 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
                 trade["_tsl_inactive_logged"] = {}
             trade["_tsl_inactive_logged"][t] = True
             _log(
-                f"  TSL {leg_type}: Inactive (need {threshold_profit:.2f}pt, have {current_profit:.2f}pt) | Threshold: {tsl_activation_threshold*100:.0f}% of max"
+                f"  TSL {leg_type}: Inactive (need {threshold_profit:.2f}pt, have {current_profit:.2f}pt) | Threshold: {tsl_activation_threshold * 100:.0f}% of max"
             )
         return
 
@@ -173,7 +177,7 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
             shift_pct=shift_pct,
             ltp=ltp,
             current_profit=round(current_profit, 2),
-            lock_ratio=lock_ratio
+            lock_ratio=lock_ratio,
         )
 
 
@@ -262,6 +266,15 @@ def enter_trade(state: dict):
     state["active_trade"] = trade
     state["trades_today"] += 1
 
+    # Link to previous trade (re-entry chain)
+    if state.get("all_trades"):
+        prev = state["all_trades"][-1]
+        trade["parent_trade_id"] = prev.get("trade_id", "?")
+        trade["parent_exit_reason"] = prev.get("exit_reason", "?")
+        trade["re_entry_count"] = (
+            (prev.get("re_entry_count", 0) + 1) if prev.get("exit_reason") else 0
+        )
+
     # ALSO write to DuckDB for Risk Monitor (1-min monitoring)
     try:
         trade_id = (
@@ -312,6 +325,19 @@ def enter_trade(state: dict):
     _log(
         f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
+    _log_monitoring_event(
+        "TRADE_OPEN",
+        trade.get("trade_id", "unknown"),
+        entry_time=entry_time,
+        strategy=strategy_display,
+        signal=trade.get("entry_gate_signal", "UNKNOWN"),
+        confidence=trade.get("entry_confidence", 0),
+        net_credit=trade.get("net_credit", 0),
+        leg_count=trade.get("leg_count", 0),
+        legs=trade.get("legs", []),
+        sl=trade.get("sl", {}),
+        tp=trade.get("tp", {}),
+    )
     return state
 
 
@@ -340,8 +366,8 @@ def monitor_trade(state: dict):
         trade_id,
         strategy=strategy,
         mins_open=int(mins_open),
-        entry_gate_signal=trade.get('entry_gate_signal', '?'),
-        current_signal=trade.get('signal', '?')
+        entry_gate_signal=trade.get("entry_gate_signal", "?"),
+        current_signal=trade.get("signal", "?"),
     )
 
     from duckdb_tool import _connect
@@ -367,18 +393,22 @@ def monitor_trade(state: dict):
                 continue
 
             fill = leg.get("fill_price", ltp)
-            profit = round(fill - ltp, 2) if ltp > 0 else 0  # For short: fill > ltp = profit
+            profit = (
+                round(fill - ltp, 2) if ltp > 0 else 0
+            )  # For short: fill > ltp = profit
 
-            legs_snapshot.append({
-                "tsym": leg.get("tsym", "?"),
-                "strike": leg["strike"],
-                "type": leg["type"],
-                "ltp": ltp,
-                "fill_price": fill,
-                "profit": profit,
-                "sl": trade["sl"].get(t),
-                "tp": trade["tp"].get(t)
-            })
+            legs_snapshot.append(
+                {
+                    "tsym": leg.get("tsym", "?"),
+                    "strike": leg["strike"],
+                    "type": leg["type"],
+                    "ltp": ltp,
+                    "fill_price": fill,
+                    "profit": profit,
+                    "sl": trade["sl"].get(t),
+                    "tp": trade["tp"].get(t),
+                }
+            )
 
             # Apply TSL adjustment before SL/TP check
             if ltp > 0:
@@ -395,7 +425,7 @@ def monitor_trade(state: dict):
                     leg_type=leg["type"],
                     ltp=ltp,
                     sl=trade["sl"][t],
-                    profit=profit
+                    profit=profit,
                 )
                 exit_trade(state, "SL_HIT")
                 return state
@@ -409,7 +439,7 @@ def monitor_trade(state: dict):
                     leg_type=leg["type"],
                     ltp=ltp,
                     tp=trade["tp"][t],
-                    profit=profit
+                    profit=profit,
                 )
                 exit_trade(state, "TP_HIT")
                 return state
@@ -418,14 +448,16 @@ def monitor_trade(state: dict):
 
     # Log cycle snapshot with leg details
     total_profit = sum(leg["profit"] for leg in legs_snapshot)
-    _log(f"  Price snapshot: {' | '.join([f'{leg['tsym']}={leg['ltp']:.2f}' for leg in legs_snapshot])}")
+    _log(
+        f"  Price snapshot: {' | '.join([f'{leg['tsym']}={leg['ltp']:.2f}' for leg in legs_snapshot])}"
+    )
     _log(f"  Profit snapshot: {total_profit:.2f} (Open: {int(mins_open)}min)")
     _log_monitoring_event(
         "CYCLE_SNAPSHOT",
         trade_id,
         legs=legs_snapshot,
         total_profit=total_profit,
-        minutes_open=int(mins_open)
+        minutes_open=int(mins_open),
     )
 
     # ── Monitoring Crew: Morpher → Shifter ──────────────────────────────
@@ -454,7 +486,9 @@ def monitor_trade(state: dict):
         exit_trade(state, "TIME_EXIT")
 
     # Log cycle end
-    _log(f"[MONITOR-CYCLE-END] {trade_id} | Duration: {int(mins_open)}min | {now_str()}\n")
+    _log(
+        f"[MONITOR-CYCLE-END] {trade_id} | Duration: {int(mins_open)}min | {now_str()}\n"
+    )
     _log_monitoring_event("MONITOR_CYCLE_END", trade_id, cycle_duration=int(mins_open))
 
     return state
@@ -472,6 +506,7 @@ def _get_llm_monitor():
             model="deepseek/deepseek-chat",
             base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
             api_key=api_key,
+            temperature=0,
         )
     except Exception:
         return None
@@ -503,7 +538,7 @@ def _run_monitoring_crew(state: dict):
         trade_id,
         signal=pre_signal,
         position_type=trade.get("position_type", "?"),
-        morph_count=len(trade.get("morphs", []))
+        morph_count=len(trade.get("morphs", [])),
     )
 
     morpher = af.create_agent(
@@ -570,9 +605,13 @@ def _run_monitoring_crew(state: dict):
                     )
 
                     # Check for action markers
-                    action_taken = "no_action" not in raw.lower() and ("executed" in raw.lower() or "success" in raw.lower())
+                    action_taken = "no_action" not in raw.lower() and (
+                        "executed" in raw.lower() or "success" in raw.lower()
+                    )
 
-                    _log(f"  [{name.upper()}] {'✓ ACTION' if action_taken else '○ NO-ACTION'} | {json.dumps(parsed)[:250]}")
+                    _log(
+                        f"  [{name.upper()}] {'✓ ACTION' if action_taken else '○ NO-ACTION'} | {json.dumps(parsed)[:250]}"
+                    )
 
                     # Log detailed event
                     _log_monitoring_event(
@@ -580,29 +619,26 @@ def _run_monitoring_crew(state: dict):
                         trade_id,
                         action_taken=action_taken,
                         raw_output=raw[:500],
-                        parsed_output=parsed
+                        parsed_output=parsed,
                     )
                 except Exception as e:
                     _log(f"  [{name.upper()}] {raw[:250]}")
                     _log_monitoring_event(
-                        event_type,
-                        trade_id,
-                        error=str(e),
-                        raw_output=raw[:500]
+                        event_type, trade_id, error=str(e), raw_output=raw[:500]
                     )
     else:
         _log(f"  Monitoring Crew result: {str(result)[:400]}")
         _log_monitoring_event(
-            "MONITORING_CREW_RESULT",
-            trade_id,
-            result=str(result)[:500]
+            "MONITORING_CREW_RESULT", trade_id, result=str(result)[:500]
         )
 
     # Post-monitoring state
     post_signal = state.get("active_trade", {}).get("signal", "?")
     if post_signal != pre_signal:
         _log(f"  ⚠ SIGNAL CHANGED: {pre_signal} → {post_signal}")
-        _log_monitoring_event("SIGNAL_CHANGE", trade_id, pre_signal=pre_signal, post_signal=post_signal)
+        _log_monitoring_event(
+            "SIGNAL_CHANGE", trade_id, pre_signal=pre_signal, post_signal=post_signal
+        )
 
     return state
 
@@ -687,6 +723,14 @@ def exit_trade(state: dict, reason: str):
     state["all_trades"].append(trade)
     state["active_trade"] = None
 
+    # Persist closed trade to DuckDB trade_history
+    try:
+        from trade_execution_db import close_trade
+
+        close_trade(trade["trade_id"], reason, trade["pnl"])
+    except Exception:
+        pass
+
     # Log trade→pattern correlation for EOD analysis
     try:
         from pattern_enricher import log_trade_pattern
@@ -732,6 +776,7 @@ def run_pm(state: dict):
                     "DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"
                 ),
                 api_key=os.environ["DEEPSEEK_API_KEY"],
+                temperature=0,
             )
 
         trades_summary = json.dumps(state["all_trades"], default=str)[:3000]
@@ -814,7 +859,22 @@ def main():
         elif should_enter(state):
             # No trade, gates passed — run full 5-agent chain
             enter_trade(state)
-        # else: cooldown or max trades reached — skip
+        else:
+            # Cooldown or max trades reached — log so the gap is explained
+            if state["trades_today"] >= max_t:
+                reason = "max_trades_reached"
+            elif state.get("all_trades"):
+                reason = "cooldown"
+            else:
+                reason = "other"
+            _log_monitoring_event(
+                "NO_CHECK",
+                "NO_TRADE",
+                reason=reason,
+                trades_today=state["trades_today"],
+                max_trades=max_t,
+            )
+            _log(f"  Skip entry check: {reason}")
 
         save_state(state)
     finally:
