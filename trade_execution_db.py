@@ -11,67 +11,121 @@ Location: /home/trading_ceo/brahmand/data/trade_execution.duckdb
 """
 
 import duckdb
+import fcntl
+import time
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, List
 import json
 
 DB_PATH = Path("/home/trading_ceo/brahmand/data/trade_execution.duckdb")
+_LOCK_PATH = Path(str(DB_PATH) + ".lock")
+_LOCK_TIMEOUT_S = 15.0  # max wait for the cross-process lock
+_CONNECT_RETRIES = 20
+_CONNECT_BACKOFF_S = 0.3
+
+
+@contextmanager
+def _connect():
+    """Cross-process-safe DuckDB connection for trade_execution.duckdb.
+
+    DuckDB permits only one read-write process per file, but kickoff (5-min),
+    the risk monitor (1-min) and order_agent all write this DB. Each open is
+    serialized with an flock mutex (the OS auto-releases it on process exit, so
+    there are no stale locks) and retried on the residual IOException race.
+    Connections are short-lived: lock -> connect -> work -> close -> unlock.
+    """
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    lock_fd = open(_LOCK_PATH, "w")
+    deadline = time.monotonic() + _LOCK_TIMEOUT_S
+    while True:
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            break
+        except BlockingIOError:
+            if time.monotonic() >= deadline:
+                lock_fd.close()
+                raise IOError(
+                    f"trade_execution.duckdb: lock not acquired in {_LOCK_TIMEOUT_S}s"
+                )
+            time.sleep(0.2)
+
+    conn = None
+    try:
+        last_err = None
+        for _ in range(_CONNECT_RETRIES):
+            try:
+                conn = duckdb.connect(str(DB_PATH))
+                break
+            except Exception as e:  # residual DuckDB-level lock race
+                last_err = e
+                time.sleep(_CONNECT_BACKOFF_S)
+        if conn is None:
+            raise IOError(f"trade_execution.duckdb: connect failed: {last_err}")
+        yield conn
+    finally:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        try:
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        finally:
+            lock_fd.close()
 
 
 def _ensure_tables():
     """Create tables if they don't exist."""
-    conn = duckdb.connect(str(DB_PATH))
+    with _connect() as conn:
+        # Create sequence first
+        conn.execute("CREATE SEQUENCE IF NOT EXISTS seq_monitoring START 1")
 
-    # Create sequence first
-    conn.execute("CREATE SEQUENCE IF NOT EXISTS seq_monitoring START 1")
+        # Active trades (positions currently open)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS active_trades (
+                trade_id TEXT PRIMARY KEY,
+                entry_time TIMESTAMP,
+                strategy TEXT,
+                entry_gate_signal TEXT,
+                legs JSON,
+                sl JSON,
+                tp JSON,
+                status TEXT,  -- ACTIVE | CLOSING | CLOSED
+                created_at TIMESTAMP DEFAULT now()
+            )
+        """)
 
-    # Active trades (positions currently open)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS active_trades (
-            trade_id TEXT PRIMARY KEY,
-            entry_time TIMESTAMP,
-            strategy TEXT,
-            entry_gate_signal TEXT,
-            legs JSON,
-            sl JSON,
-            tp JSON,
-            status TEXT,  -- ACTIVE | CLOSING | CLOSED
-            created_at TIMESTAMP DEFAULT now()
-        )
-    """)
+        # Trade history (closed positions, for research)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS trade_history (
+                trade_id TEXT PRIMARY KEY,
+                entry_time TIMESTAMP,
+                close_time TIMESTAMP,
+                strategy TEXT,
+                close_reason TEXT,  -- SL_HIT | TP_HIT | MORPH | MANUAL
+                entry_pnl FLOAT,
+                final_pnl FLOAT,
+                duration_mins INTEGER,
+                legs JSON,
+                created_at TIMESTAMP DEFAULT now()
+            )
+        """)
 
-    # Trade history (closed positions, for research)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS trade_history (
-            trade_id TEXT PRIMARY KEY,
-            entry_time TIMESTAMP,
-            close_time TIMESTAMP,
-            strategy TEXT,
-            close_reason TEXT,  -- SL_HIT | TP_HIT | MORPH | MANUAL
-            entry_pnl FLOAT,
-            final_pnl FLOAT,
-            duration_mins INTEGER,
-            legs JSON,
-            created_at TIMESTAMP DEFAULT now()
-        )
-    """)
-
-    # Monitoring audit trail (minute-by-minute checks)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS monitoring_log (
-            id INTEGER PRIMARY KEY DEFAULT nextval('seq_monitoring'),
-            trade_id TEXT,
-            monitored_at TIMESTAMP,
-            current_ltp JSON,
-            current_pnl FLOAT,
-            action_taken TEXT,  -- NULL | SL_EXIT | TP_EXIT | MORPH | SHIFT
-            note TEXT,
-            FOREIGN KEY (trade_id) REFERENCES active_trades(trade_id)
-        )
-    """)
-
-    conn.close()
+        # Monitoring audit trail (minute-by-minute checks)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS monitoring_log (
+                id INTEGER PRIMARY KEY DEFAULT nextval('seq_monitoring'),
+                trade_id TEXT,
+                monitored_at TIMESTAMP,
+                current_ltp JSON,
+                current_pnl FLOAT,
+                action_taken TEXT,  -- NULL | SL_EXIT | TP_EXIT | MORPH | SHIFT
+                note TEXT,
+                FOREIGN KEY (trade_id) REFERENCES active_trades(trade_id)
+            )
+        """)
 
 
 def init_db():
@@ -91,9 +145,7 @@ def add_active_trade(
 ):
     """Record a new active trade."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         conn.execute(
             """
             INSERT INTO active_trades
@@ -111,16 +163,12 @@ def add_active_trade(
             ],
         )
         conn.commit()
-    finally:
-        conn.close()
 
 
 def get_active_trades() -> List[Dict]:
     """Get all active trades."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         result = conn.execute("""
             SELECT trade_id, entry_time, strategy, legs, sl, tp, status
             FROM active_trades
@@ -142,8 +190,6 @@ def get_active_trades() -> List[Dict]:
                 }
             )
         return trades
-    finally:
-        conn.close()
 
 
 def close_trade(
@@ -154,9 +200,7 @@ def close_trade(
 ):
     """Mark trade as closed and archive to history."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         # Get active trade details
         row = conn.execute(
             "SELECT entry_time, strategy, legs FROM active_trades WHERE trade_id = ?",
@@ -202,8 +246,6 @@ def close_trade(
 
         conn.commit()
         return True
-    finally:
-        conn.close()
 
 
 def log_monitor_action(
@@ -215,9 +257,7 @@ def log_monitor_action(
 ):
     """Log a monitoring check."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         conn.execute(
             """
             INSERT INTO monitoring_log
@@ -234,22 +274,16 @@ def log_monitor_action(
             ],
         )
         conn.commit()
-    finally:
-        conn.close()
 
 
 def has_active_trades() -> bool:
     """Check if there are any active trades."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         result = conn.execute(
             "SELECT COUNT(*) FROM active_trades WHERE status = 'ACTIVE'"
         ).fetchone()
         return result[0] > 0 if result else False
-    finally:
-        conn.close()
 
 
 def update_active_trade(
@@ -257,9 +291,7 @@ def update_active_trade(
 ):
     """Update active trade legs/SL/TP after morph or roll."""
     init_db()
-    conn = duckdb.connect(str(DB_PATH))
-
-    try:
+    with _connect() as conn:
         if legs is not None:
             conn.execute(
                 "UPDATE active_trades SET legs = ? WHERE trade_id = ?",
@@ -277,5 +309,3 @@ def update_active_trade(
             )
         conn.commit()
         return True
-    finally:
-        conn.close()

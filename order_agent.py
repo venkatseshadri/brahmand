@@ -106,6 +106,7 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
             reason=f"{leg.get('type')} {leg.get('action')} @ {leg.get('strike')}"
         )
         entry_orders.append(result["order_id"])
+        leg["fill_price"] = result.get("price", 0)  # Capture execution price for P&L calc
 
     # STEP 2: Build SL/TP dicts for duckdb
     sl = {}
@@ -510,11 +511,7 @@ def update_trade_in_duckdb(
         True if successful
     """
     try:
-        import duckdb
-        from pathlib import Path
-
-        db_path = Path(__file__).parent / "data" / "trade_execution.duckdb"
-        con = duckdb.connect(str(db_path))
+        from trade_execution_db import _connect
 
         updates = []
         params = []
@@ -529,15 +526,14 @@ def update_trade_in_duckdb(
             updates.append("status = ?")
             params.append(status)
 
-        if updates:
-            params.append(trade_id)
-            query = f"UPDATE active_trades SET {', '.join(updates)} WHERE trade_id = ?"
-            con.execute(query, params)
-            con.close()
-            return True
-        else:
-            con.close()
+        if not updates:
             return False
+
+        params.append(trade_id)
+        query = f"UPDATE active_trades SET {', '.join(updates)} WHERE trade_id = ?"
+        with _connect() as con:
+            con.execute(query, params)
+        return True
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning(f"Failed to update trade in duckdb: {e}")
