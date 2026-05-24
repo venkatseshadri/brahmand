@@ -161,6 +161,19 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
             "mode": "PAPER" | "LIVE"
         }
     """
+    # Idempotent: if SL/TP orders already exist for this trade, do nothing.
+    # Lets both the entry flow (deterministic) and the risk agent call this safely.
+    existing = get_trade_orders(trade_id)
+    if any(o.get("order_type") in ("SL", "TP") for o in existing):
+        return {
+            "trade_id": trade_id,
+            "sl_orders": [],
+            "tp_orders": [],
+            "total_orders": 0,
+            "mode": "LIVE" if LIVE_MODE else "PAPER",
+            "skipped": "already_placed",
+        }
+
     sl_orders = []
     tp_orders = []
 

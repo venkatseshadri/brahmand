@@ -191,18 +191,21 @@ def is_market_hours() -> bool:
 
 
 def should_enter(state: dict) -> bool:
-    """Gate entry: no active trade, below max, cooldown. Regime check next."""
-    # Check both JSON state AND order_ledger (DuckDB)
-    if state["active_trade"] is not None:
-        return False
+    """Gate entry: no active trade, below max, cooldown. Regime check next.
+
+    The DuckDB ledger is the source of truth for an open position (the 1-min
+    monitor closes trades there); JSON state["active_trade"] is only a fallback
+    when the ledger is unreachable.
+    """
     try:
         from trade_execution_db import has_active_trades as ledger_has_active
 
         if ledger_has_active():
-            _log("  SKIP: Active trade in order_ledger (not in JSON — syncing)")
             return False
     except Exception:
-        pass  # DuckDB might be locked — proceed with JSON check only
+        # DuckDB locked/unavailable — fall back to JSON state
+        if state["active_trade"] is not None:
+            return False
     max_trades = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
     if state["trades_today"] >= max_trades:
         return False
@@ -321,6 +324,10 @@ def enter_trade(state: dict):
         _log(f"  ✅ Wrote to order ledger: {trade.get('trade_id', trade_id)}")
     except Exception as e:
         _log(f"  ⚠️  Order ledger write failed: {e}")
+
+    # SL/TP placement is OWNED by the LLM RISK agent (primary). A deterministic
+    # fallback in position_manager.run_bridge places them only when the LLM is down.
+    # Do NOT hard-place SL/TP here — see risk_agent_crew.py docstring (reverted 2x).
 
     _log(
         f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
@@ -845,9 +852,18 @@ def main():
 
         max_t = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
 
-        # SIMPLE CHECK: Look at in-memory state first (fast)
-        # Risk Monitor keeps DuckDB in sync, so this is sufficient
-        has_active = state["active_trade"] is not None
+        # DuckDB ledger is the source of truth (the 1-min monitor closes trades
+        # there). JSON state is only a fallback when the ledger is unreachable.
+        try:
+            from trade_execution_db import has_active_trades as ledger_has_active
+
+            has_active = ledger_has_active()
+        except Exception:
+            has_active = state["active_trade"] is not None
+        # Monitor may have closed the trade in the ledger — clear stale JSON so the
+        # market-close path doesn't try to re-close a flat position.
+        if not has_active and state["active_trade"] is not None:
+            state["active_trade"] = None
 
         _log(
             f"Scheduled run | Active: {has_active} | Today: {state['trades_today']}/{max_t}"

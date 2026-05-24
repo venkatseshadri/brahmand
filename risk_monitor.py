@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 """
+DEPRECATED — superseded by position_manager.py (run via run_position_manager.sh).
+
+The live 1-min risk monitor is now position_manager.run_bridge(); that is the only
+path the cron invokes. This module and run_risk_monitor.sh are retained only for
+the legacy tests that import monitor_trades. Do NOT schedule this in cron.
+
+------------------------------------------------------------------------------
 Risk Monitor — Runs every 1 minute during market hours.
 
 Only executes when there are active positions.
@@ -7,12 +14,6 @@ Checks: SL/TP triggers, MORPH detection, leg shifts.
 Closes trades and cleans up when SL/TP hit.
 
 Audit log: /home/trading_ceo/brahmand/logs/risk_monitor_YYYYMMDD.log
-
-Usage:
-    python3 risk_monitor.py
-
-Cron:
-    */1 9-15 * * 1-5 cd /home/trading_ceo/brahmand && python3 risk_monitor.py >> logs/risk_monitor_$(date +%%Y%%m%%d).log 2>&1
 """
 
 import json

@@ -169,10 +169,13 @@ def get_active_trades() -> List[Dict]:
     """Get all active trades."""
     init_db()
     with _connect() as conn:
+        # A position is open until CLOSED. ACTIVE, SL_TP_PLACED and CLOSING are all
+        # still-open states — filtering on 'ACTIVE' alone hid trades from the monitor
+        # and the re-entry gate the moment SL/TP orders were placed.
         result = conn.execute("""
             SELECT trade_id, entry_time, strategy, legs, sl, tp, status
             FROM active_trades
-            WHERE status = 'ACTIVE'
+            WHERE status != 'CLOSED'
             ORDER BY entry_time DESC
         """).fetchall()
 
@@ -281,7 +284,7 @@ def has_active_trades() -> bool:
     init_db()
     with _connect() as conn:
         result = conn.execute(
-            "SELECT COUNT(*) FROM active_trades WHERE status = 'ACTIVE'"
+            "SELECT COUNT(*) FROM active_trades WHERE status != 'CLOSED'"
         ).fetchone()
         return result[0] > 0 if result else False
 

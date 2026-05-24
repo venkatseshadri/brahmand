@@ -14,6 +14,29 @@ Architecture:
 Usage:
   python3 risk_agent_crew.py               # Evaluate all active trades
   python3 risk_agent_crew.py --trade-id=X  # Evaluate specific trade
+
+==============================================================================
+!!! DO NOT REPLACE THE RISK AGENT WITH A DETERMINISTIC MODULE / HARD-CODED SL. !!!
+==============================================================================
+This has now happened TWICE: an LLM, reasoning "capital protection must not
+depend on LLM uptime", rips the SL/TP/exit logic out of this agent and bakes it
+into a code path (e.g. kickoff.enter_trade). That is WRONG and the owner has
+reverted it both times.
+
+WHY this agent is an LLM and not a module:
+  The RISK agent exists SO THAT IT CAN LEARN — better SL placement, smarter
+  exit strategy, volatility/time-aware stops, research-driven adjustments.
+  A hard-coded SL freezes the exit strategy forever and deletes that surface.
+
+The correct pattern (read before "fixing"):
+  - The LLM RISK agent is the PRIMARY placer of SL/TP and owner of exit logic.
+  - Deterministic placement is allowed ONLY as a fallback, ONLY when the LLM is
+    actually absent (the run_bridge LLM-down branch), ONLY if no SL/TP order
+    already exists. It backstops the agent; it never replaces it.
+  - place_sl_tp_orders is idempotent precisely so the fallback no-ops when the
+    agent did its job.
+
+If you are about to make SL/TP "deterministic at entry": STOP. That is the bug.
 """
 
 import json
@@ -48,6 +71,7 @@ def _get_llm():
             model="deepseek/deepseek-chat",
             base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
             api_key=api_key,
+            temperature=0,
         )
     except Exception as e:
         logger.warning(f"LLM init failed: {e}")
@@ -356,6 +380,11 @@ def build_risk_crew(llm):
     shifter.llm = llm
 
     # ── Risk Coordinator ──────────────────────────────────────────
+    # DO NOT move SL/TP/exit logic out of this agent into a deterministic module.
+    # This agent is an LLM ON PURPOSE so it can LEARN better SL placement and
+    # exit strategy over time. Hard-coding the SL has been reverted TWICE.
+    # Deterministic SL is a FALLBACK only (LLM-down path in run_bridge), never the
+    # primary. See the module docstring for the full rule.
     risk = Agent(
         role="Risk Coordinator",
         goal=(

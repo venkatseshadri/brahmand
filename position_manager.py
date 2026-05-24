@@ -326,8 +326,16 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
                     }
                 )
 
-        # ── P6: Cumulative floor ──
-        cumulative = trade.get("cumulative_pnl", trade.get("pnl", 0))
+        # ── P6: Cumulative floor (realized + live mark-to-market) ──
+        realized = trade.get("cumulative_pnl", 0)
+        unrealized = sum(
+            (ld["fill"] - ld["ltp"])
+            if ld["action"] == "SELL"
+            else (ld["ltp"] - ld["fill"])
+            for ld in legs_data
+            if ld["ltp"] > 0
+        )
+        cumulative = realized + unrealized
         if cumulative <= FLOOR:
             actions.append(
                 {
@@ -398,6 +406,72 @@ def _has_call_spread(trade: dict) -> bool:
     )
 
 
+def _norm_close_reason(reason: str) -> str:
+    """Map a free-text action reason to a trade_history.close_reason code."""
+    r = (reason or "").upper()
+    if "SL" in r:
+        return "SL_HIT"
+    if "TP" in r:
+        return "TP_HIT"
+    if "FLOOR" in r or "CUMULATIVE" in r:
+        return "FLOOR"
+    if "MARKET CLOSE" in r:
+        return "MARKET_CLOSE"
+    return "MANUAL"
+
+
+def _square_off(legs: list, trade_id: str, reason: str) -> float:
+    """Place EXIT (square-off) orders for each leg and return realized P&L (points).
+
+    BUY-to-close shorts, SELL-to-close longs. In paper mode order_agent fills the
+    mock order; in live mode it routes to the broker. P&L uses the live LTP when
+    present, else the entry fill (so a missing tick books 0 rather than a phantom).
+    """
+    try:
+        from order_agent import place_order
+    except Exception:
+        place_order = None
+    pnl = 0.0
+    for leg in legs:
+        fill = leg.get("fill_price", leg.get("fill", 0)) or 0
+        ltp = leg.get("ltp", fill) or 0
+        if leg.get("action") == "SELL":
+            pnl += fill - ltp
+            close_action = "BUY"
+        else:
+            pnl += ltp - fill
+            close_action = "SELL"
+        if place_order:
+            try:
+                place_order(
+                    symbol=leg.get("tsym", ""),
+                    action_type=close_action,
+                    quantity=leg.get("quantity", 65),
+                    price=ltp,
+                    order_type="EXIT",
+                    component="position_manager",
+                    trade_id=trade_id,
+                    reason=reason,
+                )
+            except Exception:
+                pass
+    return pnl
+
+
+def _close_in_db(trade_id: str, reason: str, trade: dict):
+    """Archive the trade to history and mark it CLOSED so the 5-min flow can re-enter."""
+    try:
+        from trade_execution_db import close_trade
+
+        close_trade(
+            trade_id,
+            close_reason=_norm_close_reason(reason),
+            final_pnl=trade.get("cumulative_pnl"),
+        )
+    except Exception:
+        pass
+
+
 def execute_action(action: dict, trade: dict) -> dict:
     """
     Execute a position manager action. Position Manager OWNS SL/TP.
@@ -408,8 +482,33 @@ def execute_action(action: dict, trade: dict) -> dict:
     trade.setdefault("sl", {})
     trade.setdefault("tp", {})
     side_key = action.get("leg", {}).get("type", "").lower()
+    trade_id = trade.get("trade_id", "?")
 
-    if action["type"] in (CLOSE_ALL,):
+    if action["type"] == CLOSE_SIDE:
+        side = action.get("side", "")
+        side_legs = action.get(
+            "legs", [l for l in trade.get("legs", []) if l.get("type") == side]
+        )
+        trade["cumulative_pnl"] += _square_off(
+            side_legs, trade_id, action.get("reason", "CLOSE_SIDE")
+        )
+        trade["legs"] = [l for l in trade.get("legs", []) if l.get("type") != side]
+        sk = side.lower()
+        trade["sl"][sk] = None
+        trade["tp"][sk] = None
+        # No sold legs left → the position is flat, close it out fully.
+        if not any(l.get("action") == "SELL" for l in trade["legs"]):
+            _close_in_db(trade_id, action.get("reason", "CLOSE_SIDE"), trade)
+        return trade
+
+    if action["type"] == CLOSE_ALL:
+        trade["cumulative_pnl"] += _square_off(
+            trade.get("legs", []), trade_id, action.get("reason", "CLOSE_ALL")
+        )
+        trade["legs"] = []
+        trade["sl"] = {}
+        trade["tp"] = {}
+        _close_in_db(trade_id, action.get("reason", "CLOSE_ALL"), trade)
         return trade
 
     if action["type"] in (ROLL, TIGHTEN):
@@ -643,6 +742,34 @@ def _get_atm_from_legs(legs: list) -> int:
 # ── Bridge: Order Ledger → Risk Agent Crew ────────────────────────────────
 
 
+def _ensure_sl_tp_orders(trade: dict, trade_id: str):
+    """Fallback (LLM-down): place resting SL/TP for SELL legs if none exist yet.
+
+    The LLM RISK agent is the PRIMARY placer and owner of SL/TP + exit strategy.
+    This ONLY backstops it when the agent is unavailable. place_sl_tp_orders is
+    idempotent, so this no-ops if the agent already placed them. Do NOT promote
+    this to an unconditional/at-entry placement — see risk_agent_crew docstring.
+    """
+    try:
+        from order_agent import place_sl_tp_orders
+
+        sl_map = trade.get("sl", {}) or {}
+        tp_map = trade.get("tp", {}) or {}
+        legs_for_orders = []
+        for leg in trade.get("legs", []):
+            lt = leg.get("type", "").lower()
+            leg2 = dict(leg)
+            if leg.get("action") == "SELL":
+                leg2["sl"] = sl_map.get(lt)
+                leg2["tp"] = tp_map.get(lt)
+            legs_for_orders.append(leg2)
+        res = place_sl_tp_orders(trade_id, legs_for_orders)
+        if res.get("total_orders"):
+            print(f"  🛟 Fallback SL/TP placed (LLM down): {res['total_orders']}")
+    except Exception as e:
+        print(f"  ⚠️  Fallback SL/TP placement failed: {e}")
+
+
 def run_bridge():
     """Read active trades from order_ledger (DuckDB), dispatch to risk_agent_crew.
 
@@ -655,7 +782,11 @@ def run_bridge():
     sys.path.insert(0, str(Path(__file__).parent))
 
     try:
-        from trade_execution_db import get_active_trades as ledger_get_active
+        from trade_execution_db import (
+            get_active_trades as ledger_get_active,
+            update_active_trade,
+            log_monitor_action,
+        )
 
         trades = ledger_get_active()
     except Exception as e:
@@ -671,32 +802,62 @@ def run_bridge():
             f"[{now_str()}] PM: Evaluating trade {trade_id} ({trade.get('strategy', '?')})"
         )
 
-        # ── Try LLM path first ──
+        actions = []
+        llm_ok = False
+        # ── Try LLM path first (RISK agent is the primary SL/TP + exit owner) ──
         try:
             from risk_agent_crew import evaluate_trade as llm_evaluate
 
             result = llm_evaluate(trade)
             if result.get("status") == "ok":
+                llm_ok = True
+                llm_actions = result.get("result", [])
+                if isinstance(llm_actions, list):
+                    actions = llm_actions
                 print(f"  ✅ LLM: {str(result.get('result', ''))[:120]}")
             elif result.get("error"):
                 print(
                     f"  ⚠️  LLM failed: {result['error'][:80]} → falling back to P1-P7"
                 )
-                # Fallback: deterministic check
                 actions = run(trade)
-                for action in actions:
-                    execute_action(action, trade)
-                print(f"  🔄 P1-P7 fallback: {len(actions)} actions")
         except ImportError:
             print(f"  ⚠️  risk_agent_crew not available → P1-P7 fallback")
             actions = run(trade)
-            for action in actions:
-                execute_action(action, trade)
         except Exception as e:
             print(f"  ❌ LLM exception: {e} → P1-P7 fallback")
             actions = run(trade)
-            for action in actions:
-                execute_action(action, trade)
+
+        # The LLM (primary placer) was unavailable → ensure resting SL/TP exist.
+        if not llm_ok:
+            _ensure_sl_tp_orders(trade, trade_id)
+
+        # Execute all actions and persist
+        for action in actions:
+            trade = execute_action(action, trade)
+            # Log each morph/shift/TSL action to DuckDB
+            try:
+                log_monitor_action(
+                    trade_id,
+                    current_ltp={"ltp": action.get("ltp")},
+                    current_pnl=trade.get("cumulative_pnl", 0),
+                    action_taken=action.get("type", "monitor"),
+                    note=json.dumps(action, default=str)[:500],
+                )
+            except Exception:
+                pass
+
+        if actions:
+            print(f"  🔄 {len(actions)} actions executed")
+            # Persist modified trade (legs, SL/TP) to DuckDB
+            try:
+                update_active_trade(
+                    trade_id,
+                    legs=trade.get("legs"),
+                    sl=trade.get("sl"),
+                    tp=trade.get("tp"),
+                )
+            except Exception as e:
+                print(f"  ⚠️  Failed to persist trade: {e}")
 
 
 if __name__ == "__main__":
