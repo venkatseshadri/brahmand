@@ -19,7 +19,15 @@ from datetime import datetime
 from typing import Tuple
 
 V31_DB = Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
-V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
+V31_SENSEX_DB = Path(
+    "/home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb"
+)
+V4_NIFTY_DB = Path(
+    "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb"
+)
+V4_SENSEX_DB = Path(
+    "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb"
+)
 STATE_FILE = Path(__file__).parent / "data" / "data_health_state.json"
 
 # Baseline: expected NULL% for indicators (buffer warmup on first 50 bars)
@@ -90,13 +98,14 @@ def check_v31() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
-def check_v4() -> Tuple[bool, list]:
+def check_v4(index: str = "NIFTY") -> Tuple[bool, list]:
     """Check v4 multi-TF DuckDB for empty bars and staleness."""
     warnings = []
+    db_path = V4_NIFTY_DB if index.upper() == "NIFTY" else V4_SENSEX_DB
     try:
         import duckdb
 
-        db = duckdb.connect(str(V4_DB), read_only=True)
+        db = duckdb.connect(str(db_path), read_only=True)
 
         for tf in [5, 15, 30, 60, 240, 1440]:
             n = db.execute(
@@ -140,13 +149,14 @@ def check_redis() -> Tuple[bool, list]:
         r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
         r.ping()
 
-        n = r.llen("v3_ohlcv_queue")
-        if n == 0:
+        n = r.llen("v3_ohlcv_queue_NIFTY")
+        n_sensex = r.llen("v3_ohlcv_queue_SENSEX")
+        if n == 0 and n_sensex == 0:
             warnings.append("Redis: EMPTY queue")
             return False, warnings
 
-        # Check latest bar
-        latest = json.loads(r.lindex("v3_ohlcv_queue", 0))
+        # Check latest bar from NIFTY queue
+        latest = json.loads(r.lindex("v3_ohlcv_queue_NIFTY", 0))
         ts = latest.get("timestamp")
 
         # Check staleness
@@ -203,7 +213,12 @@ def run_all() -> Tuple[bool, list]:
     results = []
     all_warnings = []
 
-    for name, fn in [("v3.1", check_v31), ("v4", check_v4), ("Redis", check_redis)]:
+    for name, fn in [
+        ("v3.1", check_v31),
+        ("v4_NIFTY", lambda: check_v4("NIFTY")),
+        ("v4_SENSEX", lambda: check_v4("SENSEX")),
+        ("Redis", check_redis),
+    ]:
         ok, warnings = fn()
         results.append(ok)
         for w in warnings:

@@ -27,8 +27,13 @@ load_dotenv()
 
 from trade_execution_db import add_active_trade
 
-STATE_DIR = Path(__file__).parent / "data"
-STATE_DIR.mkdir(parents=True, exist_ok=True)
+_SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
+if _SANDBOX:
+    STATE_DIR = Path(_SANDBOX) / "state"
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+else:
+    STATE_DIR = Path(__file__).parent / "data"
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOCK_FILE = STATE_DIR / "brahmand_kickoff.lock"
 STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
 
@@ -186,6 +191,8 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
 
 
 def is_market_hours() -> bool:
+    if os.environ.get("BRAHMAND_SANDBOX"):
+        return True
     t = datetime.now()
     return (
         datetime.strptime("09:15", "%H:%M").time()

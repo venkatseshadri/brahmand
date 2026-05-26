@@ -36,6 +36,8 @@ done
 for DB in \
     /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb \
     /home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb \
+    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb \
+    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb \
     /home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb \
 ; do
     if [ -f "$DB" ]; then
@@ -53,6 +55,8 @@ find /home/trading_ceo/brahmand/locks -maxdepth 1 \( -name "*.lock" -o -name "*.
 for DB in \
     /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb \
     /home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb \
+    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb \
+    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb \
     /home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb \
 ; do
     if python3 -c "import duckdb; duckdb.connect('$DB').close()" 2>/dev/null; then

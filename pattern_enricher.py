@@ -28,19 +28,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger("PatternEnricher")
 
-V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
+
+def _v4_db_path(index: str = "NIFTY") -> Path:
+    return Path(
+        f"/home/trading_ceo/python-trader/varaha/data/market_data_multitf_{index.lower()}.duckdb"
+    )
 
 
-def _v4_connect(read_only: bool = False, retries: int = 10, backoff: float = 0.3):
-    """Open V4_DB with retry. The v4 aggregator also writes this file, so an
-    open can transiently hit DuckDB's single-writer lock — back off and retry
-    instead of losing the write."""
+def _v4_connect(
+    index: str = "NIFTY",
+    read_only: bool = False,
+    retries: int = 10,
+    backoff: float = 0.3,
+):
     import duckdb
 
     last = None
     for _ in range(retries):
         try:
-            return duckdb.connect(str(V4_DB), read_only=read_only)
+            return duckdb.connect(str(_v4_db_path(index)), read_only=read_only)
         except Exception as e:
             last = e
             time.sleep(backoff)
@@ -475,14 +481,14 @@ def main():
         while True:
             try:
                 # Create fresh connection for each cycle to avoid lock conflicts
-                db = _v4_connect()
+                db = _v4_connect(index="NIFTY")
                 enrich_bars(db, limit=50)
                 db.close()
             except Exception as e:
                 logger.warning(f"Enrichment cycle failed: {str(e)[:100]}")
             time.sleep(300)
     else:
-        db = duckdb.connect(str(V4_DB))
+        db = duckdb.connect(str(_v4_db_path("NIFTY")))
         enrich_bars(db, limit=args.limit, force=args.force)
         db.close()
 

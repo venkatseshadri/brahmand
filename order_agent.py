@@ -13,6 +13,7 @@ Live mode: forwards to Shoonya API and tracks order status.
 """
 
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -21,7 +22,12 @@ from enum import Enum
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-LEDGER_FILE = Path(__file__).parent / "data" / "order_ledger.json"
+_SANDBOX_OA = os.environ.get("BRAHMAND_SANDBOX", "")
+LEDGER_FILE = (
+    Path(_SANDBOX_OA) / "state" / "order_ledger.json"
+    if _SANDBOX_OA
+    else Path(__file__).parent / "data" / "order_ledger.json"
+)
 LIVE_MODE = False  # Set to True when going live
 
 # Import trade execution DB for dual-write
@@ -103,10 +109,12 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
             order_type="ENTRY",
             component="execution_agent",
             trade_id=trade_id,
-            reason=f"{leg.get('type')} {leg.get('action')} @ {leg.get('strike')}"
+            reason=f"{leg.get('type')} {leg.get('action')} @ {leg.get('strike')}",
         )
         entry_orders.append(result["order_id"])
-        leg["fill_price"] = result.get("price", 0)  # Capture execution price for P&L calc
+        leg["fill_price"] = result.get(
+            "price", 0
+        )  # Capture execution price for P&L calc
 
     # STEP 2: Build SL/TP dicts for duckdb
     sl = {}
@@ -133,6 +141,7 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
     except Exception as e:
         # Log but don't fail — orders are already in ledger
         import logging
+
         logging.getLogger(__name__).warning(f"Failed to write to duckdb: {e}")
 
     return {
@@ -140,7 +149,7 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
         "entry_orders": entry_orders,
         "total_orders": len(entry_orders),
         "mode": "LIVE" if LIVE_MODE else "PAPER",
-        "status": "FILLED" if not LIVE_MODE else "PLACED"
+        "status": "FILLED" if not LIVE_MODE else "PLACED",
     }
 
 
@@ -191,7 +200,7 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
                 order_type="SL",
                 component="risk_agent",
                 trade_id=trade_id,
-                reason=f"SL for {leg.get('tsym')}"
+                reason=f"SL for {leg.get('tsym')}",
             )
             sl_orders.append(sl_result["order_id"])
 
@@ -205,7 +214,7 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
                 order_type="TP",
                 component="risk_agent",
                 trade_id=trade_id,
-                reason=f"TP for {leg.get('tsym')}"
+                reason=f"TP for {leg.get('tsym')}",
             )
             tp_orders.append(tp_result["order_id"])
 
@@ -217,7 +226,7 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
         "sl_orders": sl_orders,
         "tp_orders": tp_orders,
         "total_orders": len(sl_orders) + len(tp_orders),
-        "mode": "LIVE" if LIVE_MODE else "PAPER"
+        "mode": "LIVE" if LIVE_MODE else "PAPER",
     }
 
 
@@ -423,7 +432,9 @@ def get_trade_orders(trade_id: str) -> List[Dict]:
 
 def clear_ledger():
     """Clear order ledger (for testing only)."""
-    LEDGER_FILE.write_text(json.dumps({"orders": {}, "order_counter": 0, "_trades": {}}))
+    LEDGER_FILE.write_text(
+        json.dumps({"orders": {}, "order_counter": 0, "_trades": {}})
+    )
 
 
 # ── Trade-level ledger management ──────────────────────────────────────────
@@ -509,7 +520,7 @@ def update_trade_in_duckdb(
     trade_id: str,
     strategy: str = None,
     entry_gate_signal: str = None,
-    status: str = None
+    status: str = None,
 ) -> bool:
     """
     Update trade metadata in duckdb (called after execution_agent completes).
@@ -549,6 +560,7 @@ def update_trade_in_duckdb(
         return True
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).warning(f"Failed to update trade in duckdb: {e}")
         return False
 
@@ -608,11 +620,7 @@ def get_trades_by_strategy(strategy_type: str) -> List[Dict]:
 # ── Multi-leg execution ────────────────────────────────────────────────────
 
 
-def place_legs(
-    legs: List[Dict],
-    trade_id: str,
-    strategy_type: str = "ENTRY"
-) -> Dict:
+def place_legs(legs: List[Dict], trade_id: str, strategy_type: str = "ENTRY") -> Dict:
     """
     Place multiple legs for a trade (entry, SL, TP, shifts, etc).
 
@@ -642,7 +650,7 @@ def place_legs(
                     order_type=strategy_type,
                     component="order_agent",
                     trade_id=trade_id,
-                    reason=f"{strategy_type} leg: {leg.get('action')} {leg.get('tsym')}"
+                    reason=f"{strategy_type} leg: {leg.get('action')} {leg.get('tsym')}",
                 )
                 order_id = order_result["order_id"]
                 order_ids.append(order_id)

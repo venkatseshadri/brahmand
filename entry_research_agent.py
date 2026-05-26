@@ -124,10 +124,8 @@ def query_1min_candles_v4(date: str, index: str = "NIFTY", limit: int = None) ->
         JSON string with all v4 market_data_multitf columns
     """
     try:
-        db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb",
-            read_only=True,
-        )
+        db_path = f"/home/trading_ceo/python-trader/varaha/data/market_data_multitf_{index.lower() if index else 'nifty'}.duckdb"
+        db = duckdb.connect(db_path, read_only=True)
 
         # List available tables
         tables = db.execute(

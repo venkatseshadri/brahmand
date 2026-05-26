@@ -12,6 +12,7 @@ Used exclusively by the Post-Mortem Agent for trade→market cross-referencing.
 """
 
 import json
+import os
 import time
 from pathlib import Path
 from typing import Type, Optional
@@ -20,8 +21,12 @@ import duckdb
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-# Paths (same as antariksh's contract_tools.py)
-VARAH_DATA = Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
+_SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
+VARAH_DATA = (
+    Path(_SANDBOX) / "varaha_data.duckdb"
+    if _SANDBOX
+    else Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
+)
 STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 

@@ -18,8 +18,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, List
 import json
+import os
 
-DB_PATH = Path("/home/trading_ceo/brahmand/data/trade_execution.duckdb")
+_SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
+DB_PATH = (
+    Path(_SANDBOX) / "state" / "trade_execution.duckdb"
+    if _SANDBOX
+    else Path("/home/trading_ceo/brahmand/data/trade_execution.duckdb")
+)
 _LOCK_PATH = Path(str(DB_PATH) + ".lock")
 _LOCK_TIMEOUT_S = 15.0  # max wait for the cross-process lock
 _CONNECT_RETRIES = 20

@@ -21,11 +21,19 @@ Usage:
 """
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
-EMA_BASE_DIR = Path("/home/trading_ceo/brahmand/data/ema_state")
+_EMA_BASE = (
+    Path(os.environ.get("BRAHMAND_SANDBOX", "/home/trading_ceo/brahmand"))
+    / "data"
+    / "ema_state"
+)
+if not os.environ.get("BRAHMAND_SANDBOX"):
+    _EMA_BASE = Path("/home/trading_ceo/brahmand/data/ema_state")
+EMA_BASE_DIR = _EMA_BASE
 PERIODS = [5, 9, 20, 50, 100, 200]
 TIMEFRAMES = ["1min", "5min", "15min", "60min", "1D"]
 MULTIPLIERS = {p: round(2 / (p + 1), 8) for p in PERIODS}

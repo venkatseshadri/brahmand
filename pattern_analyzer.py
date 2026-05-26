@@ -27,7 +27,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "python-trader"))
 
 logger = logging.getLogger("PatternAnalyzer")
 
-V4_DB = Path("/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb")
+
+def _v4_db_path(index: str = "NIFTY") -> Path:
+    return Path(
+        f"/home/trading_ceo/python-trader/varaha/data/market_data_multitf_{index.lower()}.duckdb"
+    )
+
 
 # Thresholds: what counts as UP / DOWN vs SIDEWAYS (in %)
 UP_THRESHOLD = 0.2  # >0.2% move = UP
@@ -69,7 +74,7 @@ class PatternAnalyzer:
         """
         import duckdb
 
-        db = duckdb.connect(str(V4_DB), read_only=True)
+        db = duckdb.connect(str(_v4_db_path("NIFTY")), read_only=True)
 
         wheres = []
         params = []
@@ -142,7 +147,7 @@ class PatternAnalyzer:
         """
         import duckdb
 
-        db = duckdb.connect(str(V4_DB), read_only=True)
+        db = duckdb.connect(str(_v4_db_path("NIFTY")), read_only=True)
 
         try:
             rows = db.execute(
@@ -205,7 +210,7 @@ class PatternAnalyzer:
         """Read current pattern from v4 bars, return prediction."""
         import duckdb
 
-        db = duckdb.connect(str(V4_DB), read_only=True)
+        db = duckdb.connect(str(_v4_db_path("NIFTY")), read_only=True)
 
         tf_order = [
             (1440, "1440m"),
@@ -237,7 +242,7 @@ class PatternAnalyzer:
         """Return top N most frequent patterns with probabilities."""
         import duckdb
 
-        db = duckdb.connect(str(V4_DB), read_only=True)
+        db = duckdb.connect(str(_v4_db_path("NIFTY")), read_only=True)
         rows = db.execute(
             """SELECT pattern, COUNT(*) as cnt
                FROM market_data_patterns

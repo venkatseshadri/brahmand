@@ -41,7 +41,7 @@ class ResearchAgentBase:
     def __init__(
         self,
         db_path_v31: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-        db_path_v4: str = "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb",
+        db_path_v4: str = "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb",
     ):
         self.db_path_v31 = db_path_v31
         self.db_path_v4 = db_path_v4
