@@ -66,12 +66,9 @@ for DB in \
     fi
 done
 
-# ── Verify Redis is alive ──
+# ── Verify Redis is alive (per-index keys: v3_ohlcv_queue_NIFTY, _SENSEX) ──
 if redis-cli ping 2>/dev/null | grep -q PONG; then
     echo "[$(date)] Redis: running"
-    # Flush stale NIFTY/SENSEX bars from previous session
-    # (both indices share v3_ohlcv_queue — old SENSEX bars pollute NIFTY reads)
-    redis-cli DEL v3_ohlcv_queue 2>/dev/null && echo "[$(date)] Redis: v3_ohlcv_queue flushed"
 else
     echo "[$(date)] ⚠️  Redis: NOT running!"
 fi
