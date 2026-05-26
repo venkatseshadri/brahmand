@@ -43,14 +43,10 @@ for DB in \
     fi
 done
 
-# ── Clean stale lock/pid files ──
-# antariksh locks dir: all stale lock/pid files are ours.
+# ── Clean stale lock/pid files from project lock dirs ──
 find /home/trading_ceo/antariksh/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
     -mmin +60 -delete 2>/dev/null || true
-# /tmp: only our own prefixed files — never blanket-delete other apps' locks/pids.
-find /tmp -maxdepth 1 \
-    \( -name "varaha_*.lock" -o -name "varaha_*.pid" \
-       -o -name "antariksh_*.lock" -o -name "antariksh_*.pid" \) \
+find /home/trading_ceo/brahmand/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
     -mmin +60 -delete 2>/dev/null || true
 
 # ── Verify DuckDBs are writable ──

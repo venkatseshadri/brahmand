@@ -10,7 +10,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOG_FILE="$PROJECT_DIR/logs/risk_monitor_$(date +%Y%m%d).log"
-LOCK_FILE="/tmp/risk_monitor.lock"
+LOCK_FILE="$PROJECT_DIR/locks/risk_monitor.lock"
+mkdir -p "$(dirname "$LOCK_FILE")"
 PYTHON_BIN="/usr/bin/python3"
 
 exec {LOCK_FD}>"$LOCK_FILE"

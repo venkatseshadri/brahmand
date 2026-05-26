@@ -10,7 +10,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOG_FILE="$PROJECT_DIR/logs/margin_capture.log"
-LOCK_FILE="/tmp/margin_capture.lock"
+LOCK_FILE="$PROJECT_DIR/locks/margin_capture.lock"
+mkdir -p "$(dirname "$LOCK_FILE")"
 PYTHON_BIN="/usr/bin/python3"
 
 exec {LOCK_FD}>"$LOCK_FILE"
