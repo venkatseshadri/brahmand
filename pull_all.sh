@@ -3,7 +3,7 @@
 # Usage: cd ~/GitHub && bash pull_all.sh
 #
 # Repos expected in the current directory (update these names):
-REPOS=("brahmand" "antariksh" "python-trader" "ShoonyaApi-py")
+REPOS=("brahmand" "antariksh" "python-trader" "ShoonyaApi-py" "orbiter")
 
 set -euo pipefail
 
@@ -17,7 +17,7 @@ for repo in "${REPOS[@]}"; do
         continue
     fi
     cd "$PARENT/$repo"
-    BRANCH=$(git branch --show-current)
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
     echo "  📂 $repo ($BRANCH)"
     git pull --ff-only 2>&1 | sed 's/^/    /'
     echo ""
