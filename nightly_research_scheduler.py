@@ -84,7 +84,8 @@ def send_telegram_notification(message: str):
 
 
 def _derive_direction(pattern: dict) -> str:
-    """Derive predicted market direction from pattern family + trigger_conditions."""
+    """Derive predicted market direction from pattern family + trigger_conditions.
+    Returns BULLISH, BEARISH, or NEUTRAL."""
     family = pattern.get("family", "").lower()
     trigger = pattern.get("trigger_conditions", {})
     name = pattern.get("pattern_name", "").upper()
@@ -95,18 +96,22 @@ def _derive_direction(pattern: dict) -> str:
             and isinstance(trigger.get("adx"), dict)
             and trigger["adx"].get("min", 0) >= 25
         ):
-            return "DOWN"
-        return "DOWN"
+            return "BEARISH"
+        return "BEARISH"
     elif family == "pcr":
-        return "DOWN"
+        return "BEARISH"
     elif family == "volatility":
         if "SPIKE" in name or "ALERT" in name:
-            return "DOWN"
-        return "SIDEWAYS"
+            return "BEARISH"
+        return "NEUTRAL"
     elif family == "ema":
-        if "RSI" in name:
-            return "SIDEWAYS"
-        return "SIDEWAYS"
+        return "NEUTRAL"
+    elif family == "volume":
+        # VWAP Positioning: direction in trigger_conditions
+        if "VWAP" in name:
+            return trigger.get("direction", "NEUTRAL")
+        # Open Range, OI Divergence, Range Exhaustion: direction context-dependent
+        return "NEUTRAL"
     return "NEUTRAL"
 
 

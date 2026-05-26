@@ -527,12 +527,13 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             ) if not_down_decision else None
 
             # ── Research Override: research is macro regime, trend+TL is micro timing ──
+            # No signal (both NEUTRAL) or conflict (trend≠TL) = market uncertain
+            # → take Iron Butterfly at moderate confidence
             research_consensus = _get_research_consensus()
             if research_consensus == "NEUTRAL":
                 t_sig = not_up_decision.get("trend_signal", "").upper()
                 tl_sig = not_up_decision.get("traffic_light_signal", "").upper()
 
-                # Consensus signal: are trend and TL in agreement?
                 trend_bull = t_sig == "BULLISH"
                 trend_bear = t_sig == "BEARISH"
                 tl_bull = tl_sig == "BULLISH"
@@ -540,21 +541,21 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 conflict = (trend_bull and tl_bear) or (trend_bear and tl_bull)
                 both_neutral = t_sig == "NEUTRAL" and tl_sig == "NEUTRAL"
 
-                # Override when neither gate has a useful signal:
-                # - Both NEUTRAL: no direction at all → Iron Butterfly
-                # - Conflict: mixed signals → market uncertain → Iron Butterfly
                 if both_neutral or conflict:
                     not_up_decision["go"] = True
                     not_up_decision["confidence"] = 40 if conflict else 50
                     not_down_decision["go"] = True
                     not_down_decision["confidence"] = 40 if conflict else 50
+                    what = "conflict" if conflict else "both neutral"
                     reason = (
                         f"Research NEUTRAL → sideways market "
-                        f"(trend={t_sig}, TL={tl_sig}, {'conflict' if conflict else 'both neutral'}) "
+                        f"(trend={t_sig}, TL={tl_sig}, {what}) "
                         f"→ IRON_BUTTERFLY"
                     )
                     not_up_decision["reasoning"] = reason
                     not_down_decision["reasoning"] = reason
+                    not_up_decision["_overridden"] = True  # flag for strategy picker
+                    not_down_decision["_overridden"] = True
                     _log(f"  Research Override: {reason}")
 
                 if not regime:
@@ -613,9 +614,67 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "not_down_confidence": not_down_decision.get("confidence", 0),
         "regime": regime.get("regime"),
         "vix": regime.get("vix", 0),
+        "strategy_to_execute": (
+            # Override path: both GO from research (conflict or both neutral)
+            # → Iron Butterfly always (market uncertain, collect theta from both sides)
+            "IRON_BUTTERFLY"
+            if (go_call_spread and go_put_spread and not_up_decision.get("_overridden"))
+            # Natural path: single gate firing → use that gate's direction
+            else (
+                "PUT_SPREAD"
+                if (
+                    go_call_spread
+                    and go_put_spread
+                    and not_up_decision.get("trend_signal", "") == "BULLISH"
+                )
+                else (
+                    "CALL_SPREAD"
+                    if (
+                        go_call_spread
+                        and go_put_spread
+                        and not_up_decision.get("trend_signal", "") == "BEARISH"
+                    )
+                    else (
+                        "CALL_SPREAD"
+                        if go_call_spread
+                        else ("PUT_SPREAD" if go_put_spread else "NONE")
+                    )
+                )
+            )
+        ),
     }
 
+    # Compute top-level signal/confidence/go (for downstream consumers like kickoff)
+    if go_call_spread and go_put_spread:
+        entry_decision["go"] = True
+        entry_decision["signal"] = entry_decision["strategy_to_execute"]
+        entry_decision["confidence"] = max(
+            not_up_decision.get("confidence", 0),
+            not_down_decision.get("confidence", 0),
+        )
+    elif go_call_spread:
+        entry_decision["go"] = True
+        entry_decision["signal"] = not_up_decision.get("signal", "NOT_UP")
+        entry_decision["confidence"] = not_up_decision.get("confidence", 0)
+    elif go_put_spread:
+        entry_decision["go"] = True
+        entry_decision["signal"] = not_down_decision.get("signal", "NOT_DOWN")
+        entry_decision["confidence"] = not_down_decision.get("confidence", 0)
+    else:
+        entry_decision["go"] = False
+        entry_decision["signal"] = "UNKNOWN"
+        entry_decision["confidence"] = 0
+
     # ── NOW run remaining agents (Strategy, Contract, Execution, Risk) ─────────
+    # Inject overridden entry decisions into strategy task (CrewAI context uses
+    # original task outputs, not post-processed dicts)
+    strategy_task.description = (
+        strategy_task.description
+        + f"\n\nOVERRIDDEN ENTRY DECISIONS (use these, not task context):\n"
+        + f"  NOT_UP: go={go_call_spread}, confidence={entry_decision['not_up_confidence']}%\n"
+        + f"  NOT_DOWN: go={go_put_spread}, confidence={entry_decision['not_down_confidence']}%\n"
+        + f"  strategy_must_use: {entry_decision['strategy_to_execute']}\n"
+    )
     try:
         full_crew = Crew(
             agents=[

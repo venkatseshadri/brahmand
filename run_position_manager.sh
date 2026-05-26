@@ -12,9 +12,11 @@ LOG_FILE="$SCRIPT_DIR/logs/position_manager_$(date +%Y%m%d).log"
 LOCK_FILE="/tmp/position_manager.lock"
 PYTHON_BIN="/usr/bin/python3"
 
-# Source environment for DEEPSEEK_API_KEY (needed by risk_agent_crew)
+# Source and EXPORT environment for DEEPSEEK_API_KEY (needed by risk_agent_crew)
+set -a  # auto-export all sourced variables
 [ -f /home/trading_ceo/antariksh/.env ] && . /home/trading_ceo/antariksh/.env
 [ -f /home/trading_ceo/brahmand/.env ] && . /home/trading_ceo/brahmand/.env
+set +a
 
 exec {LOCK_FD}>"$LOCK_FILE"
 

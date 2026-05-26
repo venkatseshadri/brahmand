@@ -102,6 +102,10 @@ def now_str():
     return datetime.now().strftime("%H:%M")
 
 
+def now_iso():
+    return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+
 def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> None:
     """Ratchet SL downward as option decays (favorable for SELL).
 
@@ -287,7 +291,7 @@ def enter_trade(state: dict):
         trade["trade_id"] = trade_id
         add_active_trade(
             trade_id=trade_id,
-            entry_time=entry_time,
+            entry_time=now_iso(),
             strategy=strategy_display,
             entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
             legs=trade.get("legs", []),

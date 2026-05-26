@@ -34,6 +34,7 @@ def run_regime_check() -> dict:
         model="deepseek/deepseek-chat",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=api_key,
+        temperature=0,
     )
 
     af = AgentFactory()

@@ -26,6 +26,7 @@ import duckdb
 sys.path.insert(0, str(Path(__file__).parent))
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from crewai import Agent, Task, Crew, Process, LLM
@@ -36,6 +37,7 @@ import os
 # ============================================================================
 # TOOLS: Market Data Analysis
 # ============================================================================
+
 
 @tool
 def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -> str:
@@ -52,7 +54,7 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
     try:
         db = duckdb.connect(
             "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-            read_only=True
+            read_only=True,
         )
 
         # Get schema to understand all available columns
@@ -73,7 +75,13 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
         result = db.execute(query).fetchall()
 
         if not result:
-            return json.dumps({"error": f"No v3.1 data for {date}", "count": 0, "database": "varaha_v3.1"})
+            return json.dumps(
+                {
+                    "error": f"No v3.1 data for {date}",
+                    "count": 0,
+                    "database": "varaha_v3.1",
+                }
+            )
 
         candles = []
         for row in result:
@@ -87,15 +95,17 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
                     candle[col] = val
             candles.append(candle)
 
-        return json.dumps({
-            "count": len(candles),
-            "date": date,
-            "index": index,
-            "database": "varaha_v3.1",
-            "available_columns": columns,
-            "candles": candles,
-            "note": "All columns from v3.1 market_data table included"
-        })
+        return json.dumps(
+            {
+                "count": len(candles),
+                "date": date,
+                "index": index,
+                "database": "varaha_v3.1",
+                "available_columns": columns,
+                "candles": candles,
+                "note": "All columns from v3.1 market_data table included",
+            }
+        )
 
     except Exception as e:
         return json.dumps({"error": str(e), "database": "varaha_v3.1"})
@@ -116,15 +126,21 @@ def query_1min_candles_v4(date: str, index: str = "NIFTY", limit: int = None) ->
     try:
         db = duckdb.connect(
             "/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb",
-            read_only=True
+            read_only=True,
         )
 
         # List available tables
-        tables = db.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='main'").fetchall()
+        tables = db.execute(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema='main'"
+        ).fetchall()
         table_names = [t[0] for t in tables]
 
         # Prefer market_data_multitf, fallback to market_data
-        target_table = "market_data_multitf" if "market_data_multitf" in table_names else "market_data"
+        target_table = (
+            "market_data_multitf"
+            if "market_data_multitf" in table_names
+            else "market_data"
+        )
 
         schema_result = db.execute(f"""
             SELECT column_name, data_type FROM information_schema.columns
@@ -143,7 +159,14 @@ def query_1min_candles_v4(date: str, index: str = "NIFTY", limit: int = None) ->
         result = db.execute(query).fetchall()
 
         if not result:
-            return json.dumps({"error": f"No v4 data for {date}", "count": 0, "database": "varaha_v4", "tables_available": table_names})
+            return json.dumps(
+                {
+                    "error": f"No v4 data for {date}",
+                    "count": 0,
+                    "database": "varaha_v4",
+                    "tables_available": table_names,
+                }
+            )
 
         candles = []
         for row in result:
@@ -157,16 +180,18 @@ def query_1min_candles_v4(date: str, index: str = "NIFTY", limit: int = None) ->
                     candle[col] = val
             candles.append(candle)
 
-        return json.dumps({
-            "count": len(candles),
-            "date": date,
-            "index": index,
-            "database": "varaha_v4",
-            "table": target_table,
-            "available_columns": columns,
-            "candles": candles,
-            "note": "All columns from v4 multitimeframe aggregator included"
-        })
+        return json.dumps(
+            {
+                "count": len(candles),
+                "date": date,
+                "index": index,
+                "database": "varaha_v4",
+                "table": target_table,
+                "available_columns": columns,
+                "candles": candles,
+                "note": "All columns from v4 multitimeframe aggregator included",
+            }
+        )
 
     except Exception as e:
         return json.dumps({"error": str(e), "database": "varaha_v4"})
@@ -184,17 +209,23 @@ def detect_significant_moves(candles_json: str, min_move_points: int = 50) -> st
         JSON with move timestamps, magnitudes, and directions
     """
     try:
-        candles = json.loads(candles_json) if isinstance(candles_json, str) else candles_json
+        candles = (
+            json.loads(candles_json) if isinstance(candles_json, str) else candles_json
+        )
 
         if isinstance(candles, dict) and "error" in candles:
-            return json.dumps(candles) if isinstance(candles_json, str) else candles_json
+            return (
+                json.dumps(candles) if isinstance(candles_json, str) else candles_json
+            )
 
         # Handle both dict format (with "candles" key) and direct list format
-        candles_list = candles.get("candles", []) if isinstance(candles, dict) else candles
+        candles_list = (
+            candles.get("candles", []) if isinstance(candles, dict) else candles
+        )
 
         moves = []
         for i in range(1, len(candles_list)):
-            prev_spot = candles_list[i-1].get("spot")
+            prev_spot = candles_list[i - 1].get("spot")
             curr_spot = candles_list[i].get("spot")
 
             if prev_spot is None or curr_spot is None:
@@ -203,27 +234,35 @@ def detect_significant_moves(candles_json: str, min_move_points: int = 50) -> st
             move = curr_spot - prev_spot
 
             if abs(move) >= min_move_points:
-                moves.append({
-                    "time": candles_list[i].get("time"),
-                    "prev_spot": prev_spot,
-                    "curr_spot": curr_spot,
-                    "move_points": round(move, 1),
-                    "direction": "UP" if move > 0 else "DOWN",
-                    "magnitude_pct": round((move / prev_spot) * 100, 2)
-                })
+                moves.append(
+                    {
+                        "time": candles_list[i].get("time"),
+                        "prev_spot": prev_spot,
+                        "curr_spot": curr_spot,
+                        "move_points": round(move, 1),
+                        "direction": "UP" if move > 0 else "DOWN",
+                        "magnitude_pct": round((move / prev_spot) * 100, 2),
+                    }
+                )
 
-        return json.dumps({
-            "min_move_threshold": min_move_points,
-            "significant_moves_found": len(moves),
-            "moves": sorted(moves, key=lambda x: abs(x["move_points"]), reverse=True)
-        })
+        return json.dumps(
+            {
+                "min_move_threshold": min_move_points,
+                "significant_moves_found": len(moves),
+                "moves": sorted(
+                    moves, key=lambda x: abs(x["move_points"]), reverse=True
+                ),
+            }
+        )
 
     except Exception as e:
         return json.dumps({"error": f"Detection failed: {str(e)}"})
 
 
 @tool
-def correlate_move_with_indicators(candles_json: str, move_time: str, lookback_minutes: int = 15) -> str:
+def correlate_move_with_indicators(
+    candles_json: str, move_time: str, lookback_minutes: int = 15
+) -> str:
     """For a given move time, find what indicators were aligned BEFORE it.
 
     Args:
@@ -252,15 +291,19 @@ def correlate_move_with_indicators(candles_json: str, move_time: str, lookback_m
 
         # Get lookback period
         start_idx = max(0, move_idx - lookback_minutes)
-        lookback_candles = candles[start_idx:move_idx+1]
+        lookback_candles = candles[start_idx : move_idx + 1]
 
         # Analyze indicators in lookback period
         analysis = {
             "move_time": move_time,
             "lookback_minutes": lookback_minutes,
             "lookback_period": {
-                "start_time": lookback_candles[0].get("time") if lookback_candles else None,
-                "end_time": lookback_candles[-1].get("time") if lookback_candles else None,
+                "start_time": lookback_candles[0].get("time")
+                if lookback_candles
+                else None,
+                "end_time": lookback_candles[-1].get("time")
+                if lookback_candles
+                else None,
             },
             "indicator_states": {
                 "st15_aligned": None,
@@ -279,19 +322,27 @@ def correlate_move_with_indicators(candles_json: str, move_time: str, lookback_m
         if st15_values:
             all_green = all(v == "GREEN" or v == True for v in st15_values)
             all_red = all(v == "RED" or v == False for v in st15_values)
-            analysis["indicator_states"]["st15_aligned"] = "GREEN" if all_green else ("RED" if all_red else "MIXED")
+            analysis["indicator_states"]["st15_aligned"] = (
+                "GREEN" if all_green else ("RED" if all_red else "MIXED")
+            )
 
         # ST60 check
         st60_values = [c.get("st60") for c in lookback_candles if c.get("st60")]
         if st60_values:
             all_green = all(v == "GREEN" or v == True for v in st60_values)
             all_red = all(v == "RED" or v == False for v in st60_values)
-            analysis["indicator_states"]["st60_aligned"] = "GREEN" if all_green else ("RED" if all_red else "MIXED")
+            analysis["indicator_states"]["st60_aligned"] = (
+                "GREEN" if all_green else ("RED" if all_red else "MIXED")
+            )
 
         # Traffic light pattern
-        tl_values = [c.get("traffic_light") for c in lookback_candles if c.get("traffic_light")]
+        tl_values = [
+            c.get("traffic_light") for c in lookback_candles if c.get("traffic_light")
+        ]
         if tl_values:
-            analysis["indicator_states"]["traffic_light_pattern"] = tl_values[-5:] if len(tl_values) > 5 else tl_values
+            analysis["indicator_states"]["traffic_light_pattern"] = (
+                tl_values[-5:] if len(tl_values) > 5 else tl_values
+            )
 
         # EMA alignment (simplified: all above or all below 20-EMA)
         ema_positions = []
@@ -303,21 +354,29 @@ def correlate_move_with_indicators(candles_json: str, move_time: str, lookback_m
 
         if ema_positions:
             consistent = len(set(ema_positions)) == 1
-            analysis["indicator_states"]["ema_alignment"] = ema_positions[-1] if ema_positions else None
+            analysis["indicator_states"]["ema_alignment"] = (
+                ema_positions[-1] if ema_positions else None
+            )
 
         # ADX level at move time
         if candles[move_idx].get("adx"):
             adx = candles[move_idx].get("adx")
-            analysis["indicator_states"]["adx_trend_strength"] = "STRONG" if adx > 25 else "WEAK" if adx < 20 else "MODERATE"
+            analysis["indicator_states"]["adx_trend_strength"] = (
+                "STRONG" if adx > 25 else "WEAK" if adx < 20 else "MODERATE"
+            )
 
         # VIX at move time
         if candles[move_idx].get("vix"):
-            analysis["indicator_states"]["vix_level"] = round(candles[move_idx].get("vix"), 2)
+            analysis["indicator_states"]["vix_level"] = round(
+                candles[move_idx].get("vix"), 2
+            )
 
         # PCR at move time
         if candles[move_idx].get("pcr"):
             pcr = candles[move_idx].get("pcr")
-            analysis["indicator_states"]["pcr_sentiment"] = "BEARISH" if pcr > 1.0 else "BULLISH" if pcr < 0.95 else "NEUTRAL"
+            analysis["indicator_states"]["pcr_sentiment"] = (
+                "BEARISH" if pcr > 1.0 else "BULLISH" if pcr < 0.95 else "NEUTRAL"
+            )
 
         return json.dumps(analysis)
 
@@ -329,7 +388,10 @@ def correlate_move_with_indicators(candles_json: str, move_time: str, lookback_m
 # AGENT DEFINITION
 # ============================================================================
 
-def create_entry_research_agent(index: str = "NIFTY", date: str = None, min_move: int = 50) -> Agent:
+
+def create_entry_research_agent(
+    index: str = "NIFTY", date: str = None, min_move: int = 50
+) -> Agent:
     """Create the Entry Research Agent with full database access."""
 
     if date is None:
@@ -339,6 +401,7 @@ def create_entry_research_agent(index: str = "NIFTY", date: str = None, min_move
         model="deepseek/deepseek-chat",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
+        temperature=0,
     )
 
     return Agent(
@@ -377,14 +440,16 @@ of predictive patterns using ALL available data.""",
             query_1min_candles_v31,
             query_1min_candles_v4,
             detect_significant_moves,
-            correlate_move_with_indicators
+            correlate_move_with_indicators,
         ],
         llm=llm,
         verbose=True,
     )
 
 
-def run_entry_research(date: str = None, index: str = "NIFTY", min_move: int = 50) -> str:
+def run_entry_research(
+    date: str = None, index: str = "NIFTY", min_move: int = 50
+) -> str:
     """Execute entry research analysis for a given day."""
 
     if date is None:
@@ -472,7 +537,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Entry Research Agent")
     parser.add_argument("--date", default=None, help="YYYY-MM-DD format")
     parser.add_argument("--index", default="NIFTY", choices=["NIFTY", "SENSEX"])
-    parser.add_argument("--min-move", type=int, default=50, help="Minimum move to track (points)")
+    parser.add_argument(
+        "--min-move", type=int, default=50, help="Minimum move to track (points)"
+    )
 
     args = parser.parse_args()
 

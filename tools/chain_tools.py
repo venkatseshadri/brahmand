@@ -145,14 +145,26 @@ class ExecutePaperTradeTool(BaseTool):
         tp_pct: float = 0.50,
     ) -> str:
         try:
-            contracts = json.loads(contracts_json).get("contracts", {})
+            data = json.loads(contracts_json)
         except Exception:
-            return json.dumps(
-                {
-                    "error": "invalid contracts_json",
-                    "contracts_json": contracts_json[:200],
+            return json.dumps({"error": "invalid contracts_json"})
+
+        # Accept both {\"contracts\": {...}} and flat list [{\"tsym\":...,\"action\":...}]
+        if isinstance(data, list):
+            contracts = {}
+            for c in data:
+                key = f"{c.get('action', '').lower()}_{c.get('type', c.get('option_type', '')).lower()}"
+                contracts[key] = {
+                    "action": c.get("action"),
+                    "strike": c.get("strike"),
+                    "option_type": c.get("type") or c.get("option_type"),
+                    "tsym": c.get("tsym"),
+                    "ltp": c.get("ltp"),
                 }
-            )
+        elif isinstance(data, dict):
+            contracts = data.get("contracts", data.get("legs", data))
+        else:
+            return json.dumps({"error": "invalid contracts_json"})
 
         if not contracts:
             return json.dumps({"error": "no contracts resolved"})
@@ -223,7 +235,7 @@ class ExecutePaperTradeTool(BaseTool):
 class PlaceEntryOrdersInput(BaseModel):
     legs: list = Field(
         ...,
-        description="List of entry leg dicts with tsym, action, strike, type, quantity, fill_price"
+        description="List of entry leg dicts with tsym, action, strike, type, quantity, fill_price",
     )
 
 
@@ -260,7 +272,7 @@ class PlaceSLTPOrdersInput(BaseModel):
     trade_id: str = Field(..., description="Trade ID from entry phase")
     legs: list = Field(
         ...,
-        description="List of leg dicts with tsym, action, strike, type, quantity, sl, tp"
+        description="List of leg dicts with tsym, action, strike, type, quantity, sl, tp",
     )
 
 

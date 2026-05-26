@@ -65,6 +65,7 @@ class MarketDataQueryTool(BaseTool):
         "- regime: Returns ADX, SuperTrend direction, structure_type\n"
         "- iv: Returns iv_current, iv_rank, iv_regime, iv_52w_high\n"
         "- pcr: Returns pcr_total, pcr_atm, oi_skew, sentiment\n"
+        "- volume: vwap, open_range_high, open_range_low, call_oi_concentration, put_oi_concentration, oi_skew, pcr_total, spot\n"
         "- all: Returns all available columns (be specific with date/time)\n\n"
         "Use this to find out: What was VIX when SL was hit? Was ADX trending "
         "or sideways? What was IV rank? This makes Post-Mortem data-driven."
@@ -91,6 +92,9 @@ class MarketDataQueryTool(BaseTool):
             "full_regime": "date, time, spot, atm_strike, india_vix, adx, "
             "supertrend_direction, st_15min_direction, ema_20, ema_50, "
             "iv_current, iv_rank, rsi, structure_type, session_phase",
+            "volume": "date, time, spot, vwap, open_range_high, open_range_low, "
+            "call_oi_concentration, put_oi_concentration, oi_skew, pcr_total, "
+            "intraday_high, intraday_low",
             "all": "*",
         }
 

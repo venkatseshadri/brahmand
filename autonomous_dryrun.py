@@ -320,6 +320,7 @@ def run_post_mortem(trades_log: list[dict]):
         model="deepseek/deepseek-chat",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
+        temperature=0,
     )
 
     task = Task(

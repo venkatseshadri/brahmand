@@ -15,9 +15,14 @@ One system, one owner. No conflict with risk monitor — this IS the risk monito
 
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+
+from dotenv import load_dotenv
+
+load_dotenv(str(Path(__file__).parent / ".env"))
 
 # ── Defaults (tune from observed data over days) ──
 DECAY_PCT = 0.375  # 37.5% theta decay → roll trigger
