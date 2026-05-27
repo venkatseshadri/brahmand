@@ -182,6 +182,24 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         _log("  E2E Chain: ⚠ DuckDB empty — skipping")
         return None
 
+    # Freshness + expiry-sanity guard. If the data capture didn't run today, the
+    # latest market_data row is from a prior session — yesterday's prices and a
+    # past expiry. On 2026-05-27 a stale 26-May snapshot caused the system to
+    # trade the already-expired 26-MAY weekly. Refuse entry on stale or expired data.
+    today = datetime.now().date()
+    snap_date = (snap.get("date") or "")[:10]
+    if snap_date != today.isoformat():
+        _log(f"  E2E Chain: ⚠ STALE snapshot (date={snap_date!r} != today {today.isoformat()!r}) — skipping entry")
+        return None
+    expiry_raw = snap.get("expiry_weekly", "")
+    try:
+        expiry_d = datetime.strptime(expiry_raw, "%d-%b-%Y").date()
+    except ValueError:
+        expiry_d = None
+    if expiry_d is None or expiry_d < today:
+        _log(f"  E2E Chain: ⚠ expiry {expiry_raw!r} missing or already expired (today={today.isoformat()}) — skipping entry")
+        return None
+
     snap_json = json.dumps(
         {
             k: snap.get(k, "")
