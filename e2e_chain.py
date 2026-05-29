@@ -474,13 +474,14 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Task 2: Regime Agent ───────────────────────────────────────────
     regime_task = Task(
         description=(
-            "Get market regime data (VIX, ADX) for entry gating.\n\n"
+            "Get market regime data for position sizing + morpher.\n\n"
             "ONE TOOL CALL: query_market_data(query_type='full_regime') to fetch VIX, ADX, ADX direction.\n\n"
-            "Decision rules (deterministic — your job is to report the values, not interpret them):\n"
-            "  - VIX > 25 → recommendation: 'skip' (panic regime, no trades)\n"
-            "  - ADX < 20 → recommendation: 'skip' (no trend, directional signals false)\n"
-            "  - VIX > 18 or ADX < 25 → recommendation: 'caution' (reduce size)\n"
+            "Gating rules (VIX only):\n"
+            "  - VIX > 25 → recommendation: 'skip' (panic, no entries)\n"
+            "  - VIX > 18 → recommendation: 'caution' (reduce size)\n"
             "  - Else → recommendation: 'enter'\n\n"
+            "ADX is a dummy pass-through — does NOT block entry.\n"
+            "It is passed to position manager for stop/morph decisions.\n\n"
             "OUTPUT only valid JSON:\n"
             '{"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution"|"skip", "reason": "..."}'
         ),
