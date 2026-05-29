@@ -51,12 +51,94 @@ def _get_llm():
 
 
 def _parse_json_output(raw: str) -> dict:
-    """Extract JSON from agent output string."""
-    s = raw.find("{")
-    e = raw.rfind("}") + 1
-    if s >= 0 and e > s:
-        return json.loads(raw[s:e])
-    return {}
+    """Extract JSON from agent raw output (may have markdown fences)."""
+    import re
+
+    if not raw or not raw.strip():
+        return {}
+    match = re.search(r"\{(?:[^{}]|\{[^{}]*\})*\}", raw, re.DOTALL)
+    if not match:
+        return {}
+    try:
+        return json.loads(match.group())
+    except json.JSONDecodeError:
+        return {}
+
+
+def _recompute_regime(vix: float, adx: float) -> dict:
+    """Deterministic regime from VIX/ADX. Same rules as entry_tools.score_regime()."""
+    if vix > 25:
+        return {"recommendation": "skip", "vix": vix, "adx": adx}
+    if adx and adx < 20:
+        return {"recommendation": "skip", "vix": vix, "adx": adx}
+    if vix > 18:
+        return {"recommendation": "caution", "vix": vix, "adx": adx}
+    if adx and adx < 25:
+        return {"recommendation": "caution", "vix": vix, "adx": adx}
+    return {"recommendation": "enter", "vix": vix, "adx": adx}
+
+
+def _verify_regime_provenance(regime: dict, vix: float, adx: float) -> bool:
+    """Verify regime agent recommendation against deterministic recomputation.
+    Clamps hallucinated VIX/ADX values and incorrect recommendations."""
+    expected = _recompute_regime(vix, adx)
+    violations = []
+    agent_vix = regime.get("vix", 0)
+    agent_adx = regime.get("adx", 0)
+
+    if agent_vix and abs(agent_vix - vix) > 0.5:
+        violations.append(f"vix agent={agent_vix:.1f} actual={vix:.1f}")
+        regime["vix"] = vix
+    if agent_adx and abs(agent_adx - adx) > 1.0:
+        violations.append(f"adx agent={agent_adx:.1f} actual={adx:.1f}")
+        regime["adx"] = adx
+
+    if regime.get("recommendation") != expected["recommendation"]:
+        violations.append(
+            f"rec agent={regime.get('recommendation')} expected={expected['recommendation']}"
+        )
+        regime["recommendation"] = expected["recommendation"]
+
+    if violations:
+        _err(f"PROVENANCE VIOLATION [REGIME]: {', '.join(violations)} — CLAMPED")
+        return False
+
+    _log(
+        f"  Regime: {regime['recommendation'].upper()} "
+        f"(VIX={vix:.1f}, ADX={adx:.1f}) — provenance OK"
+    )
+    return True
+
+
+def _verify_strategy_provenance(strategy: dict) -> bool:
+    """Verify strategy agent output against deterministic parameter rules.
+    Validates and clamps: wing_width, sl_pct, tp_pct, strategy_type."""
+    violations = []
+
+    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD", "IRON_BUTTERFLY"}
+    if strategy.get("strategy_type") not in VALID_TYPES:
+        violations.append(f"strategy_type={strategy.get('strategy_type')}")
+        strategy["strategy_type"] = "IRON_BUTTERFLY"
+
+    ww = strategy.get("wing_width", 200)
+    if not isinstance(ww, (int, float)) or ww < 50 or ww > 500:
+        violations.append(f"wing_width={ww}")
+        strategy["wing_width"] = 200
+
+    sl_p = strategy.get("sl_pct", 0.25)
+    if not isinstance(sl_p, (int, float)) or sl_p < 0.10 or sl_p > 0.50:
+        violations.append(f"sl_pct={sl_p}")
+        strategy["sl_pct"] = 0.25
+
+    tp_p = strategy.get("tp_pct", 0.50)
+    if not isinstance(tp_p, (int, float)) or tp_p < 0.15 or tp_p > 0.75:
+        violations.append(f"tp_pct={tp_p}")
+        strategy["tp_pct"] = 0.50
+
+    if violations:
+        _err(f"PROVENANCE VIOLATION [STRATEGY]: {', '.join(violations)} — CLAMPED")
+        return False
+    return True
 
 
 def _recompute_gate(decision: dict, gate_type: str) -> dict:
@@ -571,6 +653,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             _verify_provenance(
                 not_down_decision, "NOT_DOWN"
             ) if not_down_decision else None
+            _verify_regime_provenance(regime, vix, adx) if regime else None
 
             # ── Research Override: research is macro regime, trend+TL is micro timing ──
             # No signal (both NEUTRAL) or conflict (trend≠TL) = market uncertain
@@ -790,8 +873,15 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "signal", "NOT_UP"
     )
 
+    strat_clean = _verify_strategy_provenance(strategy)
+    ww = strategy.get("wing_width", 200)
+    sl_p = strategy.get("sl_pct", 0.25)
+    tp_p = strategy.get("tp_pct", 0.50)
+
     _log(
-        f"  Strategy: {stype} wings={ww} sl={sl_p} tp={tp_p} | signal={regime_entry_signal}"
+        f"  Strategy: {stype} wings={ww} sl={sl_p} tp={tp_p} "
+        f"| signal={regime_entry_signal}"
+        f"{' — provenance OK' if strat_clean else ' — provenance CLAMPED'}"
     )
 
     # Return parsed outputs for run_full_chain to use
