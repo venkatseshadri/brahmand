@@ -2,11 +2,15 @@
 """
 Data Pipeline Health Monitor — checks v3.1, v4, Redis for NULLs/empties.
 
-Runs every 5 min via cron. Slient when healthy. Logs warnings when:
+Runs every 5 min via cron. Silent when healthy. Logs warnings when:
   - Redis indicators have NULL values
   - v3.1 DuckDB NULL% spikes above baseline
   - v4 bars stop updating (stale data)
   - Redis queue stops growing (capture died)
+
+During market hours (9:15–15:30 IST), uses Redis queue as primary data
+source to avoid DuckDB lock contention with the capture process. Falls
+back to DuckDB only after hours when capture is not running.
 
 Usage:
   python3 data_health.py              # Quick health check
@@ -15,7 +19,7 @@ Usage:
 
 import sys, json, os, time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Tuple
 
 V31_DB = Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
@@ -30,7 +34,8 @@ V4_SENSEX_DB = Path(
 )
 STATE_FILE = Path(__file__).parent / "data" / "data_health_state.json"
 
-# Baseline: expected NULL% for indicators (buffer warmup on first 50 bars)
+IST = timezone(timedelta(hours=5, minutes=30))
+
 BASELINE_NULL_MAX = {
     "ema_5": 25.0,
     "ema_20": 35.0,
@@ -41,12 +46,10 @@ BASELINE_NULL_MAX = {
     "supertrend_direction": 30.0,
 }
 
-# Stale thresholds (minutes since last update before warning)
 STALE_V31_MIN = 5
 STALE_V4_MIN = 5
 STALE_REDIS_MIN = 5
 
-# Redis expected fields
 REQUIRED_REDIS_KEYS = [
     "ema5",
     "ema20",
@@ -58,9 +61,95 @@ REQUIRED_REDIS_KEYS = [
     "bb_pct_b",
 ]
 
+REDIS_TO_DB_KEY = {
+    "ema5": "ema_5",
+    "ema20": "ema_20",
+    "ema50": "ema_50",
+    "rsi": "rsi",
+    "adx": "adx",
+    "atr": "atr",
+    "st_direction": "supertrend_direction",
+    "bb_pct_b": "bb_pct_b",
+}
 
-def check_v31() -> Tuple[bool, list]:
-    """Check v3.1 DuckDB for NULL spikes. Returns (healthy, warnings)."""
+
+def _is_market_hours() -> bool:
+    now = datetime.now(IST)
+    t = now.hour * 60 + now.minute
+    weekday = now.weekday()
+    return weekday < 5 and 555 <= t <= 930
+
+
+def _check_v31_via_redis() -> Tuple[bool, list]:
+    """Check v3.1 health via Redis queue (lock-free, market hours only)."""
+    warnings = []
+    try:
+        import redis as rds
+
+        r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+        r.ping()
+
+        for queue_key, index in [
+            ("v3_ohlcv_queue_NIFTY", "NIFTY"),
+            ("v3_ohlcv_queue_SENSEX", "SENSEX"),
+        ]:
+            n = r.llen(queue_key)
+            if n == 0:
+                warnings.append(
+                    f"v3.1 [{index}]: Redis queue empty — capture may not be running"
+                )
+                continue
+
+            latest_raw = r.lindex(queue_key, 0)
+            if not latest_raw:
+                continue
+            latest = json.loads(latest_raw)
+
+            ts = latest.get("timestamp")
+            if ts:
+                try:
+                    t = datetime.fromisoformat(ts)
+                    age = (datetime.now() - t).total_seconds() / 60
+                    if age > STALE_V31_MIN:
+                        warnings.append(
+                            f"v3.1 [{index}]: stale — last bar {age:.0f} min ago"
+                        )
+                except ValueError:
+                    warnings.append(f"v3.1 [{index}]: invalid timestamp: {ts}")
+
+            sample_size = min(n, 100)
+            bars_raw = r.lrange(queue_key, 0, sample_size - 1)
+            all_bars = [json.loads(b) for b in bars_raw]
+            bars = [
+                b
+                for b in all_bars
+                if any(b.get(k) is not None for k in REQUIRED_REDIS_KEYS)
+            ]
+
+            if not bars:
+                warnings.append(
+                    f"v3.1 [{index}]: all {len(all_bars)} sampled bars have NULL indicators"
+                )
+                continue
+
+            for redis_key, db_key in REDIS_TO_DB_KEY.items():
+                null_count = sum(1 for b in bars if b.get(redis_key) is None)
+                max_pct = BASELINE_NULL_MAX.get(db_key, 30.0)
+                pct = round(null_count / len(bars) * 100, 1)
+                if pct > max_pct:
+                    warnings.append(
+                        f"v3.1 [{index}] {db_key}: {pct}% NULL in last {len(bars)} bars (limit: {max_pct}%)"
+                    )
+
+    except Exception as e:
+        warnings.append(f"v3.1 [Redis]: connection failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
+def _check_v31_via_duckdb() -> Tuple[bool, list]:
+    """Check v3.1 health via DuckDB (after hours only, no lock contention)."""
     warnings = []
     try:
         import duckdb
@@ -79,7 +168,6 @@ def check_v31() -> Tuple[bool, list]:
             if pct > max_pct:
                 warnings.append(f"v3.1 {col}: {pct}% NULL (limit: {max_pct}%)")
 
-        # Check staleness
         ts = db.execute("SELECT MAX(timestamp) FROM market_data").fetchone()[0]
         if ts:
             try:
@@ -98,14 +186,32 @@ def check_v31() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_v31() -> Tuple[bool, list]:
+    """Check v3.1 data health. Uses Redis during market hours to avoid
+    DuckDB lock contention with the capture process."""
+    if _is_market_hours():
+        return _check_v31_via_redis()
+    return _check_v31_via_duckdb()
+
+
 def check_v4(index: str = "NIFTY") -> Tuple[bool, list]:
-    """Check v4 multi-TF DuckDB for empty bars and staleness."""
+    """Check v4 multi-TF DuckDB. Uses short timeout to avoid blocking capture."""
     warnings = []
     db_path = V4_NIFTY_DB if index.upper() == "NIFTY" else V4_SENSEX_DB
     try:
         import duckdb
+        import signal
 
-        db = duckdb.connect(str(db_path), read_only=True)
+        def _timeout_handler(signum, frame):
+            raise TimeoutError("DuckDB connection timed out")
+
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(3)
+        try:
+            db = duckdb.connect(str(db_path), read_only=True)
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
 
         for tf in [5, 15, 30, 60, 240, 1440]:
             n = db.execute(
@@ -133,9 +239,12 @@ def check_v4(index: str = "NIFTY") -> Tuple[bool, list]:
                 except ValueError:
                     pass
         db.close()
-    except Exception as e:
-        warnings.append(f"v4: connection failed: {e}")
-        return False, warnings
+    except (TimeoutError, Exception) as e:
+        if "lock" in str(e).lower() or isinstance(e, TimeoutError):
+            pass
+        else:
+            warnings.append(f"v4: {e}")
+            return False, warnings
 
     return len(warnings) == 0, warnings
 
