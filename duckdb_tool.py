@@ -30,11 +30,103 @@ VARAH_DATA = (
 STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
 
 
+_CAPTURE_DIR = Path("/home/trading_ceo/python-trader/varaha/data")
+
+
+def _is_market_hours() -> bool:
+    from datetime import datetime, timezone, timedelta
+
+    IST = timezone(timedelta(hours=5, minutes=30))
+    now = datetime.now(IST)
+    h, m = now.hour, now.minute
+    t = h * 60 + m
+    return 555 <= t <= 1410
+
+
+def _resolve_db_path() -> str:
+    """If today's Penguin EOD warehouse exists, use it. Else legacy DuckDB."""
+    from datetime import date
+
+    warehouse = Path(
+        f"/home/trading_ceo/research/{date.today().isoformat()}/nifty.duckdb"
+    )
+    if warehouse.exists():
+        return str(warehouse)
+    return str(VARAH_DATA)
+
+
+def _connect_sqlite_intraday() -> duckdb.DuckDBPyConnection | None:
+    """During market hours, read from live Penguin SQLite via sqlite_scanner."""
+    sqlite_path = _CAPTURE_DIR / "capture_nifty.sqlite"
+    if not sqlite_path.exists():
+        return None
+
+    try:
+        con = duckdb.connect(":memory:")
+        con.execute("INSTALL sqlite_scanner; LOAD sqlite_scanner;")
+        src = str(sqlite_path.resolve())
+        enr_src = src
+
+        con.execute(f"""
+            CREATE VIEW market_data AS
+            SELECT
+                timestamp,
+                substr(timestamp, 1, 10) AS date,
+                substr(timestamp, 12, 8) AS time,
+                instrument AS index_name,
+                close AS spot,
+                open AS open_price,
+                high AS intraday_high,
+                low AS intraday_low,
+                volume,
+                ltp,
+                e.india_vix, e.vwap, e.prev_close, e.atm_strike,
+                e.ema_5, e.ema_20, e.ema_50,
+                e.supertrend_value, e.supertrend_direction,
+                e.adx, e.atr, e.rsi,
+                e.bb_pct_b, e.bb_width, e.ema20_slope,
+                e.gap_pct, e.prev_day_high, e.prev_day_low, e.prev_day_range,
+                e.pivot_pp, e.pivot_r1, e.pivot_r2, e.pivot_r3,
+                e.pivot_s1, e.pivot_s2, e.pivot_s3,
+                e.fib_0, e.fib_236, e.fib_382, e.fib_50, e.fib_618, e.fib_786, e.fib_100,
+                e.open_range_high, e.open_range_low,
+                e.iv_current, e.iv_52w_high, e.iv_52w_low, e.iv_rank, e.iv_regime,
+                e.iv_short, e.iv_long, e.iv_slope, e.hv_20, e.hv_60,
+                e.agg_delta, e.agg_gamma, e.agg_vega, e.agg_theta,
+                e.wings_delta, e.body_delta,
+                e.pcr_total, e.pcr_atm, e.sentiment, e.max_pain_strike,
+                e.call_oi_concentration, e.put_oi_concentration, e.oi_skew,
+                e.ob_zone_high, e.ob_zone_low, e.ob_strength,
+                e.fvg_high, e.fvg_low, e.fvg_mitigated,
+                e.swing_high, e.swing_low, e.liquidity_swept,
+                e.structure_type, e.structure_confirmed, e.next_target, e.smc_strength,
+                e.cluster_support, e.cluster_resistance,
+                e.distance_to_support, e.distance_to_resistance,
+                e.st_5min_value, e.st_5min_direction,
+                e.st_15min_value, e.st_15min_direction, e.st_consensus,
+                e.session_phase, e.open_to_current_pct,
+                e.distance_to_pivot_pct, e.distance_to_r1_pct, e.distance_to_s1_pct
+            FROM sqlite_scan('{src}', 'market_data') m
+            LEFT JOIN sqlite_scan('{enr_src}', 'market_data_enriched') e
+                ON m.timestamp = e.timestamp AND m.instrument = e.instrument
+        """)
+        return con
+    except Exception:
+        return None
+
+
 def _connect() -> duckdb.DuckDBPyConnection:
-    """Open read-only DuckDB connection with concurrent access."""
+    """Open read-only DuckDB connection with concurrent access.
+    Priority: Penguin SQLite (intraday) → Penguin warehouse → legacy DuckDB."""
+    if _is_market_hours():
+        con = _connect_sqlite_intraday()
+        if con is not None:
+            return con
+
+    db_path = _resolve_db_path()
     for attempt in range(30):
         try:
-            con = duckdb.connect(str(VARAH_DATA), read_only=True)
+            con = duckdb.connect(db_path, read_only=True)
             con.execute("PRAGMA enable_progress_bar=false")
             return con
         except Exception:

@@ -143,27 +143,79 @@ class EntryCheckTool(BaseTool):
 
         return None
 
+    def _query_penguin_sqlite(self, index: str) -> dict | None:
+        """Read latest enriched bar from Penguin SQLite (fastest intraday path)."""
+        try:
+            import sqlite3
+
+            db_path = Path(
+                f"/home/trading_ceo/python-trader/varaha/data/capture_{index.lower()}.sqlite"
+            )
+            if not db_path.exists():
+                return None
+
+            conn = sqlite3.connect(str(db_path))
+            conn.row_factory = sqlite3.Row
+            row = conn.execute(
+                "SELECT e.adx, e.supertrend_direction, m.close AS spot, e.ema_20 "
+                "FROM market_data m "
+                "LEFT JOIN market_data_enriched e ON m.timestamp = e.timestamp AND m.instrument = e.instrument "
+                "WHERE m.instrument = ? "
+                "ORDER BY m.timestamp DESC LIMIT 1",
+                (index,),
+            ).fetchone()
+            conn.close()
+
+            if not row or row["adx"] is None:
+                return None
+
+            adx = row["adx"]
+            st_direction = row["supertrend_direction"] or ""
+            spot = row["spot"]
+
+            if adx > 25 and st_direction:
+                signal = "BULLISH" if st_direction.lower() == "bullish" else "BEARISH"
+                confidence = min(int(adx / 30 * 100), 95)
+            elif adx < 20:
+                signal = "NEUTRAL"
+                confidence = 50
+            else:
+                signal = "NEUTRAL"
+                confidence = 40
+
+            return {
+                "signal": signal,
+                "confidence": confidence,
+                "timestamp": datetime.now().isoformat(),
+                "trend_signal": signal,
+                "traffic_light_signal": "UNKNOWN",
+                "reasoning": f"Penguin SQLite: ADX={adx:.1f}, ST={st_direction}, spot={spot}",
+            }
+        except Exception:
+            return None
+
     def _query_duckdb(self, index: str) -> dict | None:
         """
-        Fallback: Query DuckDB directly for latest indicators
-
-        This extracts the core trend/traffic light logic from Redis
-        and runs it against DuckDB data.
+        Fallback: Query DuckDB directly for latest indicators.
+        Tries Penguin SQLite first, then legacy DuckDB.
         """
+        result = self._query_penguin_sqlite(index)
+        if result:
+            result["source"] = "penguin_sqlite (fallback)"
+            return result
+
         try:
             from duckdb_tool import _connect
             import sys
             from pathlib import Path
 
-            # Add antariksh to path to import entry_tools
             sys.path.insert(0, str(Path(__file__).parent.parent.parent / "antariksh"))
 
             con = _connect()
 
-            # Get latest bar from DuckDB
             row = con.execute(
                 "SELECT spot, ema_20, adx, supertrend_direction "
-                "FROM ohlcv_1min WHERE index_name = ? "
+                "FROM market_data WHERE index_name = ? "
                 "ORDER BY timestamp DESC LIMIT 1",
                 (index,),
             ).fetchone()
@@ -173,7 +225,6 @@ class EntryCheckTool(BaseTool):
 
             spot, ema_20, adx, st_direction = row
 
-            # Simple heuristic: if ADX > 25 + ST agreement = trending
             if adx and adx > 25 and st_direction:
                 signal = "BULLISH" if st_direction.lower() == "bullish" else "BEARISH"
                 confidence = min(int(adx / 30 * 100), 95)

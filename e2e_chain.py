@@ -189,7 +189,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     today = datetime.now().date()
     snap_date = (snap.get("date") or "")[:10]
     if snap_date != today.isoformat():
-        _log(f"  E2E Chain: ⚠ STALE snapshot (date={snap_date!r} != today {today.isoformat()!r}) — skipping entry")
+        _log(
+            f"  E2E Chain: ⚠ STALE snapshot (date={snap_date!r} != today {today.isoformat()!r}) — skipping entry"
+        )
         return None
     expiry_raw = snap.get("expiry_weekly", "")
     try:
@@ -197,7 +199,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     except ValueError:
         expiry_d = None
     if expiry_d is None or expiry_d < today:
-        _log(f"  E2E Chain: ⚠ expiry {expiry_raw!r} missing or already expired (today={today.isoformat()}) — skipping entry")
+        _log(
+            f"  E2E Chain: ⚠ expiry {expiry_raw!r} missing or already expired (today={today.isoformat()}) — skipping entry"
+        )
         return None
 
     snap_json = json.dumps(
@@ -322,6 +326,25 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     expiry = snap.get("expiry_weekly", "")
+    # Guard: if data capture didn't run today, expiry_weekly may be stale (yesterday's)
+    # Never trade expired contracts — compute fresh expiry
+    from datetime import date as _dt
+
+    try:
+        expiry_dt = datetime.strptime(expiry, "%d-%b-%Y").date()
+        if expiry_dt < _dt.today():
+            _log(f"  ⚠ expiry_weekly {expiry} is stale (past) — computing fresh")
+            today_dt = datetime.now()
+            days_to_tue = (1 - today_dt.weekday()) % 7
+            if days_to_tue == 0 and today_dt.hour >= 15:
+                days_to_tue = 7
+            expiry_dt_computed = today_dt + timedelta(days=days_to_tue)
+            if (expiry_dt_computed - today_dt).days < 2:
+                expiry_dt_computed = expiry_dt_computed + timedelta(days=7)
+            expiry = expiry_dt_computed.strftime("%d-%b-%Y").upper()
+            _log(f"  ✓ corrected expiry: {expiry}")
+    except ValueError:
+        pass
     from crewai import Task, Crew, Process
 
     # ── Task 1a: NOT_UP Entry Agent (CALL_SPREAD gate) ─────────────────

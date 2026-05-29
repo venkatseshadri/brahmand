@@ -211,10 +211,14 @@ def detect_market_regime(date: str) -> str:
     try:
         import duckdb
 
-        db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-            read_only=True,
+        # Project Penguin — prefer EOD warehouse DuckDB (fed from SQLite capture)
+        warehouse = Path(f"/home/trading_ceo/research/{date}/nifty.duckdb")
+        db_path = (
+            str(warehouse)
+            if warehouse.exists()
+            else "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
         )
+        db = duckdb.connect(db_path, read_only=True)
 
         result = db.execute(f"""
             SELECT

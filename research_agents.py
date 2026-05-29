@@ -43,6 +43,14 @@ class ResearchAgentBase:
         db_path_v31: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
         db_path_v4: str = "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb",
     ):
+        # Project Penguin — prefer EOD warehouse if available
+        from pathlib import Path
+        from datetime import date
+
+        today = date.today()
+        warehouse = Path(f"/home/trading_ceo/research/{today.isoformat()}/nifty.duckdb")
+        if warehouse.exists():
+            db_path_v31 = str(warehouse)
         self.db_path_v31 = db_path_v31
         self.db_path_v4 = db_path_v4
         self.db_v31 = duckdb.connect(db_path_v31, read_only=True)
