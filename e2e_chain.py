@@ -392,10 +392,15 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     # ── Task 2: Regime Agent ───────────────────────────────────────────
     regime_task = Task(
         description=(
-            "Get market regime data (VIX, ADX) for parameter optimization.\n\n"
+            "Get market regime data (VIX, ADX) for entry gating.\n\n"
             "ONE TOOL CALL: query_market_data(query_type='full_regime') to fetch VIX, ADX, ADX direction.\n\n"
+            "Decision rules (deterministic — your job is to report the values, not interpret them):\n"
+            "  - VIX > 25 → recommendation: 'skip' (panic regime, no trades)\n"
+            "  - ADX < 20 → recommendation: 'skip' (no trend, directional signals false)\n"
+            "  - VIX > 18 or ADX < 25 → recommendation: 'caution' (reduce size)\n"
+            "  - Else → recommendation: 'enter'\n\n"
             "OUTPUT only valid JSON:\n"
-            '{"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution", "reason": "..."}'
+            '{"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution"|"skip", "reason": "..."}'
         ),
         expected_output="Regime JSON with VIX and ADX",
         agent=regime_agent,
@@ -630,12 +635,23 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "not_down_decision": not_down_decision,
         }
 
-    # Regime gate (validates the rejection signals)
+    # Regime gate
+    if regime.get("recommendation") == "skip":
+        _log(
+            f"  Regime: SKIP — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}"
+        )
+        return {
+            "recommendation": "regime_skip",
+            "not_up_decision": not_up_decision,
+            "not_down_decision": not_down_decision,
+            "regime": regime,
+        }
+
     if regime.get("recommendation") == "caution":
         _log(
             f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}"
         )
-        # Still allow entry on caution, just log it
+        # Allow entry on caution but limit position size (Strategy agent handles this)
 
     _log(
         f"  Regime: {regime.get('regime')} (VIX={regime.get('vix', '?')}) → {regime.get('recommendation')}"
