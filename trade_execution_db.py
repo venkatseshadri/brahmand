@@ -3,7 +3,7 @@
 Trade Execution DB — Separate DuckDB for order ledger and trade state.
 
 Stores:
-  - active_trades: current positions (written by Order Agent)
+  - active_trades: current positions (written by order_routing)
   - trade_history: closed positions (written by Risk Monitor)
   - monitoring_log: minute-by-minute audit trail (written by Risk Monitor)
 

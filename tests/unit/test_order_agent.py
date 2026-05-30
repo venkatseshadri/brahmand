@@ -1,4 +1,4 @@
-"""Unit tests: Order Agent — routes entry/SL/TP orders to broker (PAPER/LIVE)."""
+"""Unit tests: Order routing — routes entry/SL/TP orders to broker (PAPER/LIVE)."""
 
 import pytest
 

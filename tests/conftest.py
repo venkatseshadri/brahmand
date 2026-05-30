@@ -4,7 +4,7 @@ Brahmand Test Fixtures & Configuration
 Provides:
 - Market snapshots (bullish, bearish, neutral, high VIX, low VIX)
 - Sample trades (CALL_SPREAD, PUT_SPREAD, IRON_BUTTERFLY)
-- Mock tools (DuckDB, order_agent, risk_agent)
+- Mock tools (DuckDB, order_routing, risk_agent)
 - Utility functions
 """
 
@@ -17,6 +17,7 @@ from datetime import datetime
 # ═══════════════════════════════════════════════════════════════════════════════
 # MARKET SNAPSHOTS (Bullish, Bearish, Neutral, High/Low VIX)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def market_snapshot_bearish():
@@ -137,6 +138,7 @@ def market_snapshot_low_vix():
 # SAMPLE TRADES (CALL_SPREAD, PUT_SPREAD, IRON_BUTTERFLY)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def sample_trade_call_spread():
     """CALL_SPREAD: Sell ATM CE, Buy ATM+200 CE"""
@@ -163,7 +165,7 @@ def sample_trade_call_spread():
                 "entry_price": 75.50,
                 "current_price": 75.50,
                 "sl": 113.25,  # 75.50 * 1.50 (150% = 1 + 0.50 for 50% loss on net_credit)
-                "tp": 37.75,   # 75.50 * 0.50 (50% profit)
+                "tp": 37.75,  # 75.50 * 0.50 (50% profit)
             },
             {
                 "tsym": "NIFTY26MAY26C23600",
@@ -211,7 +213,7 @@ def sample_trade_put_spread():
                 "entry_price": 80.25,
                 "current_price": 80.25,
                 "sl": 120.375,  # 80.25 * 1.50
-                "tp": 40.125,   # 80.25 * 0.50
+                "tp": 40.125,  # 80.25 * 0.50
             },
             {
                 "tsym": "NIFTY26MAY26P23800",
@@ -282,6 +284,7 @@ def sample_trade_with_shift(sample_trade_call_spread):
 # ENTRY SIGNALS & DECISIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def entry_decision_bearish():
     """Entry Agent output: Market rejects upside"""
@@ -325,6 +328,7 @@ def entry_decision_no_go():
 # STRATEGY DECISIONS (VIX/ADX-based parameter optimization)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def strategy_decision_default():
     """Strategy Agent: Default parameters (moderate VIX, moderate ADX)"""
@@ -343,7 +347,7 @@ def strategy_decision_high_vix():
     return {
         "strategy_type": "CALL_SPREAD",
         "wing_width": 250,  # Wider
-        "sl_pct": 0.35,     # Tighter SL in high vol
+        "sl_pct": 0.35,  # Tighter SL in high vol
         "tp_pct": 0.50,
         "reason": "VIX > 20: wider wings for protection, tighter SL for volatility",
     }
@@ -356,7 +360,7 @@ def strategy_decision_low_vix():
         "strategy_type": "CALL_SPREAD",
         "wing_width": 150,  # Narrower
         "sl_pct": 0.25,
-        "tp_pct": 0.55,     # Extended TP in low vol sideways
+        "tp_pct": 0.55,  # Extended TP in low vol sideways
         "reason": "VIX < 15, ADX < 20: narrow wings OK, let premium decay fully",
     }
 
@@ -364,6 +368,7 @@ def strategy_decision_low_vix():
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONTRACTED SYMBOLS (From DuckDB)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def contracts_call_spread():
@@ -420,12 +425,13 @@ def contracts_put_spread():
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ORDER RESULTS (From order_agent)
+# ORDER RESULTS (From order_routing)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def order_result_entry():
-    """Order Agent: Entry orders placed"""
+    """Order routing: Entry orders placed"""
     return {
         "trade_id": "TRD-20260523093000",
         "entry_orders": [
@@ -439,7 +445,7 @@ def order_result_entry():
 
 @pytest.fixture
 def order_result_sl_tp():
-    """Order Agent: SL/TP orders placed"""
+    """Order routing: SL/TP orders placed"""
     return {
         "trade_id": "TRD-20260523093000",
         "sl_orders": ["ORD-20260523-0003"],
@@ -452,6 +458,7 @@ def order_result_sl_tp():
 # ═══════════════════════════════════════════════════════════════════════════════
 # MONITORING EVENTS (Morph, Shift, TSL, Exit)
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def monitoring_event_no_action():
@@ -497,6 +504,7 @@ def monitoring_event_shift():
 # EXIT EVENTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def exit_event_tp_hit():
     """Trade exited at Take Profit"""
@@ -540,6 +548,7 @@ def exit_event_time():
 # POSTMORTEM ANALYSIS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def postmortem_analysis_success():
     """Postmortem: Trade executed well"""
@@ -582,6 +591,7 @@ def postmortem_analysis_loss():
 # UTILITY FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def cleanup_ledger():
     """Clean up order_ledger.json after test"""
@@ -602,20 +612,15 @@ def cleanup_duckdb():
 # PYTEST CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def pytest_configure(config):
     """Register custom markers"""
-    config.addinivalue_line(
-        "markers", "unit: unit test (fast, isolated)"
-    )
+    config.addinivalue_line("markers", "unit: unit test (fast, isolated)")
     config.addinivalue_line(
         "markers", "phase: phase integration test (entry/monitoring/post-trade)"
     )
     config.addinivalue_line(
         "markers", "scenario: scenario test (realistic trading day)"
     )
-    config.addinivalue_line(
-        "markers", "e2e: end-to-end test (full workflow)"
-    )
-    config.addinivalue_line(
-        "markers", "slow: slow test (> 1 second)"
-    )
+    config.addinivalue_line("markers", "e2e: end-to-end test (full workflow)")
+    config.addinivalue_line("markers", "slow: slow test (> 1 second)")

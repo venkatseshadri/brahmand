@@ -368,8 +368,8 @@ class PlaceEntryOrdersTool(BaseTool):
     name: str = "place_entry_orders"
     description: str = (
         "Route all entry orders (typically 4 legs for butterfly, 2 for spreads) "
-        "through the Order Agent's centralized hub. "
-        "The Order Agent decides: PAPER mode → save to order_ledger.json, "
+        "through the centralized order routing hub. "
+        "The order routing hub decides: PAPER mode → save to order_ledger.json, "
         "LIVE mode → forward to Shoonya API. "
         "Returns: {trade_id, entry_orders: [order_id list], status: FILLED|PLACED, mode: PAPER|LIVE}"
     )
@@ -404,7 +404,7 @@ class PlaceSLTPOrdersInput(BaseModel):
 class PlaceSLTPOrdersTool(BaseTool):
     name: str = "place_sl_tp_orders"
     description: str = (
-        "Route all SL/TP orders through the Order Agent's centralized hub. "
+        "Route all SL/TP orders through the centralized order routing hub. "
         "Receives trade_id and legs (from the entry trade). "
         "For each SELL leg: places SL (buy trigger) and TP (buy limit) order. "
         "BUY legs (hedges) get NO orders — held to expiry. "
