@@ -248,11 +248,15 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     llm = _get_llm()
 
     from factory import AgentFactory
-    from duckdb_tool import MarketDataQueryTool, get_latest_market_snapshot
+    from market_data import MarketDataQueryTool, get_latest_market_snapshot
 
     af = AgentFactory()
     market_tool = MarketDataQueryTool()
     snap = get_latest_market_snapshot()
+    if not snap or not snap.get("spot"):
+        from duckdb_tool import get_latest_market_snapshot as ddb_snap
+
+        snap = ddb_snap()
 
     spot = float(snap.get("spot", 0))
     atm = int(float(snap.get("atm_strike", 0)))
@@ -261,7 +265,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     adx = float(adx_val) if adx_val and adx_val != "None" else 0.0
 
     if not spot or not atm:
-        _log("  E2E Chain: ⚠ DuckDB empty — skipping")
+        _log("  E2E Chain: ⚠ No market data — skipping")
         return None
 
     # Freshness + expiry-sanity guard. If the data capture didn't run today, the
