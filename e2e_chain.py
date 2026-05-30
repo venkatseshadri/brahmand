@@ -957,8 +957,11 @@ def _deterministic_fallback(entry_time, spot, atm, vix, adx, snap):
 def _resolve_contracts(
     atm: int, wing_width: int, expiry: str, option_tool, strategy_type: str
 ) -> tuple:
-    """Generate leg specs from strategy + query DuckDB for contract tsyms/LTPs."""
-    from duckdb_tool import _connect
+    """Generate leg specs from strategy + query SQLite option_prices for tsyms/LTPs."""
+    import sqlite3
+    from antariksh.config.sqlite_schema import get_sqlite_capture_path
+
+    db_path = get_sqlite_capture_path("NIFTY")
 
     if strategy_type == "PUT_SPREAD":
         leg_specs = [
@@ -978,20 +981,21 @@ def _resolve_contracts(
             ("wing_above", atm + wing_width, "CE", "BUY"),
         ]
 
-    con = _connect()
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
     try:
         result = {}
         for label, strike, ot, action in leg_specs:
-            row = con.execute(
-                "SELECT tsym, ltp FROM option_snapshots "
-                "WHERE expiry_date = ? AND strike = ? AND option_type = ? "
-                "AND tsym IS NOT NULL ORDER BY timestamp DESC LIMIT 1",
-                (expiry, strike, ot),
+            row = conn.execute(
+                "SELECT tsym, ltp FROM option_prices "
+                "WHERE strike = ? AND option_type = ? "
+                "ORDER BY timestamp DESC LIMIT 1",
+                (strike, ot),
             ).fetchone()
-            if row:
+            if row and row["tsym"]:
                 result[label] = {
-                    "tsym": row[0],
-                    "ltp": float(row[1] or 0),
+                    "tsym": row["tsym"],
+                    "ltp": float(row["ltp"] or 0),
                     "strike": strike,
                     "option_type": ot,
                     "action": action,
@@ -1006,7 +1010,7 @@ def _resolve_contracts(
                 }
         return result, leg_specs
     finally:
-        con.close()
+        conn.close()
 
 
 def _build_trade(
@@ -1079,11 +1083,11 @@ def run_full_chain(
         # Audit every entry-gate evaluation (GO and rejections) to the
         # structured monitoring JSONL. Lazy import avoids circular import.
         try:
-            from kickoff import _log_monitoring_event
+            from logger import log_monitoring_event
 
             ed = (crew_result or {}).get("entry_decision", {})
             rg = (crew_result or {}).get("regime", {})
-            _log_monitoring_event(
+            log_monitoring_event(
                 "ENTRY_CHECK",
                 "NO_TRADE",
                 entry_time=entry_time,

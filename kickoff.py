@@ -38,33 +38,16 @@ STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOCK_FILE = STATE_DIR / "brahmand_kickoff.lock"
 STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
 
-from logger import get_logger, agent_log, chain_summary, log_exception
+from logger import (
+    get_logger,
+    agent_log,
+    chain_summary,
+    log_exception,
+    log_monitoring_event,
+)
 
 _log = get_logger("kickoff").info
 _err = get_logger("kickoff").error
-
-# Monitoring events log (structured JSONL)
-MONITORING_EVENTS_DIR = Path(__file__).parent / "logs"
-MONITORING_EVENTS_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def _log_monitoring_event(event_type: str, trade_id: str, **details):
-    """Log a structured monitoring event (JSONL format)."""
-    try:
-        events_file = (
-            MONITORING_EVENTS_DIR
-            / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
-        )
-        event = {
-            "timestamp": datetime.now().isoformat(),
-            "event_type": event_type,
-            "trade_id": trade_id,
-            **details,
-        }
-        with open(events_file, "a") as f:
-            f.write(json.dumps(event) + "\n")
-    except Exception as e:
-        _err(f"Failed to log monitoring event: {e}")
 
 
 def now_str():
@@ -141,7 +124,7 @@ def _apply_tsl(trade: dict, leg_type: str, entry_price: float, ltp: float) -> No
             f"  TSL: {leg_type} SL ratcheted {old_sl:.2f} → {new_sl:.2f} ({shift_pct}% favorable) [LTP={ltp:.2f}]"
         )
         # Log to structured event log
-        _log_monitoring_event(
+        log_monitoring_event(
             "TSL_ADJUSTMENT",
             trade.get("trade_id", "unknown"),
             leg=leg_type,
@@ -307,7 +290,7 @@ def enter_trade(state: dict):
     _log(
         f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
-    _log_monitoring_event(
+    log_monitoring_event(
         "TRADE_OPEN",
         trade.get("trade_id", "unknown"),
         entry_time=entry_time,
@@ -343,7 +326,7 @@ def monitor_trade(state: dict):
     _log(
         f"\n[MONITOR-CYCLE] {trade_id} | {strategy} | {int(mins_open)}min | {now_str()}"
     )
-    _log_monitoring_event(
+    log_monitoring_event(
         "MONITOR_CYCLE_START",
         trade_id,
         strategy=strategy,
@@ -401,7 +384,7 @@ def monitor_trade(state: dict):
                 _log(
                     f"  ✓ SL HIT — {leg['tsym']}: LTP={ltp} >= SL={trade['sl'][t]} [{now_str()}]"
                 )
-                _log_monitoring_event(
+                log_monitoring_event(
                     "SL_HIT",
                     trade_id,
                     leg_type=leg["type"],
@@ -415,7 +398,7 @@ def monitor_trade(state: dict):
                 _log(
                     f"  ✓ TP HIT — {leg['tsym']}: LTP={ltp} <= TP={trade['tp'][t]} [{now_str()}]"
                 )
-                _log_monitoring_event(
+                log_monitoring_event(
                     "TP_HIT",
                     trade_id,
                     leg_type=leg["type"],
@@ -434,7 +417,7 @@ def monitor_trade(state: dict):
         f"  Price snapshot: {' | '.join([f'{leg['tsym']}={leg['ltp']:.2f}' for leg in legs_snapshot])}"
     )
     _log(f"  Profit snapshot: {total_profit:.2f} (Open: {int(mins_open)}min)")
-    _log_monitoring_event(
+    log_monitoring_event(
         "CYCLE_SNAPSHOT",
         trade_id,
         legs=legs_snapshot,
@@ -449,11 +432,11 @@ def monitor_trade(state: dict):
             state = _run_monitoring_crew(state)
         except Exception as e:
             _log(f"  ⚠ Monitoring crew failed: {e} — falling back to Python checks")
-            _log_monitoring_event("MONITORING_CREW_ERROR", trade_id, error=str(e))
+            log_monitoring_event("MONITORING_CREW_ERROR", trade_id, error=str(e))
             state = _monitor_fallback(state, trade)
     else:
         _log("  ⚠ LLM unavailable — skipping MORPH/SHIFT checks")
-        _log_monitoring_event("LLM_UNAVAILABLE", trade_id)
+        log_monitoring_event("LLM_UNAVAILABLE", trade_id)
 
     # Auto-exit after 45 min if no SL/TP
     mins_open = (
@@ -464,14 +447,14 @@ def monitor_trade(state: dict):
     ).total_seconds() / 60
     if mins_open > 45:
         _log(f"  ⏰ Auto-exit after {int(mins_open)} min")
-        _log_monitoring_event("TIME_EXIT", trade_id, minutes_open=int(mins_open))
+        log_monitoring_event("TIME_EXIT", trade_id, minutes_open=int(mins_open))
         exit_trade(state, "TIME_EXIT")
 
     # Log cycle end
     _log(
         f"[MONITOR-CYCLE-END] {trade_id} | Duration: {int(mins_open)}min | {now_str()}\n"
     )
-    _log_monitoring_event("MONITOR_CYCLE_END", trade_id, cycle_duration=int(mins_open))
+    log_monitoring_event("MONITOR_CYCLE_END", trade_id, cycle_duration=int(mins_open))
 
     return state
 
@@ -515,7 +498,7 @@ def _run_monitoring_crew(state: dict):
 
     # Pre-monitoring state
     pre_signal = trade.get("signal", "?")
-    _log_monitoring_event(
+    log_monitoring_event(
         "PRE_MORPH_STATE",
         trade_id,
         signal=pre_signal,
@@ -596,7 +579,7 @@ def _run_monitoring_crew(state: dict):
                     )
 
                     # Log detailed event
-                    _log_monitoring_event(
+                    log_monitoring_event(
                         event_type,
                         trade_id,
                         action_taken=action_taken,
@@ -605,12 +588,12 @@ def _run_monitoring_crew(state: dict):
                     )
                 except Exception as e:
                     _log(f"  [{name.upper()}] {raw[:250]}")
-                    _log_monitoring_event(
+                    log_monitoring_event(
                         event_type, trade_id, error=str(e), raw_output=raw[:500]
                     )
     else:
         _log(f"  Monitoring Crew result: {str(result)[:400]}")
-        _log_monitoring_event(
+        log_monitoring_event(
             "MONITORING_CREW_RESULT", trade_id, result=str(result)[:500]
         )
 
@@ -618,7 +601,7 @@ def _run_monitoring_crew(state: dict):
     post_signal = state.get("active_trade", {}).get("signal", "?")
     if post_signal != pre_signal:
         _log(f"  ⚠ SIGNAL CHANGED: {pre_signal} → {post_signal}")
-        _log_monitoring_event(
+        log_monitoring_event(
             "SIGNAL_CHANGE", trade_id, pre_signal=pre_signal, post_signal=post_signal
         )
 
@@ -858,7 +841,7 @@ def main():
                 reason = "cooldown"
             else:
                 reason = "other"
-            _log_monitoring_event(
+            log_monitoring_event(
                 "NO_CHECK",
                 "NO_TRADE",
                 reason=reason,

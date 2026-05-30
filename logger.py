@@ -185,3 +185,22 @@ def log_exception(logger: logging.Logger, error: Exception, context: str = ""):
         logger.error(f"{context}: {error}\n{tb}")
     else:
         logger.error(f"{error}\n{tb}")
+
+
+def log_monitoring_event(event_type: str, trade_id: str, **details):
+    """Append a structured monitoring event (JSONL) to the daily events file."""
+    try:
+        events_file = (
+            LOG_DIR / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
+        )
+        event = {
+            "timestamp": datetime.now().isoformat(),
+            "event_type": event_type,
+            "trade_id": trade_id,
+            **details,
+        }
+        with open(events_file, "a") as f:
+            f.write(json.dumps(event) + "\n")
+    except Exception as e:
+        _err = logging.getLogger("brahmand.kickoff").error
+        _err(f"Failed to log monitoring event: {e}")
