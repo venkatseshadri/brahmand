@@ -1,0 +1,66 @@
+# ── Antariksh Trading System — Monday Morning Automation ──
+
+# 06:58 AM — Kill zombie data_capture processes + release DuckDB locks
+58 6 * * 1-5 /bin/bash /home/trading_ceo/brahmand/cron/cleanup_zombies.sh
+
+# 07:00 AM — Refresh broker tokens (daily, before pre-market)
+0 7 * * 1-5 /bin/bash /home/trading_ceo/antariksh/cron/run_token_refresh.sh
+
+# 08:00 AM — OM Pre-Flight health check (GO/NOGO before session)
+
+# 09:12 AM — Legacy Varaha token refresh (backup)
+
+# 09:14 AM — Data capture (NIFTY + SENSEX)
+
+# 09:15 AM — Session orchestrator — market entry
+15 9 * * 1-5 /usr/bin/python3 /home/trading_ceo/antariksh/tools/session_orchestrator.py --action entry >> /home/trading_ceo/antariksh/logs/session_entry_cron.log 2>&1
+
+# Every 5 min during market — watchdog restarts dead captures
+
+# 14:35 PM — Session orchestrator — market exit (before 15:30 close)
+35 14 * * 1-5 /usr/bin/python3 /home/trading_ceo/antariksh/tools/session_orchestrator.py --action exit >> /home/trading_ceo/antariksh/logs/session_exit_cron.log 2>&1
+
+# 15:35 PM — EOD cleanup (stop captures, checkpoint DBs, sourceswap)
+35 15 * * 1-5 /home/trading_ceo/python-trader/varaha/eod_cleanup.sh
+
+# 18:00 PM — Daily exec report generation
+0 18 * * 1-5 /usr/bin/python3 /home/trading_ceo/antariksh/exec_report.py daily >> /home/trading_ceo/antariksh/logs/exec_report_cron.log 2>&1
+
+# 20:00 PM — Weekly exec report (Sundays)
+0 20 * * 0 /usr/bin/python3 /home/trading_ceo/antariksh/exec_report.py weekly >> /home/trading_ceo/antariksh/logs/exec_report_weekly_cron.log 2>&1
+
+# ── Scheduled Crew Kicks (autonomous dispatch) ──
+# CEO 07:55 — governance alignment check
+
+# AM 08:55 — broker margin query
+
+# PM 08:55 — strategy spec
+
+# TA 09:18 — pre-trade validation
+
+# PA 16:00 — post-mortem analysis
+
+# CEO 16:00 — end-of-day alignment
+
+# Sunday 10:00 — CEO weekend readiness check
+# Sunday 10:05 — OM weekend pre-flight
+
+# 11:00 AM — Brahmand autonomous dry-run (Mon/Wed/Fri)
+# Every 5 min 9:30-15:30 — Brahmand autonomous kickoff
+1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_kickoff.sh
+# 09:14 AM — Data Capture + Multi-TF Aggregation (v3 + v4 together)
+# Pipeline health check (every 5 min, 9:15-15:30 weekdays)
+
+# Brahmand autonomous paper trading — Trend+TL entry gate, 5-agent chain
+# Every 5 min 9:30-15:30 — Margin capture (Shoonya span calculator for wing optimization)
+*/5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_margin_capture.sh
+# Every 5 min 9:30-15:30 — Pattern enricher (builds traffic light probability DB)
+*/5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_pattern_enricher.sh
+# Every 5 min — Data pipeline health check
+*/5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_data_health.sh
+# Entry Check Daemon — start at 09:15, run until market close
+*/1 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_position_manager.sh
+30 8 * * 1-5 /usr/bin/python3 /home/trading_ceo/antariksh/margin_calculator.py >> /home/trading_ceo/antariksh/logs/margin_calculator_cron.log 2>&1
+@daily /usr/bin/python3 /home/trading_ceo/antariksh/tools/log_cleanup.py >> /home/trading_ceo/antariksh/logs/log_cleanup_cron.log 2>&1
+
+0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
