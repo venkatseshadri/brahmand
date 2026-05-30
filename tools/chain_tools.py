@@ -3,7 +3,7 @@ Chain Tools — Contract Resolution + Execution + Order Routing tools for the E2
 Contract Agent uses resolve_option_contracts.
 Execution Agent uses execute_paper_trade + place_entry_orders.
 Risk Agent uses place_sl_tp_orders.
-Order Agent wraps order_agent.place_entry_orders() and order_agent.place_sl_tp_orders().
+Order routing via order_routing module functions.
 """
 
 import json
@@ -229,7 +229,132 @@ class ExecutePaperTradeTool(BaseTool):
         return json.dumps(trade, indent=2, default=str)
 
 
-# ── Order Agent Tools (centralized routing) ──────────────────────────────
+class BuildAndExecuteTradeTool(BaseTool):
+    """Build trade dict from contracts AND route entry orders atomically.
+
+    Combines ExecutePaperTradeTool (build) + PlaceEntryOrdersTool (route).
+    Single tool for the Execution Agent so the LLM doesn't have to decide
+    which of two tools to call — both happen in one deterministic step.
+    """
+
+    name: str = "build_and_execute_trade"
+    description: str = (
+        "Build legs, calculate net credit and SL/TP, then route ALL entry orders "
+        "through the centralized order hub. Returns complete trade dict with trade_id."
+    )
+    args_schema: Type[BaseModel] = ExecutePaperTradeInput
+
+    def _run(
+        self,
+        contracts_json: str = "{}",
+        strategy_type: str = "IRON_BUTTERFLY",
+        entry_time: str = "",
+        spot: float = 0.0,
+        atm: int = 0,
+        vix: float = 0.0,
+        expiry: str = "",
+        wing_width: int = 200,
+        sl_pct: float = 0.25,
+        tp_pct: float = 0.50,
+    ) -> str:
+        try:
+            data = json.loads(contracts_json)
+        except Exception:
+            return json.dumps({"error": "invalid contracts_json"})
+
+        if isinstance(data, list):
+            contracts = {}
+            for c in data:
+                key = f"{c.get('action', '').lower()}_{c.get('type', c.get('option_type', '')).lower()}"
+                contracts[key] = {
+                    "action": c.get("action"),
+                    "strike": c.get("strike"),
+                    "option_type": c.get("type") or c.get("option_type"),
+                    "tsym": c.get("tsym"),
+                    "ltp": c.get("ltp"),
+                }
+        elif isinstance(data, dict):
+            contracts = data.get("contracts", data.get("legs", data))
+        else:
+            return json.dumps({"error": "invalid contracts_json"})
+
+        if not contracts:
+            return json.dumps({"error": "no contracts resolved"})
+
+        from persistence import save_execution_report
+        from schemas import ExecutionReport
+
+        legs = []
+        sl = {}
+        tp = {}
+        prem_sell = 0.0
+        prem_buy = 0.0
+        for label, c in contracts.items():
+            leg = {
+                "action": c["action"],
+                "strike": c["strike"],
+                "type": c["option_type"],
+                "fill_price": c["ltp"],
+                "tsym": c["tsym"],
+            }
+            legs.append(leg)
+            if c["action"] == "SELL":
+                prem_sell += c["ltp"]
+                key = c["option_type"].lower()
+                sl[key] = round(c["ltp"] * (1 + sl_pct), 2)
+                tp[key] = round(c["ltp"] * (1 - tp_pct), 2)
+            else:
+                prem_buy += c["ltp"]
+
+        net = round(prem_sell - prem_buy, 2)
+
+        trade = {
+            "entry_time": entry_time,
+            "spot_at_entry": spot,
+            "atm_strike": atm,
+            "vix": vix,
+            "expiry": expiry,
+            "wing_width": wing_width,
+            "strategy_type": strategy_type,
+            "leg_count": len(legs),
+            "net_credit": net,
+            "premium_sell": round(prem_sell, 2),
+            "premium_buy": round(prem_buy, 2),
+            "legs": legs,
+            "sl": sl,
+            "tp": tp,
+            "status": "OPEN",
+        }
+
+        for leg in legs:
+            if leg["action"] == "SELL":
+                save_execution_report(
+                    ExecutionReport(
+                        order_id=f"SIM-{leg['tsym']}",
+                        status="MOCK",
+                        fill_price=leg["fill_price"],
+                        agent_version="execution-agent",
+                    )
+                )
+
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        try:
+            from order_routing import place_entry_orders
+
+            result = place_entry_orders(legs)
+            trade["trade_id"] = result.get("trade_id", "")
+            trade["entry_orders"] = result.get("entry_orders", [])
+            trade["order_status"] = result.get("status", "")
+            trade["order_mode"] = result.get("mode", "PAPER")
+        except ImportError as e:
+            return json.dumps({"error": f"Failed to import order_routing: {e}"})
+        except Exception as e:
+            return json.dumps({"error": f"place_entry_orders failed: {str(e)[:200]}"})
+
+        return json.dumps(trade, indent=2, default=str)
+
+
+# ── Order Routing Tools (centralized) ─────────────────────────────────────
 
 
 class PlaceEntryOrdersInput(BaseModel):
@@ -254,12 +379,12 @@ class PlaceEntryOrdersTool(BaseTool):
         if not legs:
             return json.dumps({"error": "No legs provided"})
 
-        # Import order_agent from parent directory
+        # Import order_routing from parent directory
         sys.path.insert(0, str(Path(__file__).parent.parent))
         try:
-            from order_agent import place_entry_orders
+            from order_routing import place_entry_orders
         except ImportError as e:
-            return json.dumps({"error": f"Failed to import order_agent: {e}"})
+            return json.dumps({"error": f"Failed to import order_routing: {e}"})
 
         try:
             result = place_entry_orders(legs)
@@ -291,12 +416,12 @@ class PlaceSLTPOrdersTool(BaseTool):
         if not trade_id or not legs:
             return json.dumps({"error": "trade_id and legs required"})
 
-        # Import order_agent from parent directory
+        # Import order_routing from parent directory
         sys.path.insert(0, str(Path(__file__).parent.parent))
         try:
-            from order_agent import place_sl_tp_orders
+            from order_routing import place_sl_tp_orders
         except ImportError as e:
-            return json.dumps({"error": f"Failed to import order_agent: {e}"})
+            return json.dumps({"error": f"Failed to import order_routing: {e}"})
 
         try:
             result = place_sl_tp_orders(trade_id, legs)

@@ -258,7 +258,7 @@ def enter_trade(state: dict):
 
     # ALSO write to order_ledger.json (single source of truth for active trades)
     try:
-        from order_agent import create_trade
+        from order_routing import create_trade
 
         legs = trade.get("legs", [])
         if isinstance(legs, str):

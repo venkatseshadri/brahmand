@@ -84,7 +84,7 @@ def has_active_trade() -> bool:
 
     # Fallback: check order_ledger for any ACTIVE trades today
     try:
-        from order_agent import get_active_trades
+        from order_routing import get_active_trades
 
         return len(get_active_trades()) > 0
     except Exception:
@@ -100,7 +100,7 @@ def get_active_trade() -> dict:
 
     # Fallback: get first active trade from order ledger
     try:
-        from order_agent import get_active_trades
+        from order_routing import get_active_trades
 
         active = get_active_trades()
         if active:
@@ -234,7 +234,7 @@ def close_trade_and_cleanup(trade: dict, reason: str, ltp: float):
     trade_id = trade.get("trade_id")
     if trade_id:
         try:
-            from order_agent import update_trade
+            from order_routing import update_trade
 
             update_trade(
                 trade_id,

@@ -322,8 +322,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     )
     from tools.chain_tools import (
         ResolveOptionContractsTool,
-        ExecutePaperTradeTool,
-        PlaceEntryOrdersTool,
+        BuildAndExecuteTradeTool,
         PlaceSLTPOrdersTool,
     )
 
@@ -333,8 +332,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     not_up_rejection_tool = EvaluateNotUpRejection()
     not_down_rejection_tool = EvaluateNotDownRejection()
     contract_tool = ResolveOptionContractsTool()
-    execution_tool = ExecutePaperTradeTool()
-    entry_orders_tool = PlaceEntryOrdersTool()
+    execution_tool = BuildAndExecuteTradeTool()
     sl_tp_orders_tool = PlaceSLTPOrdersTool()
 
     # Risk tools (still needed for monitoring phase: morph/shift operations)
@@ -383,26 +381,16 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 "phase": "1",  # Phase 1 (NIFTY only), Phase 2+ (multi-asset, receives asset from upstream)
                 "role": "dumb_executor",  # Does NOT make decisions. All decisions upstream.
             },
-            tools=[execution_tool, entry_orders_tool],
+            tools=[execution_tool],
         )
         execution_agent.llm = llm
 
         risk_agent = af.create_agent(
             "risk_agent",
             variables={"market_type": "NIFTY", "ticker": "NIFTY", "mock_mode": "paper"},
-            tools=[
-                sl_tp_orders_tool
-            ],  # Entry phase: ONLY use centralized order routing
+            tools=[sl_tp_orders_tool],
         )
         risk_agent.llm = llm
-
-        # Order Agent (routes orders through centralized hub)
-        order_agent = af.create_agent(
-            "order_agent",
-            variables={"market_type": "NIFTY", "ticker": "NIFTY"},
-            tools=[entry_orders_tool, sl_tp_orders_tool],
-        )
-        order_agent.llm = llm
     except KeyError as e:
         _log(f"  ⚠ Agent factory: {e}")
         return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)

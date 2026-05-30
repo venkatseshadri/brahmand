@@ -37,7 +37,7 @@ def _connect():
     """Cross-process-safe DuckDB connection for trade_execution.duckdb.
 
     DuckDB permits only one read-write process per file, but kickoff (5-min),
-    the risk monitor (1-min) and order_agent all write this DB. Each open is
+    the risk monitor (1-min) and order_routing module all write this DB. Each open is
     serialized with an flock mutex (the OS auto-releases it on process exit, so
     there are no stale locks) and retried on the residual IOException race.
     Connections are short-lived: lock -> connect -> work -> close -> unlock.

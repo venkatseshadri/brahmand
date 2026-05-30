@@ -139,7 +139,7 @@ class CheckActiveSpreads(BaseTool):
 
     def _run(self, index: str = "NIFTY") -> str:
         import json
-        from order_agent import get_active_trades, get_trades_by_strategy
+        from order_routing import get_active_trades, get_trades_by_strategy
 
         try:
             result = {

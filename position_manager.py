@@ -428,12 +428,12 @@ def _norm_close_reason(reason: str) -> str:
 def _square_off(legs: list, trade_id: str, reason: str) -> float:
     """Place EXIT (square-off) orders for each leg and return realized P&L (points).
 
-    BUY-to-close shorts, SELL-to-close longs. In paper mode order_agent fills the
+    BUY-to-close shorts, SELL-to-close longs. In paper mode order_routing fills the
     mock order; in live mode it routes to the broker. P&L uses the live LTP when
     present, else the entry fill (so a missing tick books 0 rather than a phantom).
     """
     try:
-        from order_agent import place_order
+        from order_routing import place_order
     except Exception:
         place_order = None
     pnl = 0.0
@@ -756,7 +756,7 @@ def _ensure_sl_tp_orders(trade: dict, trade_id: str):
     this to an unconditional/at-entry placement — see risk_agent_crew docstring.
     """
     try:
-        from order_agent import place_sl_tp_orders
+        from order_routing import place_sl_tp_orders
 
         sl_map = trade.get("sl", {}) or {}
         tp_map = trade.get("tp", {}) or {}
@@ -773,6 +773,66 @@ def _ensure_sl_tp_orders(trade: dict, trade_id: str):
             print(f"  🛟 Fallback SL/TP placed (LLM down): {res['total_orders']}")
     except Exception as e:
         print(f"  ⚠️  Fallback SL/TP placement failed: {e}")
+
+
+def _check_sl_tp(trade: dict) -> dict:
+    """Deterministic SL/TP check before LLM dispatch.
+
+    Reads live LTPs from SQLite option_prices (populated by penguin consumer).
+    Returns action dict: {"action": "SL_HIT"|"TP_HIT", "leg": {...}, "mtm": X}
+    or {"action": "ACTIVE", "mtm": X}
+    """
+    import sqlite3
+    from antariksh.config.sqlite_schema import get_sqlite_capture_path
+
+    db_path = get_sqlite_capture_path("NIFTY")
+    if not db_path.exists():
+        return {"action": "ACTIVE", "mtm": 0.0}
+
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    mtm = 0.0
+
+    try:
+        for leg in trade.get("legs", []):
+            tsym = leg.get("tsym", "")
+            fill_price = leg.get("fill_price", leg.get("fill", 0)) or 0
+            action = leg.get("action", "")
+            qty = leg.get("quantity", 65)
+            sl = leg.get("sl")
+            tp = leg.get("tp")
+
+            row = conn.execute(
+                "SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)
+            ).fetchone()
+            current_ltp = row["ltp"] if row else fill_price
+
+            if action == "SELL":
+                mtm += (fill_price - current_ltp) * qty
+            else:
+                mtm += (current_ltp - fill_price) * qty
+
+            if action == "SELL":
+                if sl is not None and current_ltp >= sl:
+                    return {
+                        "action": "SL_HIT",
+                        "leg": dict(leg),
+                        "ltp": current_ltp,
+                        "sl": sl,
+                        "mtm": round(mtm, 2),
+                    }
+                if tp is not None and current_ltp <= tp:
+                    return {
+                        "action": "TP_HIT",
+                        "leg": dict(leg),
+                        "ltp": current_ltp,
+                        "tp": tp,
+                        "mtm": round(mtm, 2),
+                    }
+    finally:
+        conn.close()
+
+    return {"action": "ACTIVE", "mtm": round(mtm, 2)}
 
 
 def run_bridge():
@@ -807,12 +867,37 @@ def run_bridge():
             f"[{now_str()}] PM: Evaluating trade {trade_id} ({trade.get('strategy', '?')})"
         )
 
+        # ── DETERMINISTIC SL/TP CHECK (reads SQLite option_prices) ─────────
+        sl_result = _check_sl_tp(trade)
+        trade["last_mtm"] = sl_result.get("mtm", 0)
+        if sl_result["action"] in ("SL_HIT", "TP_HIT"):
+            leg = sl_result["leg"]
+            print(
+                f"  🔴 {sl_result['action']}: {leg['tsym']} "
+                f"ltp={sl_result['ltp']:.2f} mtm={sl_result['mtm']:.2f}"
+            )
+            if sl_result["action"] == "SL_HIT":
+                execute_action(
+                    {"type": "SL_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade
+                )
+                _close_side(trade, leg["type"])
+            else:
+                execute_action(
+                    {"type": "TP_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade
+                )
+                _close_side(trade, leg["type"])
+            continue  # Skip LLM — SL/TP is arithmetic
+
+        print(f"  📊 MTM = {sl_result['mtm']:.2f}  (ACTIVE)")
+
         actions = []
         llm_ok = False
-        # ── Try LLM path first (RISK agent is the primary SL/TP + exit owner) ──
+        # ── Try LLM path (now only for morph/shift/TSL decisions) ──
         try:
             from risk_agent_crew import evaluate_trade as llm_evaluate
 
+            # Inject real-time MTM into trade context for LLM
+            trade["current_mtm"] = sl_result["mtm"]
             result = llm_evaluate(trade)
             if result.get("status") == "ok":
                 llm_ok = True

@@ -22,7 +22,7 @@ from typing import Optional, Dict, Tuple
 sys.path.insert(0, str(Path(__file__).parent))
 
 from duckdb_tool import _connect
-from order_agent import place_order, cancel_order
+from order_routing import place_order, cancel_order
 
 
 def _load_margin_matrix() -> dict:
@@ -59,7 +59,11 @@ def _lookup_margin_from_matrix(
 
 def _get_current_atm(trade: dict) -> int:
     """Get ATM from trade setup."""
-    return trade.get("setup", {}).get("atm_strike", 0) if isinstance(trade.get("setup"), dict) else 0
+    return (
+        trade.get("setup", {}).get("atm_strike", 0)
+        if isinstance(trade.get("setup"), dict)
+        else 0
+    )
 
 
 def _classify_legs(trade: dict) -> Tuple[Optional[dict], Optional[dict], str]:
@@ -75,23 +79,31 @@ def _classify_legs(trade: dict) -> Tuple[Optional[dict], Optional[dict], str]:
 
     # PE: SELL > HEDGE in strike
     if pe_legs and len(pe_legs) >= 2:
-        sell_pe = max(pe_legs, key=lambda l: l.get("strike", 0)) if any(
-            l.get("action") == "SELL" for l in pe_legs
-        ) else None
-        hedge_pe = min(pe_legs, key=lambda l: l.get("strike", 0)) if any(
-            l.get("action") == "BUY" for l in pe_legs
-        ) else None
+        sell_pe = (
+            max(pe_legs, key=lambda l: l.get("strike", 0))
+            if any(l.get("action") == "SELL" for l in pe_legs)
+            else None
+        )
+        hedge_pe = (
+            min(pe_legs, key=lambda l: l.get("strike", 0))
+            if any(l.get("action") == "BUY" for l in pe_legs)
+            else None
+        )
         if sell_pe and hedge_pe:
             return (sell_pe, hedge_pe, "PE")
 
     # CE: SELL < HEDGE in strike
     if ce_legs and len(ce_legs) >= 2:
-        sell_ce = min(ce_legs, key=lambda l: l.get("strike", 0)) if any(
-            l.get("action") == "SELL" for l in ce_legs
-        ) else None
-        hedge_ce = max(ce_legs, key=lambda l: l.get("strike", 0)) if any(
-            l.get("action") == "BUY" for l in ce_legs
-        ) else None
+        sell_ce = (
+            min(ce_legs, key=lambda l: l.get("strike", 0))
+            if any(l.get("action") == "SELL" for l in ce_legs)
+            else None
+        )
+        hedge_ce = (
+            max(ce_legs, key=lambda l: l.get("strike", 0))
+            if any(l.get("action") == "BUY" for l in ce_legs)
+            else None
+        )
         if sell_ce and hedge_ce:
             return (sell_ce, hedge_ce, "CE")
 
@@ -131,7 +143,7 @@ def evaluate_hedge_shift(trade: dict) -> Optional[Dict]:
         hedge_ltp = con.execute(
             "SELECT ltp FROM option_snapshots WHERE expiry_date = ? AND strike = ? AND option_type = ? "
             "ORDER BY timestamp DESC LIMIT 1",
-            (expiry, hedge_leg.get("strike"), option_type)
+            (expiry, hedge_leg.get("strike"), option_type),
         ).fetchone()
         hedge_ltp = float(hedge_ltp[0]) if hedge_ltp else hedge_leg.get("fill_price", 0)
 
@@ -200,7 +212,7 @@ def evaluate_sell_shift(trade: dict, available_margin: float) -> Optional[Dict]:
         sell_ltp = con.execute(
             "SELECT ltp FROM option_snapshots WHERE expiry_date = ? AND strike = ? AND option_type = ? "
             "ORDER BY timestamp DESC LIMIT 1",
-            (expiry, sell_leg.get("strike"), option_type)
+            (expiry, sell_leg.get("strike"), option_type),
         ).fetchone()
         sell_ltp = float(sell_ltp[0]) if sell_ltp else sell_leg.get("fill_price", 0)
 
@@ -353,8 +365,13 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
         # Step 2: Place SELL order for old hedge (CLOSE)
         old_hedge_tsym = f"NIFTY{trade.get('expiry', '').replace('-', '')}{option_type}{old_hedge_strike}"
         old_hedge_leg = next(
-            (l for l in trade.get("legs", [])
-             if l.get("type") == option_type and l.get("action") == "BUY" and l.get("strike") == old_hedge_strike),
+            (
+                l
+                for l in trade.get("legs", [])
+                if l.get("type") == option_type
+                and l.get("action") == "BUY"
+                and l.get("strike") == old_hedge_strike
+            ),
             None,
         )
         old_hedge_ltp = 0
@@ -364,13 +381,17 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
                 "ORDER BY timestamp DESC LIMIT 1",
                 (expiry, old_hedge_strike, option_type),
             ).fetchone()
-            old_hedge_ltp = float(row_old[0]) if row_old else old_hedge_leg.get("fill_price", 0)
+            old_hedge_ltp = (
+                float(row_old[0]) if row_old else old_hedge_leg.get("fill_price", 0)
+            )
 
         close_order = place_order(
             symbol=old_hedge_tsym,
             action_type="SELL",
             quantity=65,
-            price=old_hedge_ltp or old_hedge_leg.get("fill_price", 0) if old_hedge_leg else 0,
+            price=old_hedge_ltp or old_hedge_leg.get("fill_price", 0)
+            if old_hedge_leg
+            else 0,
             order_type="SHIFT_CLOSE",
             component="leg_shifter",
             trade_id=trade.get("trade_id"),
@@ -381,7 +402,11 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
         trade["legs"] = [
             l
             for l in trade.get("legs", [])
-            if not (l.get("type") == option_type and l.get("action") == "BUY" and l.get("strike") == old_hedge_strike)
+            if not (
+                l.get("type") == option_type
+                and l.get("action") == "BUY"
+                and l.get("strike") == old_hedge_strike
+            )
         ]
 
         # Step 4: Add new hedge leg (BUY at new_hedge_strike)
@@ -455,8 +480,13 @@ def execute_sell_shift(trade: dict, proposal: Dict) -> Dict:
 
         # Get old SELL leg for profit calculation and order tracking
         old_sell_leg = next(
-            (l for l in trade.get("legs", [])
-             if l.get("type") == option_type and l.get("action") == "SELL" and l.get("strike") == old_sell_strike),
+            (
+                l
+                for l in trade.get("legs", [])
+                if l.get("type") == option_type
+                and l.get("action") == "SELL"
+                and l.get("strike") == old_sell_strike
+            ),
             None,
         )
         profit = 0
@@ -464,10 +494,14 @@ def execute_sell_shift(trade: dict, proposal: Dict) -> Dict:
         # Step 1: Book profit on old SELL (realized P&L) + place CLOSE order
         if old_sell_ltp > 0 and old_sell_leg:
             profit = old_sell_leg.get("fill_price", 0) - old_sell_ltp
-            trade["cumulative_pnl"] = trade.get("cumulative_pnl", 0) + (profit * 65)  # 65 = NIFTY lot size
+            trade["cumulative_pnl"] = trade.get("cumulative_pnl", 0) + (
+                profit * 65
+            )  # 65 = NIFTY lot size
 
             # Place BUY order to close old SELL (buy back)
-            old_sell_tsym = f"NIFTY{expiry.replace('-', '')}{option_type}{old_sell_strike}"
+            old_sell_tsym = (
+                f"NIFTY{expiry.replace('-', '')}{option_type}{old_sell_strike}"
+            )
             close_order = place_order(
                 symbol=old_sell_tsym,
                 action_type="BUY",
@@ -476,14 +510,18 @@ def execute_sell_shift(trade: dict, proposal: Dict) -> Dict:
                 order_type="SHIFT_CLOSE",
                 component="leg_shifter",
                 trade_id=trade.get("trade_id"),
-                reason=f"SELL_SHIFT_CLOSE: {old_sell_strike} (profit=₹{profit*65:.0f})",
+                reason=f"SELL_SHIFT_CLOSE: {old_sell_strike} (profit=₹{profit * 65:.0f})",
             )
 
         # Step 2: Remove old SELL leg
         trade["legs"] = [
             l
             for l in trade.get("legs", [])
-            if not (l.get("type") == option_type and l.get("action") == "SELL" and l.get("strike") == old_sell_strike)
+            if not (
+                l.get("type") == option_type
+                and l.get("action") == "SELL"
+                and l.get("strike") == old_sell_strike
+            )
         ]
 
         # Step 3: Place SELL order for new SELL position (OPEN)
@@ -539,7 +577,9 @@ def execute_sell_shift(trade: dict, proposal: Dict) -> Dict:
 if __name__ == "__main__":
     # Test with mock trade
     print("[LEG_SHIFTER] Test mode\n")
-    print("Import via: from leg_shifter import run_leg_shifter, execute_hedge_shift, execute_sell_shift")
+    print(
+        "Import via: from leg_shifter import run_leg_shifter, execute_hedge_shift, execute_sell_shift"
+    )
     print("Call: proposals = run_leg_shifter(trade, available_margin)")
     print("Then: result = execute_hedge_shift(trade, proposals['hedge_shift'])")
     print("      result = execute_sell_shift(trade, proposals['sell_shift'])")
