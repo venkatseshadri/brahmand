@@ -26,17 +26,17 @@ sys.path.insert(0, str(Path(__file__).parent))
 load_dotenv()
 
 from trade_execution_db import add_active_trade
+from lock import acquire_lock, release_lock
+from state import load_state, save_state
 
 _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if _SANDBOX:
     STATE_DIR = Path(_SANDBOX) / "state"
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
 else:
     STATE_DIR = Path(__file__).parent / "data"
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
+STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOCK_FILE = STATE_DIR / "brahmand_kickoff.lock"
 STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
-
 
 from logger import get_logger, agent_log, chain_summary, log_exception
 
@@ -65,42 +65,6 @@ def _log_monitoring_event(event_type: str, trade_id: str, **details):
             f.write(json.dumps(event) + "\n")
     except Exception as e:
         _err(f"Failed to log monitoring event: {e}")
-
-
-def acquire_lock() -> bool:
-    if LOCK_FILE.exists():
-        pid = LOCK_FILE.read_text().strip()
-        try:
-            os.kill(int(pid), 0)
-            _log(f"Already running (PID {pid}) — skipping")
-            return False
-        except (OSError, ValueError):
-            pass
-    LOCK_FILE.write_text(str(os.getpid()))
-    return True
-
-
-def release_lock():
-    LOCK_FILE.unlink(missing_ok=True)
-
-
-def load_state() -> dict:
-    today = datetime.now().strftime("%Y%m%d")
-    if STATE_FILE.exists():
-        state = json.loads(STATE_FILE.read_text())
-        if state.get("date") == today:
-            return state
-    return {
-        "date": today,
-        "trades_today": 0,
-        "active_trade": None,
-        "all_trades": [],
-        "post_mortem_done": False,
-    }
-
-
-def save_state(state: dict):
-    STATE_FILE.write_text(json.dumps(state, indent=2, default=str))
 
 
 def now_str():
@@ -844,14 +808,14 @@ def run_pm(state: dict):
 
 
 def main():
-    if not acquire_lock():
+    if not acquire_lock(LOCK_FILE):
         sys.exit(0)
 
     try:
-        state = load_state()
+        state = load_state(STATE_FILE)
         today = datetime.now().strftime("%Y%m%d")
         if state["date"] != today:
-            state = load_state()  # Reset for new day
+            state = load_state(STATE_FILE)  # Reset for new day
             state["date"] = today
 
         if not is_market_hours():
@@ -903,9 +867,9 @@ def main():
             )
             _log(f"  Skip entry check: {reason}")
 
-        save_state(state)
+        save_state(STATE_FILE, state)
     finally:
-        release_lock()
+        release_lock(LOCK_FILE)
 
 
 if __name__ == "__main__":
