@@ -8,12 +8,21 @@ Order routing via order_routing module functions.
 
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Type
 
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
+
+
+def _weekly_expiry() -> str:
+    """Compute next Tuesday expiry as fallback default (NIFTY weekly expiry)."""
+    now = datetime.now()
+    days = (1 - now.weekday()) % 7  # Monday=0, Tuesday=1
+    if days == 0:
+        days = 7
+    return (now + timedelta(days=days)).strftime("%d-%b-%Y").upper()
 
 
 class ResolveContractsInput(BaseModel):
@@ -23,7 +32,9 @@ class ResolveContractsInput(BaseModel):
     )
     atm: int = Field(default=0, description="At-the-money strike price")
     wing_width: int = Field(default=200, description="Wing width from ATM")
-    expiry: str = Field(default="", description="Expiry date, e.g. 26-MAY-2026")
+    expiry: str = Field(
+        default_factory=_weekly_expiry, description="Expiry date, e.g. 26-MAY-2026"
+    )
 
 
 # ── Contract Agent Tool ──────────────────────────────────────────────────
@@ -114,7 +125,7 @@ class ExecutePaperTradeInput(BaseModel):
     spot: float = Field(default=0.0)
     atm: int = Field(default=0)
     vix: float = Field(default=0.0)
-    expiry: str = Field(default="")
+    expiry: str = Field(default_factory=_weekly_expiry)
     wing_width: int = Field(default=200)
     sl_pct: float = Field(default=0.25)
     tp_pct: float = Field(default=0.50)
