@@ -2,16 +2,17 @@
 """
 Brahmand Entry Setup — preflight guard for kickoff.
 
-Called by cron/run_kickoff.sh. Handles ALL preparatory work:
-  1. Acquire lock
-  2. Load + roll over state (date change)
-  3. Market hours check
-  4. Order status check (active trade / max trades / cooldown)
-  5. If all clear → run kickoff chain
+Called directly by cron every 5 min during market hours:
+  1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /usr/bin/python3 /home/trading_ceo/brahmand/entry_setup.py
 
-Roles:
-  entry_setup.py → preflight + guard + state
-  kickoff.py     → run the 5-agent chain ONLY
+Handles ALL preparatory work:
+  1. Process guard (pgrep self — skip if already running)
+  2. Source .env (antariksh + brahmand)
+  3. Acquire lock
+  4. Load + roll over state
+  5. Market hours check
+  6. Order status check (active / max trades / cooldown)
+  7. If all clear → run kickoff chain
 
 Usage:
     python entry_setup.py                # full flow (cron)
@@ -20,19 +21,25 @@ Usage:
 
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent))
-load_dotenv()
 
-from lock import acquire_lock, release_lock
-from market_data import is_market_hours
-from state import load_state, save_state, rollover_if_new_day
+# Source env files BEFORE other imports (may need env vars)
+for env_file in [
+    Path("/home/trading_ceo/antariksh/.env"),
+    Path(__file__).parent / ".env",
+]:
+    if env_file.exists():
+        load_dotenv(env_file, override=True)
+
 from logger import get_logger
 
+_log = get_logger("entry_setup").info
 
 SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if SANDBOX:
@@ -46,7 +53,21 @@ ORDER_LEDGER = Path(__file__).parent / "data" / "order_ledger.json"
 MAX_TRADES = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
 COOLDOWN_MIN = int(os.environ.get("BRAHMAND_COOLDOWN_MIN", 15))
 
-_log = get_logger("entry_setup").info
+
+def _already_running() -> bool:
+    try:
+        result = subprocess.run(
+            ["pgrep", "-f", "entry_setup.py|kickoff.py"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        pids = [
+            p for p in result.stdout.strip().split("\n") if p and p != str(os.getpid())
+        ]
+        return len(pids) > 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
 
 
 def _has_active_order() -> tuple[bool, str]:
@@ -95,7 +116,18 @@ def _has_active_order() -> tuple[bool, str]:
 
 
 def main():
+    from lock import acquire_lock, release_lock
+    from market_data import is_market_hours
+    from state import load_state, save_state, rollover_if_new_day
+
     dry = "--dry-run" in sys.argv
+
+    if _already_running():
+        msg = "Already running — exiting"
+        _log(msg)
+        if dry:
+            print(f"BLOCKED: {msg}")
+        sys.exit(0)
 
     if not acquire_lock(LOCK_FILE):
         msg = "Lock held — exiting"
