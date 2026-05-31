@@ -25,6 +25,11 @@ load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
+from verification import (
+    verify_provenance,
+    verify_regime_provenance,
+    verify_strategy_provenance,
+)
 
 _log = get_logger("chain").info
 _agent = get_logger("chain")
@@ -63,154 +68,6 @@ def _parse_json_output(raw: str) -> dict:
         return json.loads(match.group())
     except json.JSONDecodeError:
         return {}
-
-
-def _recompute_regime(vix: float, adx: float) -> dict:
-    """Deterministic regime from VIX/ADX. Same rules as entry_tools.score_regime()."""
-    if vix > 25:
-        return {"recommendation": "skip", "vix": vix, "adx": adx}
-    if adx and adx < 20:
-        return {"recommendation": "skip", "vix": vix, "adx": adx}
-    if vix > 18:
-        return {"recommendation": "caution", "vix": vix, "adx": adx}
-    if adx and adx < 25:
-        return {"recommendation": "caution", "vix": vix, "adx": adx}
-    return {"recommendation": "enter", "vix": vix, "adx": adx}
-
-
-def _verify_regime_provenance(regime: dict, vix: float, adx: float) -> bool:
-    """Verify regime agent recommendation against deterministic recomputation.
-    Clamps hallucinated VIX/ADX values and incorrect recommendations."""
-    expected = _recompute_regime(vix, adx)
-    violations = []
-    agent_vix = regime.get("vix", 0)
-    agent_adx = regime.get("adx", 0)
-
-    if agent_vix and abs(agent_vix - vix) > 0.5:
-        violations.append(f"vix agent={agent_vix:.1f} actual={vix:.1f}")
-        regime["vix"] = vix
-    if agent_adx and abs(agent_adx - adx) > 1.0:
-        violations.append(f"adx agent={agent_adx:.1f} actual={adx:.1f}")
-        regime["adx"] = adx
-
-    if regime.get("recommendation") != expected["recommendation"]:
-        violations.append(
-            f"rec agent={regime.get('recommendation')} expected={expected['recommendation']}"
-        )
-        regime["recommendation"] = expected["recommendation"]
-
-    if violations:
-        _err(f"PROVENANCE VIOLATION [REGIME]: {', '.join(violations)} — CLAMPED")
-        return False
-
-    _log(
-        f"  Regime: {regime['recommendation'].upper()} "
-        f"(VIX={vix:.1f}, ADX={adx:.1f}) — provenance OK"
-    )
-    return True
-
-
-def _verify_strategy_provenance(strategy: dict) -> bool:
-    """Verify strategy agent output against deterministic parameter rules.
-    Validates and clamps: wing_width, sl_pct, tp_pct, strategy_type."""
-    violations = []
-
-    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD", "IRON_BUTTERFLY"}
-    if strategy.get("strategy_type") not in VALID_TYPES:
-        violations.append(f"strategy_type={strategy.get('strategy_type')}")
-        strategy["strategy_type"] = "IRON_BUTTERFLY"
-
-    ww = strategy.get("wing_width", 200)
-    if not isinstance(ww, (int, float)) or ww < 50 or ww > 500:
-        violations.append(f"wing_width={ww}")
-        strategy["wing_width"] = 200
-
-    sl_p = strategy.get("sl_pct", 0.25)
-    if not isinstance(sl_p, (int, float)) or sl_p < 0.10 or sl_p > 0.50:
-        violations.append(f"sl_pct={sl_p}")
-        strategy["sl_pct"] = 0.25
-
-    tp_p = strategy.get("tp_pct", 0.50)
-    if not isinstance(tp_p, (int, float)) or tp_p < 0.15 or tp_p > 0.75:
-        violations.append(f"tp_pct={tp_p}")
-        strategy["tp_pct"] = 0.50
-
-    if violations:
-        _err(f"PROVENANCE VIOLATION [STRATEGY]: {', '.join(violations)} — CLAMPED")
-        return False
-    return True
-
-
-def _recompute_gate(decision: dict, gate_type: str) -> dict:
-    """Recompute the deterministic gate output from agent's trend+TL signals.
-    Returns (expected_go, expected_confidence). Used for provenance check.
-    """
-    t_sig = decision.get("trend_signal", "NEUTRAL").upper()
-    t_conf = decision.get("trend_confidence", 50)
-    tl_sig = decision.get("traffic_light_signal", "NEUTRAL").upper()
-    tl_conf = decision.get("traffic_light_confidence", 50)
-
-    go = False
-    confidence = 0
-
-    if gate_type == "NOT_UP":
-        if t_sig == "BEARISH" and tl_sig == "BEARISH":
-            go = True
-            confidence = round((t_conf + tl_conf) / 2)
-        elif (t_sig == "BEARISH" and tl_sig == "NEUTRAL") or (
-            t_sig == "NEUTRAL" and tl_sig == "BEARISH"
-        ):
-            go = True
-            confidence = round(max(t_conf if t_sig == "BEARISH" else tl_conf, 0) * 0.67)
-        elif t_sig == "BULLISH" or tl_sig == "BULLISH":
-            go = False
-            confidence = 0
-        else:
-            go = False
-            confidence = 0
-    else:  # NOT_DOWN
-        if t_sig == "BULLISH" and tl_sig == "BULLISH":
-            go = True
-            confidence = round((t_conf + tl_conf) / 2)
-        elif (t_sig == "BULLISH" and tl_sig == "NEUTRAL") or (
-            t_sig == "NEUTRAL" and tl_sig == "BULLISH"
-        ):
-            go = True
-            confidence = round(max(t_conf if t_sig == "BULLISH" else tl_conf, 0) * 0.67)
-        elif t_sig == "BEARISH" or tl_sig == "BEARISH":
-            go = False
-            confidence = 0
-        else:
-            go = False
-            confidence = 0
-
-    return {"go": go, "confidence": confidence}
-
-
-def _verify_provenance(decision: dict, gate_type: str) -> bool:
-    """Verify agent decision numbers match deterministic gate recomputation.
-    Returns True if clean, False if hallucination detected (patches decision)."""
-    expected = _recompute_gate(decision, gate_type)
-
-    violations = []
-    if decision.get("go") != expected["go"]:
-        violations.append(f"go agent={decision.get('go')} expected={expected['go']}")
-        decision["go"] = expected["go"]  # clamp to truth
-    if decision.get("confidence", 0) != expected["confidence"]:
-        violations.append(
-            f"confidence agent={decision.get('confidence')} expected={expected['confidence']}"
-        )
-        decision["confidence"] = expected["confidence"]  # clamp to truth
-
-    if violations:
-        _err(
-            f"PROVENANCE VIOLATION [{gate_type}]: {', '.join(violations)}  "
-            f"trend={decision.get('trend_signal')}/{decision.get('trend_confidence')}% "
-            f"tl={decision.get('traffic_light_signal')}/{decision.get('traffic_light_confidence')}% "
-            f"— CLAMPED to deterministic values"
-        )
-        return False
-    return True
 
 
 def _get_research_consensus() -> str:
@@ -390,11 +247,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     expiry = snap.get("expiry_weekly", "")
     # Guard: if data capture didn't run today, expiry_weekly may be stale (yesterday's)
     # Never trade expired contracts — compute fresh expiry
-    from datetime import date as _dt
-
     try:
         expiry_dt = datetime.strptime(expiry, "%d-%b-%Y").date()
-        if expiry_dt < _dt.today():
+        if expiry_dt < datetime.now().date():
             _log(f"  ⚠ expiry_weekly {expiry} is stale (past) — computing fresh")
             today_dt = datetime.now()
             days_to_tue = (1 - today_dt.weekday()) % 7
@@ -483,11 +338,11 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             )  # Regime
 
             # Provenance guard: clamp hallucinated numbers to deterministic tool values
-            _verify_provenance(not_up_decision, "NOT_UP") if not_up_decision else None
-            _verify_provenance(
+            verify_provenance(not_up_decision, "NOT_UP") if not_up_decision else None
+            verify_provenance(
                 not_down_decision, "NOT_DOWN"
             ) if not_down_decision else None
-            _verify_regime_provenance(regime, vix, adx) if regime else None
+            verify_regime_provenance(regime, vix, adx) if regime else None
 
             # ── Research Override: research is macro regime, trend+TL is micro timing ──
             # No signal (both NEUTRAL) or conflict (trend≠TL) = market uncertain
@@ -707,7 +562,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "signal", "NOT_UP"
     )
 
-    strat_clean = _verify_strategy_provenance(strategy)
+    strat_clean = verify_strategy_provenance(strategy)
     ww = strategy.get("wing_width", 200)
     sl_p = strategy.get("sl_pct", 0.25)
     tp_p = strategy.get("tp_pct", 0.50)
@@ -784,117 +639,6 @@ def _deterministic_fallback(entry_time, spot, atm, vix, adx, snap):
         "vix": vix,
         "adx": adx,
         "regime_entry_signal": decision["signal"],
-    }
-
-
-def _resolve_contracts(
-    atm: int, wing_width: int, expiry: str, option_tool, strategy_type: str
-) -> tuple:
-    """Generate leg specs from strategy + query SQLite option_prices for tsyms/LTPs."""
-    import sqlite3
-    from antariksh.config.sqlite_schema import get_sqlite_capture_path
-
-    db_path = get_sqlite_capture_path("NIFTY")
-
-    if strategy_type == "PUT_SPREAD":
-        leg_specs = [
-            ("sell_pe", atm, "PE", "SELL"),
-            ("buy_pe", atm - wing_width, "PE", "BUY"),
-        ]
-    elif strategy_type == "CALL_SPREAD":
-        leg_specs = [
-            ("sell_ce", atm, "CE", "SELL"),
-            ("buy_ce", atm + wing_width, "CE", "BUY"),
-        ]
-    else:
-        leg_specs = [
-            ("center_ce", atm, "CE", "SELL"),
-            ("center_pe", atm, "PE", "SELL"),
-            ("wing_below", atm - wing_width, "PE", "BUY"),
-            ("wing_above", atm + wing_width, "CE", "BUY"),
-        ]
-
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
-    try:
-        result = {}
-        for label, strike, ot, action in leg_specs:
-            row = conn.execute(
-                "SELECT tsym, ltp FROM option_prices "
-                "WHERE strike = ? AND option_type = ? "
-                "ORDER BY timestamp DESC LIMIT 1",
-                (strike, ot),
-            ).fetchone()
-            if row and row["tsym"]:
-                result[label] = {
-                    "tsym": row["tsym"],
-                    "ltp": float(row["ltp"] or 0),
-                    "strike": strike,
-                    "option_type": ot,
-                    "action": action,
-                }
-            else:
-                result[label] = {
-                    "tsym": f"NIFTY{expiry.replace('-', '')}{ot[0]}{strike}",
-                    "ltp": 0.0,
-                    "strike": strike,
-                    "option_type": ot,
-                    "action": action,
-                }
-        return result, leg_specs
-    finally:
-        conn.close()
-
-
-def _build_trade(
-    entry_time,
-    spot,
-    atm,
-    vix,
-    expiry,
-    ww,
-    sl_p,
-    tp_p,
-    contracts,
-    strategy_type,
-) -> dict:
-    legs = []
-    sl = {}
-    tp = {}
-    prem_sell = 0.0
-    prem_buy = 0.0
-    for label, c in contracts.items():
-        leg = {
-            "action": c["action"],
-            "strike": c["strike"],
-            "type": c["option_type"],
-            "fill_price": c["ltp"],
-            "tsym": c["tsym"],
-        }
-        legs.append(leg)
-        if c["action"] == "SELL":
-            prem_sell += c["ltp"]
-            key = c["option_type"].lower()
-            sl[key] = round(c["ltp"] * (1 + sl_p), 2)
-            tp[key] = round(c["ltp"] * (1 - tp_p), 2)
-        else:
-            prem_buy += c["ltp"]
-    return {
-        "entry_time": entry_time,
-        "spot_at_entry": spot,
-        "atm_strike": atm,
-        "vix": vix,
-        "expiry": expiry,
-        "wing_width": ww,
-        "strategy_type": strategy_type,
-        "leg_count": len(legs),
-        "net_credit": round(prem_sell - prem_buy, 2),
-        "premium_sell": round(prem_sell, 2),
-        "premium_buy": round(prem_buy, 2),
-        "legs": legs,
-        "sl": sl,
-        "tp": tp,
-        "status": "OPEN",
     }
 
 
