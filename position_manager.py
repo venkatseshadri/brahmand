@@ -968,7 +968,7 @@ if __name__ == "__main__":
     if args.bridge:
         run_bridge()
     elif args.test:
-        from kickoff import load_state
+        from state import load_state
 
         state = load_state()
         t = state.get("active_trade")

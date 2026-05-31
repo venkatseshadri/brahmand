@@ -17,7 +17,6 @@ State tracked in data/brahmand_kickoff.json:
 
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -26,7 +25,7 @@ load_dotenv()
 
 from market_data import is_market_hours, now_str
 from lock import acquire_lock, release_lock
-from state import load_state, save_state
+from state import load_state, save_state, rollover_if_new_day, activate_trade
 
 _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if _SANDBOX:
@@ -46,16 +45,12 @@ _log = get_logger("kickoff").info
 
 
 def run_entry_pipeline(state: dict):
-    """Run Entry → Regime → Strategy → Contract → Execution → Risk chain.
-    Entry Agent is the first gate — called inline, not from a stale file."""
     from e2e_chain import run_full_chain
 
     entry_time = now_str()
     try:
         trade = run_full_chain(entry_time)
     except Exception as e:
-        from logger import log_exception
-
         log_exception(get_logger("kickoff"), e, "Chain failed")
         return state
     if trade is None:
@@ -68,44 +63,10 @@ def run_entry_pipeline(state: dict):
         _log("  SKIP: Entry Agent NO-GO")
         return state
 
-    strategy_type = trade.get("strategy_type", "IRON_BUTTERFLY")
-
-    # Store entry_scores on trade for pattern logging on exit
-    trade["entry_gate_signal"] = trade.get(
-        "entry_gate_signal", trade.get("entry_scores", {}).get("signal", "UNKNOWN")
-    )
-    trade["monitored_since"] = entry_time
-
-    # Initialize monitoring phase tracking for postmortem analysis
-    trade["monitoring_events"] = {
-        "tsl_adjustments": [],  # TSL ratchet history
-        "morph_actions": [],  # Signal reversal actions
-        "shift_actions": [],  # Premium decay shifts
-        "mtm_checks": [],  # P&L snapshots during monitoring
-    }
-
-    state["active_trade"] = trade
-    state["trades_today"] += 1
-
-    # Link to previous trade (re-entry chain)
-    if state.get("all_trades"):
-        prev = state["all_trades"][-1]
-        trade["parent_trade_id"] = prev.get("trade_id", "?")
-        trade["parent_exit_reason"] = prev.get("exit_reason", "?")
-        trade["re_entry_count"] = (
-            (prev.get("re_entry_count", 0) + 1) if prev.get("exit_reason") else 0
-        )
-
-    # Order creation is owned by the execution agent via place_entry_orders()
-    # (tools/chain_tools.py), which writes to BOTH order_ledger.json AND
-    # trade_execution.duckdb atomically. No duplicate writes here.
-
-    # SL/TP placement is OWNED by the LLM RISK agent (primary). A deterministic
-    # fallback in position_manager.run_bridge places them only when the LLM is down.
-    # Do NOT hard-place SL/TP here — see risk_agent_crew.py docstring (reverted 2x).
+    activate_trade(state, trade, entry_time)
 
     _log(
-        f"ENTERED: {strategy_type} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
+        f"ENTERED: {trade.get('strategy_type', '?')} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
     return state
 
@@ -117,10 +78,8 @@ def main():
 
     try:
         state = load_state(STATE_FILE)
-        today = datetime.now().strftime("%Y%m%d")
-        if state["date"] != today:
-            _log(f"New trading day: {today} (was {state['date']})")
-            state["date"] = today
+        if rollover_if_new_day(state):
+            _log(f"New trading day: {state['date']}")
 
         if not is_market_hours():
             if state["active_trade"]:
