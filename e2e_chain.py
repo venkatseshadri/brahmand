@@ -14,7 +14,6 @@ Contract/Execution/Risk are pure Python (no LLM, no CrewAI overhead).
 """
 
 import json
-import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -25,6 +24,10 @@ load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
+from entry_agent import get_research_consensus
+from llm import get_llm
+from parsing import parse_json_output
+from fallback import deterministic_fallback
 from verification import (
     verify_provenance,
     verify_regime_provenance,
@@ -40,69 +43,13 @@ _err = lambda msg, exc=None: (
 )
 
 
-def _get_llm():
-    """Return DeepSeek LLM or None if unavailable."""
-    from crewai import LLM
-
-    api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-    if not api_key:
-        return None
-    return LLM(
-        model="deepseek/deepseek-chat",
-        base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
-        api_key=api_key,
-        temperature=0,
-    )
-
-
-def _parse_json_output(raw: str) -> dict:
-    """Extract JSON from agent raw output (may have markdown fences)."""
-    import re
-
-    if not raw or not raw.strip():
-        return {}
-    match = re.search(r"\{(?:[^{}]|\{[^{}]*\})*\}", raw, re.DOTALL)
-    if not match:
-        return {}
-    try:
-        return json.loads(match.group())
-    except json.JSONDecodeError:
-        return {}
-
-
-def _get_research_consensus() -> str:
-    """Load ChromaDB research patterns and return consensus direction.
-    Returns BULLISH, BEARISH, NEUTRAL, or UNKNOWN if ChromaDB unavailable."""
-    try:
-        from entry_agent import EntryAgent
-
-        ea = EntryAgent()
-        if not ea.patterns:
-            return "UNKNOWN"
-
-        directions = [p.get("predicted_direction", "NEUTRAL") for p in ea.patterns]
-        bull = sum(1 for d in directions if d == "BULLISH")
-        bear = sum(1 for d in directions if d == "BEARISH")
-        neutral = sum(1 for d in directions if d == "NEUTRAL")
-
-        if neutral >= len(directions) * 0.5:
-            return "NEUTRAL"
-        elif bull > bear:
-            return "BULLISH"
-        elif bear > bull:
-            return "BEARISH"
-        return "NEUTRAL"
-    except Exception:
-        return "UNKNOWN"
-
-
 def run_sequential_crew(entry_time: str) -> dict | None:
     """
     Run Entry → Regime → Strategy as a single sequential CrewAI pipeline.
     Returns the combined agent decisions dict or None if Entry says NO-GO
     or if any agent fails.
     """
-    llm = _get_llm()
+    llm = get_llm()
 
     from factory import AgentFactory, TaskFactory
     from market_data import MarketDataQueryTool, get_latest_market_snapshot
@@ -172,7 +119,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
     if not llm:
         _log("  E2E Chain: ⚠ No LLM — using deterministic fallback")
-        return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+        return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     # ── Build tools ────────────────────────────────────────────────────
     from tools.entry_gate_tools import (
@@ -242,7 +189,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         risk_agent.llm = llm
     except KeyError as e:
         _log(f"  ⚠ Agent factory: {e}")
-        return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+        return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     expiry = snap.get("expiry_weekly", "")
     # Guard: if data capture didn't run today, expiry_weekly may be stale (yesterday's)
@@ -317,7 +264,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         entry_result = entry_crew.kickoff()
     except Exception as e:
         _log(f"  Entry Crew failed: {e}")
-        return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+        return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     # Parse dual Entry Agents output
     not_up_decision = {}
@@ -325,14 +272,14 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     regime = {}
     if hasattr(entry_result, "tasks_output"):
         try:
-            not_up_decision = _parse_json_output(
+            not_up_decision = parse_json_output(
                 str(entry_result.tasks_output[0])
             )  # NOT_UP agent
-            not_down_decision = _parse_json_output(
+            not_down_decision = parse_json_output(
                 str(entry_result.tasks_output[1])
             )  # NOT_DOWN agent
             regime = (
-                _parse_json_output(str(entry_result.tasks_output[2]))
+                parse_json_output(str(entry_result.tasks_output[2]))
                 if len(entry_result.tasks_output) > 2
                 else {}
             )  # Regime
@@ -347,7 +294,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             # ── Research Override: research is macro regime, trend+TL is micro timing ──
             # No signal (both NEUTRAL) or conflict (trend≠TL) = market uncertain
             # → take Iron Butterfly at moderate confidence
-            research_consensus = _get_research_consensus()
+            research_consensus = get_research_consensus()
             if research_consensus == "NEUTRAL":
                 t_sig = not_up_decision.get("trend_signal", "").upper()
                 tl_sig = not_up_decision.get("traffic_light_signal", "").upper()
@@ -384,7 +331,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
 
         except Exception as e:
             _err(f"Entry gate parse failed: {e}")
-            return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+            return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     agent_log(_agent, "NotUpEntry_Agent", not_up_decision)
     agent_log(_agent, "NotDownEntry_Agent", not_down_decision)
@@ -529,7 +476,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         result = full_crew.kickoff()
     except Exception as e:
         _log(f"  Strategy/Execution Crew failed: {e}")
-        return _deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+        return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     # ── Log remaining agent outputs ─────────────────────────────────────
     agent_names = ["Strategy", "Contract", "Execution", "Risk"]
@@ -539,7 +486,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             if i < len(result.tasks_output):
                 raw = str(result.tasks_output[i])
                 try:
-                    parsed = _parse_json_output(raw)
+                    parsed = parse_json_output(raw)
                     parsed_outputs[i] = parsed
                     agent_log(_agent, f"{name}_Agent", parsed)
                 except Exception:
@@ -587,58 +534,6 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "adx": adx,
         "expiry": expiry,
         "regime_entry_signal": regime_entry_signal,
-    }
-
-
-def _deterministic_fallback(entry_time, spot, atm, vix, adx, snap):
-    """Deterministic fallback when LLM is unavailable."""
-    from pathlib import Path as _Path
-
-    _ANTARIKSH = _Path(__file__).parent.parent / "antariksh"
-    sys.path.insert(0, str(_ANTARIKSH))
-
-    from tools.entry_tools import (
-        score_trend_redis,
-        score_traffic_light_redis,
-        combine_entry_scores,
-    )
-
-    trend = score_trend_redis("NIFTY")
-    tl = score_traffic_light_redis("NIFTY")
-    decision = combine_entry_scores(trend, tl)
-
-    _log(
-        f"  Entry (deterministic): {'GO' if decision['go'] else 'NO-GO'} | "
-        f"{decision['signal']} {decision['confidence']}% | → {decision.get('suggested_trade')}"
-    )
-
-    if not decision["go"]:
-        return {"recommendation": "no_go", "entry_decision": decision}
-
-    stype = {
-        "NOT_UP": "CALL_SPREAD",
-        "NOT_DOWN": "PUT_SPREAD",
-    }.get(decision["signal"], "CALL_SPREAD")
-
-    return {
-        "entry_decision": decision,
-        "regime": {
-            "regime": "sideways" if adx < 25 else "trending",
-            "recommendation": "caution" if vix > 18 else "enter",
-            "confidence": 0.6,
-        },
-        "strategy": {
-            "strategy_type": stype,
-            "wing_width": 200,
-            "sl_pct": 0.25,
-            "tp_pct": 0.50,
-            "entry_signal": decision["signal"],
-        },
-        "atm": atm,
-        "spot": spot,
-        "vix": vix,
-        "adx": adx,
-        "regime_entry_signal": decision["signal"],
     }
 
 

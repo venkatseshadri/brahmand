@@ -443,3 +443,29 @@ if __name__ == "__main__":
             print(f"   ├─ Target: {signal.target_points}+ pts")
             print(f"   └─ Position Size: {signal.recommended_size:.1%}")
         print()
+
+
+def get_research_consensus() -> str:
+    """Load ChromaDB research patterns and return consensus direction.
+    Returns BULLISH, BEARISH, NEUTRAL, or UNKNOWN if ChromaDB unavailable."""
+    try:
+        from entry_agent import EntryAgent
+
+        ea = EntryAgent()
+        if not ea.patterns:
+            return "UNKNOWN"
+
+        directions = [p.get("predicted_direction", "NEUTRAL") for p in ea.patterns]
+        bull = sum(1 for d in directions if d == "BULLISH")
+        bear = sum(1 for d in directions if d == "BEARISH")
+        neutral = sum(1 for d in directions if d == "NEUTRAL")
+
+        if neutral >= len(directions) * 0.5:
+            return "NEUTRAL"
+        elif bull > bear:
+            return "BULLISH"
+        elif bear > bull:
+            return "BEARISH"
+        return "NEUTRAL"
+    except Exception:
+        return "UNKNOWN"

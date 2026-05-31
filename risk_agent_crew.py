@@ -57,25 +57,7 @@ logger = logging.getLogger("RiskAgentCrew")
 
 # ── LLM Provider ──────────────────────────────────────────────────────────────
 
-
-def _get_llm():
-    """Return DeepSeek LLM or None if unavailable."""
-    try:
-        from crewai import LLM
-
-        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-        if not api_key:
-            logger.warning("DEEPSEEK_API_KEY not set — Risk Agent disabled")
-            return None
-        return LLM(
-            model="deepseek/deepseek-chat",
-            base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
-            api_key=api_key,
-            temperature=0,
-        )
-    except Exception as e:
-        logger.warning(f"LLM init failed: {e}")
-        return None
+from llm import get_llm
 
 
 # ── Trade Loader ──────────────────────────────────────────────────────────────
@@ -538,7 +520,9 @@ STEP 4: Output: {{"risk_decision": "ACTIVE"|"CLOSED", "actions": [...], "pnl": X
 
 def evaluate_trade(trade: dict) -> dict:
     """Evaluate a single trade through the risk agent crew. Returns decisions."""
-    llm = _get_llm()
+    llm = get_llm()
+    if not llm:
+        logger.warning("DEEPSEEK_API_KEY not set — Risk Agent disabled")
     if not llm:
         return {"error": "LLM unavailable", "trade_id": trade.get("trade_id")}
 
