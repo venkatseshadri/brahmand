@@ -15,25 +15,42 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-sys.path.insert(0, str(Path(__file__).parent))
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s"
+)
 logger = logging.getLogger("PreMarketValidation")
 
-# Import modules to test
-try:
+
+def _import_modules():
     from margin_capture import capture_margins, _get_atm, _get_expiry
-    from wing_optimizer import get_optimal_wing, _check_margin_freshness, _check_premium_freshness, compare_wings
-except ImportError as e:
-    logger.error(f"❌ Import failed: {e}")
-    sys.exit(1)
+    from wing_optimizer import (
+        get_optimal_wing,
+        _check_margin_freshness,
+        _check_premium_freshness,
+        compare_wings,
+    )
+
+    return (
+        capture_margins,
+        _get_atm,
+        _get_expiry,
+        get_optimal_wing,
+        _check_margin_freshness,
+        _check_premium_freshness,
+        compare_wings,
+    )
 
 
 def test_margin_capture():
     """Test 1: Can we capture margins from Shoonya?"""
-    logger.info("\n" + "="*70)
+    capture_margins, _get_atm, _get_expiry, _, _, _, _ = _import_modules()
+
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 1: Margin Capture")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     atm = _get_atm()
     expiry = _get_expiry()
@@ -63,13 +80,19 @@ def test_margin_capture():
 
     # Check all spreads have valid margins
     if spreads_ok < 10:
-        logger.warning(f"⚠️  Only {spreads_ok}/10 spreads captured (some API calls failed)")
+        logger.warning(
+            f"⚠️  Only {spreads_ok}/10 spreads captured (some API calls failed)"
+        )
         failed = [s for s in spreads if s.get("margin") is None]
         for f in failed[:2]:
-            logger.warning(f"   {f['type']} {f['sell_strike']}-{f['buy_strike']}: {f.get('error')}")
+            logger.warning(
+                f"   {f['type']} {f['sell_strike']}-{f['buy_strike']}: {f.get('error')}"
+            )
 
     # Verify margins are positive
-    bad_margins = [s for s in spreads if s.get("margin") is not None and s["margin"] <= 0]
+    bad_margins = [
+        s for s in spreads if s.get("margin") is not None and s["margin"] <= 0
+    ]
     if bad_margins:
         logger.error(f"❌ {len(bad_margins)} spreads have non-positive margin")
         return False
@@ -80,11 +103,13 @@ def test_margin_capture():
 
 def test_margin_freshness():
     """Test 2: Is margin data fresh?"""
-    logger.info("\n" + "="*70)
-    logger.info("TEST 2: Data Freshness")
-    logger.info("="*70)
+    _, _, _, _, check_fresh, _, _ = _import_modules()
 
-    fresh, msg = _check_margin_freshness(max_age_minutes=60)
+    logger.info("\n" + "=" * 70)
+    logger.info("TEST 2: Data Freshness")
+    logger.info("=" * 70)
+
+    fresh, msg = check_fresh(max_age_minutes=60)
     logger.info(f"Margin freshness: {msg}")
 
     if not fresh:
@@ -98,12 +123,14 @@ def test_margin_freshness():
 
 def test_wing_optimizer():
     """Test 3: Can wing optimizer select valid wings?"""
-    logger.info("\n" + "="*70)
-    logger.info("TEST 3: Wing Optimizer")
-    logger.info("="*70)
+    _, get_atm, get_expiry, get_wing, _, _, compare = _import_modules()
 
-    atm = _get_atm()
-    expiry = _get_expiry()
+    logger.info("\n" + "=" * 70)
+    logger.info("TEST 3: Wing Optimizer")
+    logger.info("=" * 70)
+
+    atm = get_atm()
+    expiry = get_expiry()
 
     if not atm or not expiry:
         logger.error("❌ Cannot get ATM/expiry")
@@ -114,9 +141,9 @@ def test_wing_optimizer():
     for otype in ("PE", "CE"):
         logger.info(f"\n{otype} Spreads:")
         logger.info(f"  {'Wing':>5s} {'Margin':>10s} {'ROI%':>7s} {'R/R':>6s}")
-        logger.info("  " + "-"*35)
+        logger.info("  " + "-" * 35)
 
-        wings = compare_wings(otype, atm, expiry)
+        wings = compare(otype, atm, expiry)
 
         if not wings:
             logger.error(f"  ❌ No {otype} wings available")
@@ -128,14 +155,16 @@ def test_wing_optimizer():
                 f"  {w['wing']:>5d} ₹{w['margin']:>9,.0f} {w['roi_pct']:>6.1f}% {w['rr']:>5.2f}"
             )
 
-        best = get_optimal_wing(otype, atm, expiry)
+        best = get_wing(otype, atm, expiry)
 
         if not best:
             logger.error(f"  ❌ No valid {otype} wing selected")
             success = False
             continue
 
-        logger.info(f"  → SELECTED: {best['wing_width']}pt wing | ROI {best['roi_pct']}% | R/R {best['rr']}")
+        logger.info(
+            f"  → SELECTED: {best['wing_width']}pt wing | ROI {best['roi_pct']}% | R/R {best['rr']}"
+        )
 
         # Verify it meets criteria
         if best["roi_pct"] < 5.0:
@@ -153,9 +182,9 @@ def test_wing_optimizer():
 
 def test_edge_cases():
     """Test 4: Edge case handling"""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 4: Edge Case Handling")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Load margin matrix to inspect
     margin_file = Path("/home/trading_ceo/brahmand/data/margin_matrix.json")
@@ -166,7 +195,11 @@ def test_edge_cases():
     data = json.loads(margin_file.read_text())
 
     # Check for zero/negative margins
-    bad = [s for s in data.get("spreads", []) if s.get("margin") is not None and s["margin"] <= 0]
+    bad = [
+        s
+        for s in data.get("spreads", [])
+        if s.get("margin") is not None and s["margin"] <= 0
+    ]
     if bad:
         logger.error(f"❌ Found {len(bad)} spreads with non-positive margin")
         return False
@@ -192,9 +225,9 @@ def test_edge_cases():
 
 def test_duckdb_connectivity():
     """Test 5: DuckDB has option data?"""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 5: DuckDB Connectivity")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         import duckdb
@@ -213,9 +246,7 @@ def test_duckdb_connectivity():
         logger.info(f"✓ option_snapshots: {opt_count} rows")
 
         # Check latest timestamp
-        latest = db.execute(
-            "SELECT MAX(timestamp) FROM market_data"
-        ).fetchone()[0]
+        latest = db.execute("SELECT MAX(timestamp) FROM market_data").fetchone()[0]
         logger.info(f"✓ Latest market_data: {latest}")
 
         db.close()
@@ -235,10 +266,10 @@ def test_duckdb_connectivity():
 def main():
     """Run all pre-market tests."""
     print("\n")
-    print("╔" + "="*68 + "╗")
-    print("║" + " "*15 + "PRE-MARKET VALIDATION (May 20, 2026)" + " "*16 + "║")
-    print("║" + " "*16 + "Run this before 09:15 AM IST" + " "*26 + "║")
-    print("╚" + "="*68 + "╝")
+    print("╔" + "=" * 68 + "╗")
+    print("║" + " " * 15 + "PRE-MARKET VALIDATION (May 20, 2026)" + " " * 16 + "║")
+    print("║" + " " * 16 + "Run this before 09:15 AM IST" + " " * 26 + "║")
+    print("╚" + "=" * 68 + "╝")
 
     tests = [
         ("DuckDB Connectivity", test_duckdb_connectivity),
@@ -255,13 +286,14 @@ def main():
         except Exception as e:
             logger.error(f"❌ Test exception: {e}")
             import traceback
+
             traceback.print_exc()
             results[name] = False
 
     # Summary
     print("\n")
-    print("╔" + "="*68 + "╗")
-    print("║ " + " "*66 + " ║")
+    print("╔" + "=" * 68 + "╗")
+    print("║ " + " " * 66 + " ║")
     passed = sum(1 for v in results.values() if v)
     total = len(results)
     if passed == total:
@@ -271,13 +303,13 @@ def main():
         print("║ " + f"⚠️  SOME TESTS FAILED ({passed}/{total})".ljust(66) + " ║")
         print("║ " + "Fix issues before trading!".ljust(66) + " ║")
 
-    print("║ " + " "*66 + " ║")
+    print("║ " + " " * 66 + " ║")
     for name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         print("║ " + f"{status}: {name}".ljust(66) + " ║")
 
-    print("║ " + " "*66 + " ║")
-    print("╚" + "="*68 + "╝")
+    print("║ " + " " * 66 + " ║")
+    print("╚" + "=" * 68 + "╝")
     print()
 
     return passed == total

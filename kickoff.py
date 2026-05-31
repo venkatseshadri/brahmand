@@ -16,39 +16,37 @@ sys.path.insert(0, str(Path(__file__).parent))
 load_dotenv()
 
 from market_data import now_str
-from state import activate_trade
 from logger import get_logger, log_exception
 
 _log = get_logger("kickoff").info
 
 
-def run_entry_pipeline(state: dict) -> dict:
+def run_entry_pipeline(entry_time: str) -> dict | None:
     from e2e_chain import run_full_chain
 
-    entry_time = now_str()
     try:
         trade = run_full_chain(entry_time)
     except Exception as e:
         log_exception(get_logger("kickoff"), e, "Chain failed")
-        return state
+        return None
 
     if trade is None:
         _log("  SKIP: Gate rejected")
-        return state
+        return None
     if isinstance(trade, dict) and trade.get("recommendation") == "skip":
         _log(f"  SKIP: {trade.get('regime', 'unknown')}")
-        return state
+        return None
     if isinstance(trade, dict) and trade.get("recommendation") == "no_go":
         _log("  SKIP: Entry Agent NO-GO")
-        return state
+        return None
 
-    activate_trade(state, trade, entry_time)
+    trade["monitored_since"] = entry_time
 
     _log(
         f"ENTERED: {trade.get('strategy_type', '?')} "
         f"({trade.get('leg_count', 0)} legs) @ ₹{trade.get('net_credit', 0)} [{entry_time}]"
     )
-    return state
+    return trade
 
 
 if __name__ == "__main__":

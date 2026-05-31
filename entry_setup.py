@@ -160,20 +160,31 @@ def main():
             return
 
         from kickoff import run_entry_pipeline
+        from market_data import now_str
 
-        prev_count = state["trades_today"]
-        state = run_entry_pipeline(state)
+        entry_time = now_str()
+        trade = run_entry_pipeline(entry_time)
 
-        if state.get("trades_today", 0) > prev_count:
-            trade = state.get("active_trade", {})
+        if trade is not None:
+            if state.get("all_trades"):
+                prev = state["all_trades"][-1]
+                trade["parent_trade_id"] = prev.get("trade_id", "?")
+                trade["parent_exit_reason"] = prev.get("exit_reason", "?")
+                trade["re_entry_count"] = (
+                    (prev.get("re_entry_count", 0) + 1)
+                    if prev.get("exit_reason")
+                    else 0
+                )
+
+            state["active_trade"] = trade
+            state["trades_today"] += 1
+
             _log(
                 f"ENTERED: {state['trades_today']} today | "
                 f"{trade.get('strategy_type', '?')} @ ₹{trade.get('net_credit', 0)}"
             )
-        elif state.get("active_trade") is None:
-            _log("SKIP: Pipeline rejected entry")
         else:
-            _log("SKIP: No new entry (trade already active)")
+            _log("SKIP: Pipeline rejected entry")
 
         save_state(STATE_FILE, state)
     finally:
