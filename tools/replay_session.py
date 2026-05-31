@@ -422,7 +422,7 @@ class ReplaySession:
 
             if self.real_kickoff:
                 try:
-                    from kickoff import main as kickoff_main
+                    from entry_setup import main as kickoff_main
                     from lock import (
                         acquire_lock as kl_acquire,
                         release_lock as kl_release,

@@ -1,11 +1,9 @@
 #!/bin/bash
-# Guard script for kickoff.py (one-shot, ~5-min cadence during market hours)
-# Sources antariksh + brahmand .env, then:
-#   1. order_status.py  →  reads DuckDB order ledger, outputs JSON
-#   2. If active trade exists → skip kickoff.py entirely (Risk Monitor handles it)
-#   3. If no active trade      → run kickoff.py for entry
+# Run entry_setup.py on 5-min cadence during market hours.
+# entry_setup.py handles ALL preflight: lock, state, market check, order check.
+# kickoff.py is called internally only when all gates pass.
 #
-# Usage (cron):
+# Cron:
 #   1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_kickoff.sh
 
 set -e
@@ -13,39 +11,19 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 LOG_FILE="$PROJECT_DIR/logs/kickoff_$(date +%Y%m%d).log"
-LOCK_FILE="$PROJECT_DIR/locks/kickoff.lock"
-mkdir -p "$(dirname "$LOCK_FILE")" "$PROJECT_DIR/logs"
-PYTHON_BIN="/usr/bin/python3"
+mkdir -p "$PROJECT_DIR/logs"
 
-# Primary guard: skip this tick if a prior kickoff is still running (overrun).
-if pgrep -f "kickoff.py" > /dev/null; then
+# Primary guard: skip if a prior kickoff/entry_setup is still running.
+if pgrep -f "entry_setup.py\|kickoff.py" > /dev/null; then
     exit 0
 fi
 
-# Source and EXPORT env (antariksh first, then brahmand — matches prior cron).
+# Source env
 set -a
 [ -f /home/trading_ceo/antariksh/.env ] && . /home/trading_ceo/antariksh/.env
 [ -f "$PROJECT_DIR/.env" ] && . "$PROJECT_DIR/.env"
 set +a
 
-# Secondary guard: close the race between two near-simultaneous ticks.
-exec {LOCK_FD}>"$LOCK_FILE"
-if ! flock -n "$LOCK_FD"; then
-    exit 0
-fi
-
 cd "$PROJECT_DIR"
 
-# ── Gate: check order ledger BEFORE calling kickoff ──────────────────────────
-# order_status.py --quiet: exits 0 if kickoff should be SKIPPED
-# (active trade exists OR max trades reached for today).
-ORDER_STATUS_OUT=$("$PYTHON_BIN" "$PROJECT_DIR/order_status.py" 2>/dev/null) || true
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] order_status: $ORDER_STATUS_OUT" >> "$LOG_FILE"
-
-if "$PYTHON_BIN" "$PROJECT_DIR/order_status.py" --quiet 2>/dev/null; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Gate blocked (active trade or max trades) → skipping kickoff" >> "$LOG_FILE"
-    exit 0
-fi
-
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] No active trade → running kickoff" >> "$LOG_FILE"
-"$PYTHON_BIN" "$PROJECT_DIR/kickoff.py" >> "$LOG_FILE" 2>&1
+/usr/bin/python3 "$PROJECT_DIR/entry_setup.py" >> "$LOG_FILE" 2>&1
