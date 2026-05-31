@@ -27,7 +27,7 @@ class TradeSignal(BaseModel):
         description="Order direction — BUY or SELL",
     )
     strategy_type: str = Field(
-        default="CALL_SPREAD", description="Strategy name — CALL_SPREAD or PUT_SPREAD"
+        default="NONE", description="Strategy name — CALL_SPREAD, PUT_SPREAD, or NONE"
     )
     size: int = Field(default=1, ge=1, le=4, description="Number of lots (1-4)")
     strikes: Dict[str, int] = Field(

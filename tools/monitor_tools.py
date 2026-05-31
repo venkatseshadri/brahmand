@@ -58,7 +58,7 @@ class MorphCheckTool(BaseTool):
                 pass
 
         entry_signal = trade.get("entry_gate_signal", "NEUTRAL")
-        strategy = trade.get("strategy_type", "CALL_SPREAD")
+        strategy = trade.get("strategy_type", "NONE")
         morph_count = trade.get("morph_count", 0)
         max_morphs = 3
 

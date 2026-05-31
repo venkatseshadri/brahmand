@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 class ResolveContractsInput(BaseModel):
     strategy_type: str = Field(
-        default="CALL_SPREAD",
+        default="NONE",
         description="PUT_SPREAD | CALL_SPREAD",
     )
     atm: int = Field(default=0, description="At-the-money strike price")
@@ -42,7 +42,7 @@ class ResolveOptionContractsTool(BaseTool):
 
     def _run(
         self,
-        strategy_type: str = "CALL_SPREAD",
+        strategy_type: str = "NONE",
         atm: int = 0,
         wing_width: int = 200,
         expiry: str = "",
@@ -109,7 +109,7 @@ class ExecutePaperTradeInput(BaseModel):
         default="{}",
         description="JSON string of contracts from resolve_option_contracts",
     )
-    strategy_type: str = Field(default="CALL_SPREAD")
+    strategy_type: str = Field(default="NONE")
     entry_time: str = Field(default="", description="HH:MM entry time")
     spot: float = Field(default=0.0)
     atm: int = Field(default=0)
@@ -133,7 +133,7 @@ class ExecutePaperTradeTool(BaseTool):
     def _run(
         self,
         contracts_json: str = "{}",
-        strategy_type: str = "CALL_SPREAD",
+        strategy_type: str = "NONE",
         entry_time: str = "",
         spot: float = 0.0,
         atm: int = 0,
@@ -246,7 +246,7 @@ class BuildAndExecuteTradeTool(BaseTool):
     def _run(
         self,
         contracts_json: str = "{}",
-        strategy_type: str = "CALL_SPREAD",
+        strategy_type: str = "NONE",
         entry_time: str = "",
         spot: float = 0.0,
         atm: int = 0,

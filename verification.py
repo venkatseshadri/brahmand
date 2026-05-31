@@ -63,7 +63,7 @@ def verify_strategy_provenance(strategy: dict) -> bool:
     Validates and clamps: wing_width, sl_pct, tp_pct, strategy_type."""
     violations = []
 
-    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD"}
+    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD", "NONE"}
     if strategy.get("strategy_type") not in VALID_TYPES:
         violations.append(f"strategy_type={strategy.get('strategy_type')}")
         strategy["strategy_type"] = "NONE"
