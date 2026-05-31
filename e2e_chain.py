@@ -16,7 +16,7 @@ Contract/Execution/Risk are pure Python (no LLM, no CrewAI overhead).
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -338,19 +338,6 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     contract_tool = ResolveOptionContractsTool()
     execution_tool = BuildAndExecuteTradeTool()
     sl_tp_orders_tool = PlaceSLTPOrdersTool()
-
-    # Risk tools (still needed for monitoring phase: morph/shift operations)
-    from tools.risk_tools import (
-        PlaceSLOrderTool,
-        PlaceTPOrderTool,
-        CancelOrderTool,
-        ModifySLOrderTool,
-    )
-
-    sl_tool = PlaceSLOrderTool()
-    tp_tool = PlaceTPOrderTool()
-    cancel_tool = CancelOrderTool()
-    modify_sl_tool = ModifySLOrderTool()
 
     # ── Build agents ───────────────────────────────────────────────────
     try:
