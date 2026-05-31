@@ -63,10 +63,10 @@ def verify_strategy_provenance(strategy: dict) -> bool:
     Validates and clamps: wing_width, sl_pct, tp_pct, strategy_type."""
     violations = []
 
-    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD", "IRON_BUTTERFLY"}
+    VALID_TYPES = {"CALL_SPREAD", "PUT_SPREAD"}
     if strategy.get("strategy_type") not in VALID_TYPES:
         violations.append(f"strategy_type={strategy.get('strategy_type')}")
-        strategy["strategy_type"] = "IRON_BUTTERFLY"
+        strategy["strategy_type"] = "NONE"
 
     ww = strategy.get("wing_width", 200)
     if not isinstance(ww, (int, float)) or ww < 50 or ww > 500:

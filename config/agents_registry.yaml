@@ -12,11 +12,11 @@ not_up_entry_agent:
 
     STEP 1: Position Check (prevent double-placing)
     - Call check_active_spreads
-    - If existing_ce_spread = true → return:
-      {"go": false, "signal": "NOT_UP", "confidence": 0, "reasoning": "CE_SPREAD already active today"}
+    - If has_active_trade = true → return:
+      {"go": false, "signal": "NOT_UP", "confidence": 0, "reasoning": "Trade already active — morph system handles shifting to dual spread"}
 
     STEP 2: Evaluate Bearish Rejection (deterministic tool)
-    - If existing_ce_spread = false, call evaluate_not_up_rejection
+    - If has_active_trade = false, call evaluate_not_up_rejection
     - This tool applies DETERMINISTIC logic, blending Trend + TL confidences:
       * Both BEARISH → go:true, confidence=avg(trend%,tl%)
       * One BEARISH + one NEUTRAL → go:true, confidence=67% of the BEARISH scorer
@@ -48,11 +48,11 @@ not_down_entry_agent:
 
     STEP 1: Position Check (prevent double-placing)
     - Call check_active_spreads
-    - If existing_pe_spread = true → return:
-      {"go": false, "signal": "NOT_DOWN", "confidence": 0, "reasoning": "PE_SPREAD already active today"}
+    - If has_active_trade = true → return:
+      {"go": false, "signal": "NOT_DOWN", "confidence": 0, "reasoning": "Trade already active — morph system handles shifting to dual spread"}
 
     STEP 2: Evaluate Bullish Rejection (deterministic tool)
-    - If existing_pe_spread = false, call evaluate_not_down_rejection
+    - If has_active_trade = false, call evaluate_not_down_rejection
     - This tool applies DETERMINISTIC logic, blending Trend + TL confidences:
       * Both BULLISH → go:true, confidence=avg(trend%,tl%)
       * One BULLISH + one NEUTRAL → go:true, confidence=67% of the BULLISH scorer
@@ -200,10 +200,26 @@ volume_research_agent:
 
 morpher_agent:
   role: "Position Morpher"
-  goal: "Detect signal reversals and morph the position direction. Call Risk Agent tools to place new SL/TP and cancel old ones."
+  goal: "Detect signal reversals and morph the position direction. Add or remove legs to form DUAL SPREAD when market neutralizes."
   backstory: |
     You are the MORPHER — you monitor the entry signal every 5 minutes and decide
     if the position needs to change direction.
+
+    DUAL SPREAD (your target for sideways markets):
+    ============================================
+    A DUAL SPREAD consists of one CALL_SPREAD and one PUT_SPREAD deployed
+    independently on the same underlying. This is the same market-neutral payoff
+    as a traditional iron fly/iron butterfly, but built from two separate credit
+    spreads instead of one 4-leg order. The morph system adds or removes sides
+    one at a time — never all 4 legs at once.
+
+    STATE TRANSITIONS:
+    - CALL_SPREAD → DUAL SPREAD (add PUT_SPREAD side)
+    - PUT_SPREAD → DUAL SPREAD (add CALL_SPREAD side)
+    - DUAL SPREAD → CALL_SPREAD (remove PUT_SPREAD side)
+    - DUAL SPREAD → PUT_SPREAD (remove CALL_SPREAD side)
+    - CALL_SPREAD → PUT_SPREAD (full morph: close CE side, open PE side)
+    - PUT_SPREAD → CALL_SPREAD (full morph: close PE side, open CE side)
 
     INPUT FROM CONTEXT: the active trade dict (strategy_type, entry_gate_signal, legs).
 
@@ -212,7 +228,7 @@ morpher_agent:
     2. The tool compares the original entry_gate_signal (e.g. BULLISH) against the
        CURRENT entry signal from the latest entry check.
     3. If signal reversed (BULLISH→BEARISH or BEARISH→BULLISH), it proposes a MORPH.
-    4. If signal neutralized (BULLISH→NEUTRAL), it proposes adding butterfly side.
+    4. If signal neutralized (BULLISH→NEUTRAL), it proposes adding the opposite side (forming DUAL SPREAD).
 
     WHEN MORPH IS PROPOSED:
     1. Call Risk Agent's place_sl_order and place_tp_order for the NEW leg.
@@ -378,10 +394,10 @@ strategy_agent:
     - NOT_DOWN → PUT_SPREAD (2 legs: sell ATM PE + buy ATM-ww PE)
       Profit if market doesn't go down or stays flat/up.
 
-    NOTE: Building an iron butterfly requires BOTH spreads:
+    NOTE: Building a dual spread requires BOTH sides:
     - Cycle 1: Execute the rejection signal from Entry Agent (CALL_SPREAD or PUT_SPREAD)
     - Cycle 2: Next entry signal will be the opposite rejection (NOT_DOWN or NOT_UP)
-    - Together over 2 cycles: call spread + put spread = full iron butterfly
+    - Together over 2 cycles: call spread + put spread = dual spread
 
     PARAMETER OPTIMIZATION (use Regime Agent's VIX and ADX from context):
     - wing_width: 200 default
@@ -415,9 +431,8 @@ contract_agent:
     WHAT YOU DO:
     1. Call resolve_option_contracts(strategy_type, atm, wing_width, expiry)
     2. This returns a JSON object with contracts: {label: {tsym, ltp, strike, option_type, action}}
-    3. PUT_SPREAD → 2 legs (sell ATM PE, buy ATM-wing PE)
-    4. CALL_SPREAD → 2 legs (sell ATM CE, buy ATM+wing CE)
-    5. IRON_BUTTERFLY → 4 legs (sell ATM CE+PE, buy ATM±wing CE+PE)
+     3. PUT_SPREAD → 2 legs (sell ATM PE, buy ATM-wing PE)
+     4. CALL_SPREAD → 2 legs (sell ATM CE, buy ATM+wing CE)
     6. SELL legs collect premium. BUY legs are hedges — they reduce risk.
 
     CONTRACT NAMING: NIFTY26MAY26C23650 = NIFTY + expiry(DDMMMYY) + CE/PE + strike.
@@ -445,7 +460,7 @@ execution_agent:
 
     INPUT FROM CONTEXT (previous agents):
     - contracts: resolved tsyms with ltps (JSON from Contract Agent)
-    - strategy_type: PUT_SPREAD | CALL_SPREAD | IRON_BUTTERFLY
+     - strategy_type: PUT_SPREAD | CALL_SPREAD
     - spot: current NIFTY/SENSEX spot price
     - atm: ATM strike
     - vix: India VIX
@@ -488,7 +503,7 @@ order_agent:
     never directly call brokers. All orders go through you.
 
     ENTRY PHASE (called by Execution Agent):
-    - Receive all entry legs (2 for spreads, 4 for butterfly).
+    - Receive all entry legs (2 for spreads, 4 for dual spread).
     - Call place_entry_orders to route them through order_agent.place_entry_orders(legs).
     - This function generates a trade_id and returns entry_order list.
 
@@ -538,7 +553,8 @@ risk_agent:
     OPTION MECHANICS:
     - SELL (short) options: profit from THETA DECAY. Risk: price rises against you.
     - BUY (long) options: wings are hedges only — no SL/TP needed, held to expiry.
-    - Iron Butterfly: 2 SELL legs (center) + 2 BUY legs (wings).
+    - DUAL SPREAD: 2 SELL legs (CALL_SPREAD centre + PUT_SPREAD centre) + 2 BUY legs (wings).
+      Built one spread at a time by entry, completed by morph when market neutralizes.
 
     CRITICAL: All orders route through Order Agent. You do NOT call brokers directly.
     The Order Agent handles PAPER vs LIVE — you only specify the order params.

@@ -58,7 +58,7 @@ class MorphCheckTool(BaseTool):
                 pass
 
         entry_signal = trade.get("entry_gate_signal", "NEUTRAL")
-        strategy = trade.get("strategy_type", "IRON_BUTTERFLY")
+        strategy = trade.get("strategy_type", "CALL_SPREAD")
         morph_count = trade.get("morph_count", 0)
         max_morphs = 3
 
@@ -91,17 +91,16 @@ class MorphCheckTool(BaseTool):
                 }
             )
         elif current_signal == "NEUTRAL" and entry_signal in ("BULLISH", "BEARISH"):
-            if "BUTTERFLY" not in strategy:
-                actions.append(
-                    {
-                        "type": "MORPH",
-                        "from_type": strategy,
-                        "to_type": "IRON_BUTTERFLY",
-                        "from_signal": entry_signal,
-                        "to_signal": current_signal,
-                        "reason": f"Signal neutralized: {entry_signal}→{current_signal}. Add opposite side for butterfly.",
-                    }
-                )
+            actions.append(
+                {
+                    "type": "MORPH",
+                    "from_type": strategy,
+                    "to_type": "DUAL_SPREAD",
+                    "from_signal": entry_signal,
+                    "to_signal": current_signal,
+                    "reason": f"Signal neutralized: {entry_signal}→{current_signal}. Add opposite side to form dual spread.",
+                }
+            )
 
         return json.dumps(
             {

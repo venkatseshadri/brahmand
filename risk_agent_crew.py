@@ -331,7 +331,7 @@ def build_risk_crew(llm):
         backstory=(
             "You are the structural optimizer. The entry gate says BULLISH/BEARISH/NEUTRAL "
             "every 5 minutes. Your job: detect when the signal no longer matches the position. "
-            "BULLISH→NEUTRAL? Add a call spread (become iron butterfly). "
+            "BULLISH→NEUTRAL? Add a call spread (become dual spread). "
             "NEUTRAL→BULLISH? Close the call spread (become put spread). "
             "Use query_pattern to check if the signal change is backed by probabilities."
         ),

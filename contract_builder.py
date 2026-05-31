@@ -29,10 +29,8 @@ def resolve_contracts(
         ]
     else:
         leg_specs = [
-            ("center_ce", atm, "CE", "SELL"),
-            ("center_pe", atm, "PE", "SELL"),
-            ("wing_below", atm - wing_width, "PE", "BUY"),
-            ("wing_above", atm + wing_width, "CE", "BUY"),
+            ("sell_ce", atm, "CE", "SELL"),
+            ("buy_ce", atm + wing_width, "CE", "BUY"),
         ]
 
     conn = sqlite3.connect(str(db_path))

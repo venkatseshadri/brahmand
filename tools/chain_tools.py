@@ -18,8 +18,8 @@ from pydantic import BaseModel, Field
 
 class ResolveContractsInput(BaseModel):
     strategy_type: str = Field(
-        default="IRON_BUTTERFLY",
-        description="PUT_SPREAD | CALL_SPREAD | IRON_BUTTERFLY",
+        default="CALL_SPREAD",
+        description="PUT_SPREAD | CALL_SPREAD",
     )
     atm: int = Field(default=0, description="At-the-money strike price")
     wing_width: int = Field(default=200, description="Wing width from ATM")
@@ -36,14 +36,13 @@ class ResolveOptionContractsTool(BaseTool):
         "based on strategy type, ATM strike, wing width, and expiry. "
         "Queries DuckDB option_snapshots for real contract data. "
         "Returns JSON array of contracts: {label: {tsym, ltp, strike, option_type, action}} "
-        "PUT_SPREAD → 2 legs (sell PE, buy PE lower). CALL_SPREAD → 2 legs (sell CE, buy CE higher). "
-        "IRON_BUTTERFLY → 4 legs (sell CE+PE, buy CE+PE wings)."
+        "PUT_SPREAD → 2 legs (sell PE, buy PE lower). CALL_SPREAD → 2 legs (sell CE, buy CE higher)."
     )
     args_schema: Type[BaseModel] = ResolveContractsInput
 
     def _run(
         self,
-        strategy_type: str = "IRON_BUTTERFLY",
+        strategy_type: str = "CALL_SPREAD",
         atm: int = 0,
         wing_width: int = 200,
         expiry: str = "",
@@ -110,7 +109,7 @@ class ExecutePaperTradeInput(BaseModel):
         default="{}",
         description="JSON string of contracts from resolve_option_contracts",
     )
-    strategy_type: str = Field(default="IRON_BUTTERFLY")
+    strategy_type: str = Field(default="CALL_SPREAD")
     entry_time: str = Field(default="", description="HH:MM entry time")
     spot: float = Field(default=0.0)
     atm: int = Field(default=0)
@@ -134,7 +133,7 @@ class ExecutePaperTradeTool(BaseTool):
     def _run(
         self,
         contracts_json: str = "{}",
-        strategy_type: str = "IRON_BUTTERFLY",
+        strategy_type: str = "CALL_SPREAD",
         entry_time: str = "",
         spot: float = 0.0,
         atm: int = 0,
@@ -247,7 +246,7 @@ class BuildAndExecuteTradeTool(BaseTool):
     def _run(
         self,
         contracts_json: str = "{}",
-        strategy_type: str = "IRON_BUTTERFLY",
+        strategy_type: str = "CALL_SPREAD",
         entry_time: str = "",
         spot: float = 0.0,
         atm: int = 0,

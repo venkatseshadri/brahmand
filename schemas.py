@@ -26,7 +26,9 @@ class TradeSignal(BaseModel):
         pattern="^(BUY|SELL)$",
         description="Order direction — BUY or SELL",
     )
-    strategy_type: str = Field(default="IRON_BUTTERFLY", description="Strategy name")
+    strategy_type: str = Field(
+        default="CALL_SPREAD", description="Strategy name — CALL_SPREAD or PUT_SPREAD"
+    )
     size: int = Field(default=1, ge=1, le=4, description="Number of lots (1-4)")
     strikes: Dict[str, int] = Field(
         default_factory=lambda: {"atm": 0, "ce_wing": 0, "pe_wing": 0},

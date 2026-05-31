@@ -31,7 +31,7 @@ TP_PCT = 0.50  # 50% below entry → TP
 FLOOR = -500  # cumulative P&L floor
 MAX_MORPHS = 3  # max morphs per day
 WING_SPREAD = 150  # wing width for credit spreads
-WING_BUTTERFLY = 200  # wing width for iron butterfly
+WING_DUAL = 200  # wing width for dual spread
 MARKET_CLOSE = "15:30"
 
 # Action types
@@ -103,7 +103,7 @@ def _pattern_risk_adjust(trade: dict) -> None:
             new_sl_pct = 0.35
             new_tsl = 0.7
         elif side >= 0.60:
-            # Sideways → iron fly regime, keep wider SL to avoid noise exits
+            # Sideways → dual spread regime, keep wider SL to avoid noise exits
             new_sl_pct = 0.60
             new_tsl = 0.4
         else:
@@ -572,10 +572,10 @@ def execute_action(action: dict, trade: dict) -> dict:
                         },
                         {
                             "action": "BUY",
-                            "strike": atm + WING_BUTTERFLY,
+                            "strike": atm + WING_DUAL,
                             "type": "CE",
                             "fill_price": buy_ce_fill,
-                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_BUTTERFLY}C",
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm + WING_DUAL}C",
                         },
                     ]
                 )
@@ -601,10 +601,10 @@ def execute_action(action: dict, trade: dict) -> dict:
                         },
                         {
                             "action": "BUY",
-                            "strike": atm - WING_BUTTERFLY,
+                            "strike": atm - WING_DUAL,
                             "type": "PE",
                             "fill_price": buy_pe_fill,
-                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_BUTTERFLY}P",
+                            "tsym": f"NIFTY{expiry.replace('-', '')}{atm - WING_DUAL}P",
                         },
                     ]
                 )

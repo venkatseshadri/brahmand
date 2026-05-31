@@ -455,7 +455,7 @@ def create_trade(
 
     Args:
         trade_id: Unique trade identifier
-        strategy_type: PUT_SPREAD | CALL_SPREAD | IRON_BUTTERFLY
+        strategy_type: PUT_SPREAD | CALL_SPREAD
         net_credit: Net credit received
         legs: List of leg dicts
         sl: Stop loss dict {ce: ..., pe: ...}

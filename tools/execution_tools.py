@@ -111,7 +111,7 @@ class ExecutionPayload(BaseModel):
         description="The index symbol. Must be 'NIFTY' or 'SENSEX'.",
     )
     strategy: str = Field(
-        default="IRON_BUTTERFLY",
+        default="CALL_SPREAD",
         description="Strategy name for logging only. Does NOT affect execution — the legs determine what is executed.",
     )
     authorized_lots: int = Field(
@@ -182,7 +182,7 @@ class ExecuteTradeTool(BaseTool):
     def _run(
         self,
         symbol: str = "NIFTY",
-        strategy: str = "IRON_BUTTERFLY",
+        strategy: str = "CALL_SPREAD",
         authorized_lots: int = 1,
         legs: list = None,
     ) -> str:

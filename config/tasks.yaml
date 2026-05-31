@@ -70,9 +70,9 @@ strategy_task:
       - NOT_DOWN decision: go=true/false → execute PUT_SPREAD if true
 
     STEP 2: SEQUENTIAL LOGIC (one spread per cycle):
-      IF BOTH go_call_spread AND go_put_spread are true:
-        → Market is sideways (both sides valid). Output IRON_BUTTERFLY.
-        → Use IRON_BUTTERFLY with wing_width optimization from Regime (VIX) data.
+      IF go_call_spread=true AND go_put_spread=true:
+        → Market has pressure on both sides. Pick CALL_SPREAD this cycle,
+        → PUT_SPREAD fires in next cycle → dual spread forms naturally.
       ELSE IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)
       ELSE IF go_put_spread=true: output PUT_SPREAD parameters (this cycle)
       ELSE: return {"skip": true}
@@ -81,13 +81,11 @@ strategy_task:
       - wing_width: 200 default, 150 if VIX<15, 250 if VIX>20
       - sl_pct: 0.25 default, 0.35 if VIX>18
       - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20
-      - IRON_BUTTERFLY gets same wing_width optimization
 
     OUTPUT JSON (one of):
     {"strategy_type": "CALL_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
     OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
-    OR {"strategy_type": "IRON_BUTTERFLY", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
-  expected_output: "CALL_SPREAD, PUT_SPREAD, or IRON_BUTTERFLY parameters"
+  expected_output: "CALL_SPREAD or PUT_SPREAD parameters"
 
 contract_task:
   description: |
@@ -126,7 +124,7 @@ execution_task:
       ✓ net_credit > 0 (strategy generates premium)
       ✓ SL > LTP on every SELL leg (SL is above current price)
       ✓ TP < LTP on every SELL leg (TP is below current price)
-      ✓ leg_count matches strategy (2 for spreads, 4 for butterfly)
+      ✓ leg_count matches strategy (2 for spreads, 4 for dual spread)
 
     STEP 4: Hand off ALL entry legs to order routing hub via place_entry_orders(legs).
       CRITICAL: Call place_entry_orders with the legs from the trade dict.

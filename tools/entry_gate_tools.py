@@ -126,88 +126,51 @@ class QueryTrafficLight(BaseTool):
 class CheckActiveSpreads(BaseTool):
     name: str = "check_active_spreads"
     description: str = (
-        "CRITICAL DEDUCTION TOOL: Determine if CE_SPREAD or PE_SPREAD is still OPEN TODAY. "
-        "CE = Option leg type CE (not 'call'), PE = Option leg type PE (not 'put'). "
-        "The ledger contains ALL historical trades (past days), so DEDUCE carefully: "
-        "Filter for (1) entry_time exists, (2) exit_time is NULL/missing (still open), (3) from TODAY's date. "
-        "Among open trades, identify: PE credit spreads (for NotDownAgent) and CE credit spreads (for NotUpAgent). "
-        "Returns: {existing_pe_spread, existing_ce_spread, pe_spread_id, ce_spread_id, pe_details, ce_details, deduction_notes}. "
-        "NotDownAgent MUST call this FIRST: if existing_pe_spread=true, return go:false (position already open). "
-        "NotUpAgent MUST call this FIRST: if existing_ce_spread=true, return go:false (position already open)."
+        "CRITICAL DEDUCTION TOOL: Determine if ANY trade is still OPEN TODAY. "
+        "If ANY active trade exists → skip this cycle. The morph system handles "
+        "shifting single spreads to dual spreads and vice versa. "
+        "Returns: {has_active_trade, active_trade_ids, trade_count, deduction_notes}. "
+        "ALL agents MUST call this FIRST: if has_active_trade=true, return go:false (position already open)."
     )
     args_schema: type[BaseModel] = IndexInput
 
     def _run(self, index: str = "NIFTY") -> str:
         import json
-        from order_routing import get_active_trades, get_trades_by_strategy
+        from order_routing import get_active_trades
 
         try:
-            result = {
-                "existing_pe_spread": False,
-                "existing_ce_spread": False,
-                "pe_spread_id": None,
-                "ce_spread_id": None,
-                "pe_details": {},
-                "ce_details": {},
-                "deduction_notes": [],
-            }
-
-            # Get all active trades from order_ledger.json (single source of truth)
             active_trades = get_active_trades()
 
+            trade_ids = []
             for trade in active_trades:
                 if not isinstance(trade, dict):
                     continue
+                if trade.get("status") == "ACTIVE" and trade.get("entry_time"):
+                    trade_ids.append(trade.get("trade_id", "?"))
 
-                trade_id = trade.get("trade_id", "?")
-                strategy = trade.get("strategy_type", "")
-                entry_time = trade.get("entry_time", "")
-                status = trade.get("status", "ACTIVE")
-
-                # Skip if not ACTIVE or no entry time
-                if status != "ACTIVE" or not entry_time:
-                    continue
-
-                # PE_SPREAD (PE legs): has "PUT" but no "CALL"
-                if "PUT" in strategy.upper() and "CALL" not in strategy.upper():
-                    result["existing_pe_spread"] = True
-                    result["pe_spread_id"] = trade_id
-                    result["pe_details"] = {
-                        "entry_time": entry_time,
-                        "strategy": strategy,
-                        "net_credit": trade.get("net_credit"),
-                        "confidence": trade.get("entry_confidence", 0),
-                    }
-                    result["deduction_notes"].append(
-                        f"Deduced: PE_SPREAD active ({trade_id})"
-                    )
-
-                # CE_SPREAD (CE legs): has "CALL" but no "PUT"
-                if "CALL" in strategy.upper() and "PUT" not in strategy.upper():
-                    result["existing_ce_spread"] = True
-                    result["ce_spread_id"] = trade_id
-                    result["ce_details"] = {
-                        "entry_time": entry_time,
-                        "strategy": strategy,
-                        "net_credit": trade.get("net_credit"),
-                        "confidence": trade.get("entry_confidence", 0),
-                    }
-                    result["deduction_notes"].append(
-                        f"Deduced: CE_SPREAD active ({trade_id})"
-                    )
-
-            result["summary"] = (
-                f"Today's open spreads: PE={result['existing_pe_spread']}, CE={result['existing_ce_spread']}"
-            )
+            has_active = len(trade_ids) > 0
+            result = {
+                "has_active_trade": has_active,
+                "active_trade_ids": trade_ids,
+                "trade_count": len(trade_ids),
+                "deduction_notes": (
+                    [
+                        f"{len(trade_ids)} active trade(s): {', '.join(trade_ids)} — skip entry"
+                    ]
+                    if has_active
+                    else ["No active trades — entry check may proceed"]
+                ),
+            }
             return json.dumps(result, indent=2)
 
         except Exception as e:
             return json.dumps(
                 {
                     "error": str(e),
-                    "existing_pe_spread": False,
-                    "existing_ce_spread": False,
-                    "deduction_notes": ["Error during position deduction"],
+                    "has_active_trade": False,
+                    "active_trade_ids": [],
+                    "trade_count": 0,
+                    "deduction_notes": ["Error during position check"],
                 }
             )
 

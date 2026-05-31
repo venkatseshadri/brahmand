@@ -24,7 +24,6 @@ load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
-from entry_agent import get_research_consensus
 from llm import get_llm
 from parsing import parse_json_output
 from fallback import deterministic_fallback
@@ -291,44 +290,6 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             ) if not_down_decision else None
             verify_regime_provenance(regime, vix, adx) if regime else None
 
-            # ── Research Override: research is macro regime, trend+TL is micro timing ──
-            # No signal (both NEUTRAL) or conflict (trend≠TL) = market uncertain
-            # → take Iron Butterfly at moderate confidence
-            research_consensus = get_research_consensus()
-            if research_consensus == "NEUTRAL":
-                t_sig = not_up_decision.get("trend_signal", "").upper()
-                tl_sig = not_up_decision.get("traffic_light_signal", "").upper()
-
-                trend_bull = t_sig == "BULLISH"
-                trend_bear = t_sig == "BEARISH"
-                tl_bull = tl_sig == "BULLISH"
-                tl_bear = tl_sig == "BEARISH"
-                conflict = (trend_bull and tl_bear) or (trend_bear and tl_bull)
-                both_neutral = t_sig == "NEUTRAL" and tl_sig == "NEUTRAL"
-
-                if both_neutral or conflict:
-                    not_up_decision["go"] = True
-                    not_up_decision["confidence"] = 40 if conflict else 50
-                    not_down_decision["go"] = True
-                    not_down_decision["confidence"] = 40 if conflict else 50
-                    what = "conflict" if conflict else "both neutral"
-                    reason = (
-                        f"Research NEUTRAL → sideways market "
-                        f"(trend={t_sig}, TL={tl_sig}, {what}) "
-                        f"→ IRON_BUTTERFLY"
-                    )
-                    not_up_decision["reasoning"] = reason
-                    not_down_decision["reasoning"] = reason
-                    not_up_decision["_overridden"] = True  # flag for strategy picker
-                    not_down_decision["_overridden"] = True
-                    _log(f"  Research Override: {reason}")
-
-                if not regime:
-                    regime = {
-                        "recommendation": "enter",
-                        "reason": "Research consensus NEUTRAL (sideways)",
-                    }
-
         except Exception as e:
             _err(f"Entry gate parse failed: {e}")
             return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
@@ -376,10 +337,10 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         f"  Regime: {regime.get('regime')} (VIX={regime.get('vix', '?')}) → {regime.get('recommendation')}"
     )
 
-    # ── Determine which spread to execute (if both go, regime preferences one) ─────────────────────
-    # For now: execute both if both are true (iron butterfly on same cycle)
-    # If only one is true: execute that one (PUT_SPREAD or CALL_SPREAD)
-    # If both false: abort (already handled above)
+    # ── Determine which spread to execute. When both gates fire, pick one based on
+    # trend direction. The other gate fires in the next cycle, forming a dual spread
+    # naturally. Morph system handles shifting if needed.
+    # ─────────────────────────────────────────────────────────────────────────────
 
     entry_decision = {
         "go_call_spread": go_call_spread,
@@ -391,32 +352,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "regime": regime.get("regime"),
         "vix": regime.get("vix", 0),
         "strategy_to_execute": (
-            # Override path: both GO from research (conflict or both neutral)
-            # → Iron Butterfly always (market uncertain, collect theta from both sides)
-            "IRON_BUTTERFLY"
-            if (go_call_spread and go_put_spread and not_up_decision.get("_overridden"))
-            # Natural path: single gate firing → use that gate's direction
-            else (
-                "PUT_SPREAD"
-                if (
-                    go_call_spread
-                    and go_put_spread
-                    and not_up_decision.get("trend_signal", "") == "BULLISH"
-                )
-                else (
-                    "CALL_SPREAD"
-                    if (
-                        go_call_spread
-                        and go_put_spread
-                        and not_up_decision.get("trend_signal", "") == "BEARISH"
-                    )
-                    else (
-                        "CALL_SPREAD"
-                        if go_call_spread
-                        else ("PUT_SPREAD" if go_put_spread else "NONE")
-                    )
-                )
-            )
+            "CALL_SPREAD"
+            if go_call_spread
+            else ("PUT_SPREAD" if go_put_spread else "NONE")
         ),
     }
 
@@ -504,7 +442,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     ww = strategy.get("wing_width", 200)
     sl_p = strategy.get("sl_pct", 0.25)
     tp_p = strategy.get("tp_pct", 0.50)
-    stype = strategy.get("strategy_type", "IRON_BUTTERFLY")
+    stype = strategy.get("strategy_type", "NONE")
     regime_entry_signal = regime.get("entry_signal") or entry_decision.get(
         "signal", "NOT_UP"
     )

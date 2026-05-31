@@ -99,7 +99,7 @@ def run_crewai_chain(trade: dict) -> dict:
 
     # ── Task 1: Execution ────────────────────────────────────────────
     exec_task = Task(
-        description=f"""SIMULATE an Iron Butterfly trade with these fills (DO NOT call broker):
+        description=f"""SIMULATE a credit spread trade with these fills (DO NOT call broker):
 {trade["legs"]}
 
 Produce a JSON TradeSignal with: market, ticker, action, strategy_type, size,
