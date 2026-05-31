@@ -24,8 +24,7 @@ from dotenv import load_dotenv
 sys.path.insert(0, str(Path(__file__).parent))
 load_dotenv()
 
-from market_data import is_market_hours, now_str, now_iso
-from trade_execution_db import add_active_trade
+from market_data import is_market_hours, now_str
 from lock import acquire_lock, release_lock
 from state import load_state, save_state
 
@@ -41,7 +40,6 @@ STATE_FILE = STATE_DIR / "brahmand_kickoff.json"
 from logger import (
     get_logger,
     log_exception,
-    log_monitoring_event,
 )
 
 _log = get_logger("kickoff").info
@@ -98,52 +96,9 @@ def run_entry_pipeline(state: dict):
             (prev.get("re_entry_count", 0) + 1) if prev.get("exit_reason") else 0
         )
 
-    # ALSO write to DuckDB for Risk Monitor (1-min monitoring)
-    try:
-        trade_id = (
-            trade.get("trade_id")
-            or f"TRADE-{datetime.now().strftime('%Y%m%d')}-{state['trades_today']:03d}"
-        )
-        trade["trade_id"] = trade_id
-        add_active_trade(
-            trade_id=trade_id,
-            entry_time=now_iso(),
-            strategy=strategy_type,
-            entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
-            legs=trade.get("legs", []),
-            sl=trade.get("sl", {}),
-            tp=trade.get("tp", {}),
-        )
-        _log(f"  ✅ Wrote to DuckDB: {trade_id}")
-    except Exception as e:
-        _log(f"  ⚠️  DuckDB write failed: {e}")
-
-    # ALSO write to order_ledger.json (single source of truth for active trades)
-    try:
-        from order_routing import create_trade
-
-        legs = trade.get("legs", [])
-        if isinstance(legs, str):
-            legs = eval(legs)
-        sl = trade.get("sl", {})
-        if isinstance(sl, str):
-            sl = eval(sl)
-        tp = trade.get("tp", {})
-        if isinstance(tp, str):
-            tp = eval(tp)
-        create_trade(
-            trade_id=trade.get("trade_id", trade_id),
-            strategy_type=strategy_type,
-            net_credit=float(trade.get("net_credit", 0)),
-            legs=legs,
-            sl=sl,
-            tp=tp,
-            entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
-            entry_confidence=float(trade.get("entry_confidence", 0)),
-        )
-        _log(f"  ✅ Wrote to order ledger: {trade.get('trade_id', trade_id)}")
-    except Exception as e:
-        _log(f"  ⚠️  Order ledger write failed: {e}")
+    # Order creation is owned by the execution agent via place_entry_orders()
+    # (tools/chain_tools.py), which writes to BOTH order_ledger.json AND
+    # trade_execution.duckdb atomically. No duplicate writes here.
 
     # SL/TP placement is OWNED by the LLM RISK agent (primary). A deterministic
     # fallback in position_manager.run_bridge places them only when the LLM is down.
@@ -151,19 +106,6 @@ def run_entry_pipeline(state: dict):
 
     _log(
         f"ENTERED: {strategy_type} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
-    )
-    log_monitoring_event(
-        "TRADE_OPEN",
-        trade.get("trade_id", "unknown"),
-        entry_time=entry_time,
-        strategy=strategy_type,
-        signal=trade.get("entry_gate_signal", "UNKNOWN"),
-        confidence=trade.get("entry_confidence", 0),
-        net_credit=trade.get("net_credit", 0),
-        leg_count=trade.get("leg_count", 0),
-        legs=trade.get("legs", []),
-        sl=trade.get("sl", {}),
-        tp=trade.get("tp", {}),
     )
     return state
 
