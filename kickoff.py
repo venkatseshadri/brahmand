@@ -70,14 +70,7 @@ def run_entry_pipeline(state: dict):
         _log("  SKIP: Entry Agent NO-GO")
         return state
 
-    # Normalize strategy_type: map one-sided strategies to "credit_spread"
-    strategy_normalized = trade.get("strategy_type", "IRON_BUTTERFLY")
-    if "SPREAD" in strategy_normalized or "CREDIT" in strategy_normalized.upper():
-        strategy_display = "credit_spread"
-    elif "BUTTERFLY" in strategy_normalized:
-        strategy_display = "iron_butterfly"
-    else:
-        strategy_display = strategy_normalized.lower()
+    strategy_type = trade.get("strategy_type", "IRON_BUTTERFLY")
 
     # Store entry_scores on trade for pattern logging on exit
     trade["entry_gate_signal"] = trade.get(
@@ -115,7 +108,7 @@ def run_entry_pipeline(state: dict):
         add_active_trade(
             trade_id=trade_id,
             entry_time=now_iso(),
-            strategy=strategy_display,
+            strategy=strategy_type,
             entry_gate_signal=trade.get("entry_gate_signal", "UNKNOWN"),
             legs=trade.get("legs", []),
             sl=trade.get("sl", {}),
@@ -140,7 +133,7 @@ def run_entry_pipeline(state: dict):
             tp = eval(tp)
         create_trade(
             trade_id=trade.get("trade_id", trade_id),
-            strategy_type=strategy_display,
+            strategy_type=strategy_type,
             net_credit=float(trade.get("net_credit", 0)),
             legs=legs,
             sl=sl,
@@ -157,13 +150,13 @@ def run_entry_pipeline(state: dict):
     # Do NOT hard-place SL/TP here — see risk_agent_crew.py docstring (reverted 2x).
 
     _log(
-        f"ENTERED: {strategy_display} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
+        f"ENTERED: {strategy_type} ({trade['leg_count']} legs) @ ₹{trade['net_credit']} [{entry_time}]"
     )
     log_monitoring_event(
         "TRADE_OPEN",
         trade.get("trade_id", "unknown"),
         entry_time=entry_time,
-        strategy=strategy_display,
+        strategy=strategy_type,
         signal=trade.get("entry_gate_signal", "UNKNOWN"),
         confidence=trade.get("entry_confidence", 0),
         net_credit=trade.get("net_credit", 0),
