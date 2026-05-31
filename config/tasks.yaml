@@ -1,0 +1,194 @@
+# Brahmand Task Registry
+# Blueprints consumed by TaskFactory. {variable} slots are populated
+# at runtime from market context (atm, expiry, spot, vix, entry_time).
+# Adding a new task = adding a YAML entry — no code changes.
+
+not_up_entry_task:
+  description: |
+    Independently evaluate if market rejects upside (bearish pressure).
+
+    Your sole job: Decide whether to PLACE CALL_SPREAD.
+
+    STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.
+    STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.
+    STEP 3: Apply NOT_UP rejection logic:
+      - Both BEARISH → go:true, confidence 90%
+      - One BEARISH + one NEUTRAL → go:true, confidence 60%
+      - Both NEUTRAL or any BULLISH → go:false
+
+    IMPORTANT: Return ONLY valid JSON:
+    {"go": true/false, "signal": "NOT_UP", "confidence": 0-100,
+    "trend_signal": "BEARISH"|"NEUTRAL"|"BULLISH",
+    "traffic_light_signal": "BEARISH"|"NEUTRAL"|"BULLISH",
+    "reasoning": "why market rejects upside or not"}
+  expected_output: "NOT_UP entry decision JSON with go flag"
+
+not_down_entry_task:
+  description: |
+    Independently evaluate if market rejects downside (bullish pressure).
+
+    Your sole job: Decide whether to PLACE PUT_SPREAD.
+
+    STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.
+    STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.
+    STEP 3: Apply NOT_DOWN rejection logic:
+      - Both BULLISH → go:true, confidence 90%
+      - One BULLISH + one NEUTRAL → go:true, confidence 60%
+      - Both NEUTRAL or any BEARISH → go:false
+
+    IMPORTANT: Return ONLY valid JSON:
+    {"go": true/false, "signal": "NOT_DOWN", "confidence": 0-100,
+    "trend_signal": "BULLISH"|"NEUTRAL"|"BEARISH",
+    "traffic_light_signal": "BULLISH"|"NEUTRAL"|"BEARISH",
+    "reasoning": "why market rejects downside or not"}
+  expected_output: "NOT_DOWN entry decision JSON with go flag"
+
+regime_task:
+  description: |
+    Get market regime data for position sizing + morpher.
+
+    ONE TOOL CALL: query_market_data(query_type='full_regime') to fetch VIX, ADX, ADX direction.
+
+    Gating rules (VIX only):
+      - VIX > 25 → recommendation: 'skip' (panic, no entries)
+      - VIX > 18 → recommendation: 'caution' (reduce size)
+      - Else → recommendation: 'enter'
+
+    ADX is a dummy pass-through — does NOT block entry.
+    It is passed to position manager for stop/morph decisions.
+
+    OUTPUT only valid JSON:
+    {"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution"|"skip", "reason": "..."}
+  expected_output: "Regime JSON with VIX and ADX"
+
+strategy_task:
+  description: |
+    Dual-Entry Sequential Execution: Pick ONE spread to execute this cycle.
+
+    STEP 1: Parse both entry decisions from context:
+      - NOT_UP decision: go=true/false → execute CALL_SPREAD if true
+      - NOT_DOWN decision: go=true/false → execute PUT_SPREAD if true
+
+    STEP 2: SEQUENTIAL LOGIC (one spread per cycle):
+      IF BOTH go_call_spread AND go_put_spread are true:
+        → Market is sideways (both sides valid). Output IRON_BUTTERFLY.
+        → Use IRON_BUTTERFLY with wing_width optimization from Regime (VIX) data.
+      ELSE IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)
+      ELSE IF go_put_spread=true: output PUT_SPREAD parameters (this cycle)
+      ELSE: return {"skip": true}
+
+    STEP 3: Optimize parameters from Regime data (VIX, ADX):
+      - wing_width: 200 default, 150 if VIX<15, 250 if VIX>20
+      - sl_pct: 0.25 default, 0.35 if VIX>18
+      - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20
+      - IRON_BUTTERFLY gets same wing_width optimization
+
+    OUTPUT JSON (one of):
+    {"strategy_type": "CALL_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
+    OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
+    OR {"strategy_type": "IRON_BUTTERFLY", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}
+  expected_output: "CALL_SPREAD, PUT_SPREAD, or IRON_BUTTERFLY parameters"
+
+contract_task:
+  description: |
+    Resolve option contracts from DuckDB.
+
+    Parse Strategy Agent's output to get strategy_type and wing_width.
+    ATM: {atm}. Expiry: {expiry}.
+
+    Call resolve_option_contracts(strategy_type, atm, wing_width, expiry).
+    Return the contracts JSON as-is from the tool. Do not modify.
+
+    Output ONLY valid JSON (the tool's output is already correct).
+  expected_output: "Contracts JSON with tsyms and ltps"
+
+execution_task:
+  description: |
+    ═══ PHASE 1 (Current): NIFTY/SENSEX Options ═══
+    YOU ARE A DUMB EXECUTOR. All decisions are made upstream.
+
+    UPSTREAM DECISIONS (already made):
+      ✓ Entry Agent: Is there a signal? → YES
+      ✓ Regime Agent: What's the regime? → Sideways
+      ✓ Strategy Agent: What to trade? → CALL_SPREAD (wing_width=200, sl=0.25, tp=0.50)
+      ✓ Contract Agent: What contracts? → Resolved tsyms + ltps
+      ✓ Asset (Phase 1): NIFTY (only option in Phase 1)
+
+    YOUR JOB:
+    STEP 1: Parse Contract Agent's output for resolved contracts (tsym, ltp, strike, action).
+    STEP 2: Parse Strategy Agent's output for strategy_type, wing_width, sl_pct, tp_pct.
+    STEP 3: Call execute_paper_trade(contracts_json, strategy_type, entry_time,
+    spot={spot}, atm={atm}, vix={vix}, expiry='{expiry}',
+    wing_width, sl_pct, tp_pct) to build trade dict.
+      This calculates net_credit, SL/TP levels, and returns the complete trade.
+
+    VERIFICATION: Check the trade dict from execute_paper_trade:
+      ✓ net_credit > 0 (strategy generates premium)
+      ✓ SL > LTP on every SELL leg (SL is above current price)
+      ✓ TP < LTP on every SELL leg (TP is below current price)
+      ✓ leg_count matches strategy (2 for spreads, 4 for butterfly)
+
+    STEP 4: Hand off ALL entry legs to order routing hub via place_entry_orders(legs).
+      CRITICAL: Call place_entry_orders with the legs from the trade dict.
+      The order_routing module inside place_entry_orders will:
+        - PAPER mode: save to order_ledger.json, return order_ids
+        - LIVE mode:  forward to Shoonya API, return broker order_ids
+      Return value: {trade_id, entry_orders: [order_ids], status, mode}
+
+    STEP 5: Extract trade_id from place_entry_orders result.
+      Pass trade_id to Risk Agent (in next task context) for SL/TP routing.
+
+    Output the complete trade dict with entry_order_results (trade_id + order_ids).
+
+    ═══ PHASE 2+ (Future): Multi-Asset Expansion ═══
+    YOU REMAIN A DUMB EXECUTOR. Architecture changes UPSTREAM, not here.
+
+    NEW UPSTREAM WORKFLOW:
+      1. Entry Agent → Regime Agent → Strategy Agent → [NEW] Asset Selector Agent
+      2. Asset Selector Agent: queries ChromaDB for best asset
+         Output: {asset_class: 'NIFTY'|'Reliance'|'Crude'|'BTC', confidence, position_size}
+      3. Contract Agent: resolves contracts for picked asset
+      4. YOU receive: {asset_class, contracts, strategy_type, wing_width, sl_pct, tp_pct}
+      5. YOU execute: same logic as Phase 1, just different assets
+
+    YOUR CODE STAYS IDENTICAL:
+      - execute_paper_trade() works for any asset (NIFTY, Reliance, Crude, BTC)
+      - place_entry_orders() works for any asset
+      - You don't care which asset — just build + route
+
+    YOU DO NOT:
+      ❌ Query historical win rates
+      ❌ Decide which asset to trade
+      ❌ Optimize parameters
+      ❌ Check liquidity
+      ❌ Make any decisions
+  expected_output: "Trade dict with legs, net_credit, sl, tp, trade_id, entry_orders"
+
+risk_task:
+  description: |
+    ENTRY PHASE: Place all SL and TP orders via the centralized order routing hub.
+
+    YOUR ONLY TOOL: place_sl_tp_orders (routes through order routing hub)
+
+    STEP 1: Parse Execution Agent's output to extract:
+      - trade_id (from the execution output)
+      - legs (array of leg dicts with tsym, action, strike, type, quantity, sl, tp)
+
+    STEP 2: Call place_sl_tp_orders(trade_id=<trade_id>, legs=<legs>)
+      This is the ONLY way to place SL/TP orders in entry phase.
+      The order_routing module inside place_sl_tp_orders will:
+        - PAPER mode: save to order_ledger.json
+        - LIVE mode:  forward to Shoonya API
+
+    MECHANICS (for reference — order_routing handles):
+      - SELL legs (center): get SL (buy trigger when price rises) + TP (buy limit when price falls)
+      - BUY legs (hedges): get NO orders — held to expiry
+      - SL = entry_premium × (1 + sl_pct). TP = entry_premium × (1 - tp_pct)
+
+    CRITICAL: Do NOT call place_sl_order or place_tp_order directly.
+    Only call place_sl_tp_orders. All orders route through the centralized hub.
+
+    Risk limits: max loss per spread = ({wing_width} - net_credit) * 65.
+
+    Output: confirmation JSON with sl_order_ids and tp_order_ids from order_routing.
+  expected_output: "Risk confirmation with SL/TP order IDs routed via order_routing"

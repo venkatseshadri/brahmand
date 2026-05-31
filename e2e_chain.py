@@ -247,10 +247,11 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     """
     llm = _get_llm()
 
-    from factory import AgentFactory
+    from factory import AgentFactory, TaskFactory
     from market_data import MarketDataQueryTool, get_latest_market_snapshot
 
     af = AgentFactory()
+    tf = TaskFactory()
     market_tool = MarketDataQueryTool()
     snap = get_latest_market_snapshot()
     if not snap or not snap.get("spot"):
@@ -406,193 +407,46 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             _log(f"  ✓ corrected expiry: {expiry}")
     except ValueError:
         pass
-    from crewai import Task, Crew, Process
+    from crewai import Crew, Process
 
     # ── Task 1a: NOT_UP Entry Agent (CALL_SPREAD gate) ─────────────────
-    not_up_entry_task = Task(
-        description=(
-            "Independently evaluate if market rejects upside (bearish pressure).\n\n"
-            "Your sole job: Decide whether to PLACE CALL_SPREAD.\n\n"
-            "STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.\n"
-            "STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.\n"
-            "STEP 3: Apply NOT_UP rejection logic:\n"
-            "  - Both BEARISH → go:true, confidence 90%\n"
-            "  - One BEARISH + one NEUTRAL → go:true, confidence 60%\n"
-            "  - Both NEUTRAL or any BULLISH → go:false\n\n"
-            "IMPORTANT: Return ONLY valid JSON:\n"
-            '{"go": true/false, "signal": "NOT_UP", "confidence": 0-100, '
-            '"trend_signal": "BEARISH"|"NEUTRAL"|"BULLISH", '
-            '"traffic_light_signal": "BEARISH"|"NEUTRAL"|"BULLISH", '
-            '"reasoning": "why market rejects upside or not"}'
-        ),
-        expected_output="NOT_UP entry decision JSON with go flag",
-        agent=not_up_entry_agent,
-    )
+    not_up_entry_task = tf.create_task("not_up_entry_task", agent=not_up_entry_agent)
 
     # ── Task 1b: NOT_DOWN Entry Agent (PUT_SPREAD gate) ────────────────
-    not_down_entry_task = Task(
-        description=(
-            "Independently evaluate if market rejects downside (bullish pressure).\n\n"
-            "Your sole job: Decide whether to PLACE PUT_SPREAD.\n\n"
-            "STEP 1: Call query_trend_ema(NIFTY) to get Trend signal.\n"
-            "STEP 2: Call query_traffic_light(NIFTY) to get Traffic Light signal.\n"
-            "STEP 3: Apply NOT_DOWN rejection logic:\n"
-            "  - Both BULLISH → go:true, confidence 90%\n"
-            "  - One BULLISH + one NEUTRAL → go:true, confidence 60%\n"
-            "  - Both NEUTRAL or any BEARISH → go:false\n\n"
-            "IMPORTANT: Return ONLY valid JSON:\n"
-            '{"go": true/false, "signal": "NOT_DOWN", "confidence": 0-100, '
-            '"trend_signal": "BULLISH"|"NEUTRAL"|"BEARISH", '
-            '"traffic_light_signal": "BULLISH"|"NEUTRAL"|"BEARISH", '
-            '"reasoning": "why market rejects downside or not"}'
-        ),
-        expected_output="NOT_DOWN entry decision JSON with go flag",
-        agent=not_down_entry_agent,
+    not_down_entry_task = tf.create_task(
+        "not_down_entry_task", agent=not_down_entry_agent
     )
 
     # ── Task 2: Regime Agent ───────────────────────────────────────────
-    regime_task = Task(
-        description=(
-            "Get market regime data for position sizing + morpher.\n\n"
-            "ONE TOOL CALL: query_market_data(query_type='full_regime') to fetch VIX, ADX, ADX direction.\n\n"
-            "Gating rules (VIX only):\n"
-            "  - VIX > 25 → recommendation: 'skip' (panic, no entries)\n"
-            "  - VIX > 18 → recommendation: 'caution' (reduce size)\n"
-            "  - Else → recommendation: 'enter'\n\n"
-            "ADX is a dummy pass-through — does NOT block entry.\n"
-            "It is passed to position manager for stop/morph decisions.\n\n"
-            "OUTPUT only valid JSON:\n"
-            '{"vix": 0.0, "adx": 0.0, "recommendation": "enter"|"caution"|"skip", "reason": "..."}'
-        ),
-        expected_output="Regime JSON with VIX and ADX",
-        agent=regime_agent,
-        context=[],
-    )
+    regime_task = tf.create_task("regime_task", agent=regime_agent)
 
     # ── Task 3: Strategy Agent (sequential execution - one spread per cycle) ────────────────────
-    strategy_task = Task(
-        description=(
-            "Dual-Entry Sequential Execution: Pick ONE spread to execute this cycle.\n\n"
-            "STEP 1: Parse both entry decisions from context:\n"
-            "  - NOT_UP decision: go=true/false → execute CALL_SPREAD if true\n"
-            "  - NOT_DOWN decision: go=true/false → execute PUT_SPREAD if true\n\n"
-            "STEP 2: SEQUENTIAL LOGIC (one spread per cycle):\n"
-            "  IF BOTH go_call_spread AND go_put_spread are true:\n"
-            "    → Market is sideways (both sides valid). Output IRON_BUTTERFLY.\n"
-            "    → Use IRON_BUTTERFLY with wing_width optimization from Regime (VIX) data.\n"
-            "  ELSE IF go_call_spread=true: output CALL_SPREAD parameters (this cycle)\n"
-            "  ELSE IF go_put_spread=true: output PUT_SPREAD parameters (this cycle)\n"
-            '  ELSE: return {"skip": true}\n\n'
-            "STEP 3: Optimize parameters from Regime data (VIX, ADX):\n"
-            "  - wing_width: 200 default, 150 if VIX<15, 250 if VIX>20\n"
-            "  - sl_pct: 0.25 default, 0.35 if VIX>18\n"
-            "  - tp_pct: 0.50 default, 0.40 if ADX>30, 0.55 if ADX<20\n"
-            "  - IRON_BUTTERFLY gets same wing_width optimization\n\n"
-            "OUTPUT JSON (one of):\n"
-            '{"strategy_type": "CALL_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}\n'
-            'OR {"strategy_type": "PUT_SPREAD", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}\n'
-            'OR {"strategy_type": "IRON_BUTTERFLY", "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50}'
-        ),
-        expected_output="CALL_SPREAD, PUT_SPREAD, or IRON_BUTTERFLY parameters",
+    strategy_task = tf.create_task(
+        "strategy_task",
         agent=strategy_agent,
         context=[not_up_entry_task, not_down_entry_task, regime_task],
     )
 
     # ── Task 4: Contract Agent ─────────────────────────────────────────
-    contract_task = Task(
-        description=(
-            "Resolve option contracts from DuckDB.\n\n"
-            "Parse Strategy Agent's output to get strategy_type and wing_width.\n"
-            f"ATM: {atm}. Expiry: {expiry}.\n\n"
-            "Call resolve_option_contracts(strategy_type, atm, wing_width, expiry).\n"
-            "Return the contracts JSON as-is from the tool. Do not modify.\n\n"
-            "Output ONLY valid JSON (the tool's output is already correct)."
-        ),
-        expected_output="Contracts JSON with tsyms and ltps",
+    contract_task = tf.create_task(
+        "contract_task",
+        variables={"atm": atm, "expiry": expiry},
         agent=contract_agent,
         context=[strategy_task],
     )
 
     # ── Task 5: Execution Agent ────────────────────────────────────────
-    execution_task = Task(
-        description=(
-            "═══ PHASE 1 (Current): NIFTY/SENSEX Options ═══\n"
-            "YOU ARE A DUMB EXECUTOR. All decisions are made upstream.\n\n"
-            "UPSTREAM DECISIONS (already made):\n"
-            "  ✓ Entry Agent: Is there a signal? → YES\n"
-            "  ✓ Regime Agent: What's the regime? → Sideways\n"
-            "  ✓ Strategy Agent: What to trade? → CALL_SPREAD (wing_width=200, sl=0.25, tp=0.50)\n"
-            "  ✓ Contract Agent: What contracts? → Resolved tsyms + ltps\n"
-            "  ✓ Asset (Phase 1): NIFTY (only option in Phase 1)\n\n"
-            "YOUR JOB:\n"
-            "STEP 1: Parse Contract Agent's output for resolved contracts (tsym, ltp, strike, action).\n"
-            "STEP 2: Parse Strategy Agent's output for strategy_type, wing_width, sl_pct, tp_pct.\n"
-            f"STEP 3: Call execute_paper_trade(contracts_json, strategy_type, entry_time, "
-            f"spot={spot}, atm={atm}, vix={vix}, expiry='{expiry}', "
-            "wing_width, sl_pct, tp_pct) to build trade dict.\n"
-            "  This calculates net_credit, SL/TP levels, and returns the complete trade.\n\n"
-            "VERIFICATION: Check the trade dict from execute_paper_trade:\n"
-            "  ✓ net_credit > 0 (strategy generates premium)\n"
-            "  ✓ SL > LTP on every SELL leg (SL is above current price)\n"
-            "  ✓ TP < LTP on every SELL leg (TP is below current price)\n"
-            "  ✓ leg_count matches strategy (2 for spreads, 4 for butterfly)\n\n"
-            "STEP 4: Hand off ALL entry legs to order routing hub via place_entry_orders(legs).\n"
-            "  CRITICAL: Call place_entry_orders with the legs from the trade dict.\n"
-            "  The order_routing module inside place_entry_orders will:\n"
-            "    - PAPER mode: save to order_ledger.json, return order_ids\n"
-            "    - LIVE mode:  forward to Shoonya API, return broker order_ids\n"
-            "  Return value: {trade_id, entry_orders: [order_ids], status, mode}\n\n"
-            "STEP 5: Extract trade_id from place_entry_orders result.\n"
-            "  Pass trade_id to Risk Agent (in next task context) for SL/TP routing.\n\n"
-            "Output the complete trade dict with entry_order_results (trade_id + order_ids).\n\n"
-            "═══ PHASE 2+ (Future): Multi-Asset Expansion ═══\n"
-            "YOU REMAIN A DUMB EXECUTOR. Architecture changes UPSTREAM, not here.\n\n"
-            "NEW UPSTREAM WORKFLOW:\n"
-            "  1. Entry Agent → Regime Agent → Strategy Agent → [NEW] Asset Selector Agent\n"
-            "  2. Asset Selector Agent: queries ChromaDB for best asset\n"
-            "     Output: {asset_class: 'NIFTY'|'Reliance'|'Crude'|'BTC', confidence, position_size}\n"
-            "  3. Contract Agent: resolves contracts for picked asset\n"
-            "  4. YOU receive: {asset_class, contracts, strategy_type, wing_width, sl_pct, tp_pct}\n"
-            "  5. YOU execute: same logic as Phase 1, just different assets\n\n"
-            "YOUR CODE STAYS IDENTICAL:\n"
-            "  - execute_paper_trade() works for any asset (NIFTY, Reliance, Crude, BTC)\n"
-            "  - place_entry_orders() works for any asset\n"
-            "  - You don't care which asset — just build + route\n\n"
-            "YOU DO NOT:\n"
-            "  ❌ Query historical win rates\n"
-            "  ❌ Decide which asset to trade\n"
-            "  ❌ Optimize parameters\n"
-            "  ❌ Check liquidity\n"
-            "  ❌ Make any decisions"
-        ),
-        expected_output="Trade dict with legs, net_credit, sl, tp, trade_id, entry_orders",
+    execution_task = tf.create_task(
+        "execution_task",
+        variables={"spot": spot, "atm": atm, "vix": vix, "expiry": expiry},
         agent=execution_agent,
         context=[strategy_task, contract_task],
     )
 
     # ── Task 6: Risk Agent ─────────────────────────────────────────────
-    risk_task = Task(
-        description=(
-            "ENTRY PHASE: Place all SL and TP orders via the centralized order routing hub.\n\n"
-            "YOUR ONLY TOOL: place_sl_tp_orders (routes through order routing hub)\n\n"
-            "STEP 1: Parse Execution Agent's output to extract:\n"
-            "  - trade_id (from the execution output)\n"
-            "  - legs (array of leg dicts with tsym, action, strike, type, quantity, sl, tp)\n\n"
-            "STEP 2: Call place_sl_tp_orders(trade_id=<trade_id>, legs=<legs>)\n"
-            "  This is the ONLY way to place SL/TP orders in entry phase.\n"
-            "  The order_routing module inside place_sl_tp_orders will:\n"
-            "    - PAPER mode: save to order_ledger.json\n"
-            "    - LIVE mode:  forward to Shoonya API\n\n"
-            "MECHANICS (for reference — order_routing handles):\n"
-            "  - SELL legs (center): get SL (buy trigger when price rises) + TP (buy limit when price falls)\n"
-            "  - BUY legs (hedges): get NO orders — held to expiry\n"
-            "  - SL = entry_premium × (1 + sl_pct). TP = entry_premium × (1 - tp_pct)\n\n"
-            "CRITICAL: Do NOT call place_sl_order or place_tp_order directly.\n"
-            "Only call place_sl_tp_orders. All orders route through the centralized hub.\n\n"
-            f"Risk limits: max loss per spread = (wing_width - net_credit) * 65.\n\n"
-            "Output: confirmation JSON with sl_order_ids and tp_order_ids from order_routing."
-        ),
-        expected_output="Risk confirmation with SL/TP order IDs routed via order_routing",
+    risk_task = tf.create_task(
+        "risk_task",
+        variables={"wing_width": 200},
         agent=risk_agent,
         context=[execution_task],
     )

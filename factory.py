@@ -1,15 +1,15 @@
 """
-Brahmand Agent & Tool Factory — Dynamic CrewAI agent creation from YAML registries.
+Brahmand Agent, Task & Tool Factory — Dynamic CrewAI creation from YAML registries.
 
-Reads agents_registry.yaml and tools_registry.yaml at runtime.
+Reads agents_registry.yaml, tasks.yaml and tools_registry.yaml at runtime.
 Populates {variable} slots from daily_config / market context.
-Returns configured CrewAI Agent and Tool instances.
+Returns configured CrewAI Agent, Task, and Tool instances.
 """
 
 from pathlib import Path
 
 import yaml
-from crewai import Agent
+from crewai import Agent, Task
 
 REGISTRY_DIR = Path(__file__).parent / "config"
 
@@ -104,3 +104,49 @@ class ToolFactory:
     def list_markets(self) -> list[str]:
         """Return available market types."""
         return list(self._market_tools.keys())
+
+
+class TaskFactory:
+    """Creates CrewAI Task instances from tasks.yaml blueprints."""
+
+    def __init__(self, registry_path: str = "tasks.yaml"):
+        self._blueprints = _load_yaml(registry_path)
+
+    def create_task(
+        self,
+        task_key: str,
+        variables: dict | None = None,
+        agent: Agent | None = None,
+        context: list = None,
+    ) -> Task:
+        """
+        Create a CrewAI Task from its YAML blueprint.
+
+        Args:
+            task_key: Key in tasks.yaml (e.g. 'not_up_entry_task')
+            variables: Dict of {variable} → value for template substitution
+            agent: CrewAI Agent instance assigned to this task
+            context: List of upstream Task objects for CrewAI context passing
+        """
+        blueprint = self._blueprints.get(task_key)
+        if blueprint is None:
+            raise KeyError(
+                f"Unknown task: {task_key}. Available: {list(self._blueprints.keys())}"
+            )
+
+        variables = variables or {}
+        description = _resolve_variables(blueprint["description"], variables)
+        expected_output = _resolve_variables(
+            blueprint.get("expected_output", ""), variables
+        )
+
+        return Task(
+            description=description,
+            expected_output=expected_output,
+            agent=agent,
+            context=context or [],
+        )
+
+    def list_tasks(self) -> list[str]:
+        """Return available task keys."""
+        return list(self._blueprints.keys())
