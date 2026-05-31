@@ -152,6 +152,7 @@ def store_approved_patterns_in_chromadb(
                 "family": pattern.get("family"),
                 "discovery_date": datetime.now().isoformat(),
                 "predicted_direction": predicted_direction,
+                "trigger_conditions": pattern.get("trigger_conditions", {}),
                 "backtest_results": {
                     "total_matches": summary.total_matches,
                     "win_rate": summary.overall_win_rate,

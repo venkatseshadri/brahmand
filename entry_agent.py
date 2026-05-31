@@ -45,11 +45,13 @@ class EntryAgent:
 
         self.chroma_path = chroma_path
         self.patterns = []
+        # Option A: original backtest-calibrated weights, EMA excluded (double-counts Trend).
         self.family_weights = {
             "supertrend": 0.87,
             "pcr": 0.72,
-            "ema": 0.77,
+            "ema": 0.0,  # excluded — EMA already covered by Trend checkpoint
             "volatility": 0.68,
+            "volume": 0.60,
         }
 
         self.load_patterns_from_chromadb()
@@ -59,7 +61,7 @@ class EntryAgent:
         """Convert win_rate string ('100.0%') to float (1.0)"""
         try:
             if isinstance(win_rate_str, str):
-                return float(win_rate_str.rstrip('%')) / 100.0
+                return float(win_rate_str.rstrip("%")) / 100.0
             return float(win_rate_str)
         except Exception:
             return 0.5
@@ -104,7 +106,11 @@ class EntryAgent:
                             if metadata
                             else "NEUTRAL",
                         ),
-                        "hit_rate": self._parse_win_rate(metadata.get("win_rate", "50%")) if metadata else 0.5,
+                        "hit_rate": self._parse_win_rate(
+                            metadata.get("win_rate", "50%")
+                        )
+                        if metadata
+                        else 0.5,
                     }
 
                     if pattern["active"]:
@@ -147,6 +153,8 @@ class EntryAgent:
         pattern_quality = {}
 
         for pattern in self.patterns:
+            if pattern.get("weight", 0.5) == 0:
+                continue  # excluded family (e.g. EMA double-counts Trend)
             if self._pattern_matches(current_candle, pattern):
                 matching_patterns.append(pattern["pattern_name"])
                 hit_rate = pattern.get("hit_rate", 0.5)
@@ -160,7 +168,9 @@ class EntryAgent:
         traffic_light = self._get_traffic_light(confidence)
 
         # Step 4: Determine direction from matched patterns' stored predicted_direction
-        entry = confidence >= 0.75  # MEDIUM gate: filters worst 25% of low-confidence setups
+        entry = (
+            confidence >= 0.75
+        )  # MEDIUM gate: filters worst 25% of low-confidence setups
         direction = self._determine_direction_from_patterns(matching_patterns)
         target_points = self._calculate_target_from_patterns(matching_patterns)
         recommended_size = self._scale_position_size(confidence)
@@ -194,11 +204,22 @@ class EntryAgent:
 
             # Handle different condition types
             if isinstance(expected_value, dict):
-                # Range condition: {"min": 30, "max": 50}
-                if "min" in expected_value and actual_value < expected_value["min"]:
-                    return False
-                if "max" in expected_value and actual_value > expected_value["max"]:
-                    return False
+                # "outside" mode: trigger when value is OUTSIDE [min, max]
+                # Used for PCR (outside 0.85-1.15), RSI (outside 30-70)
+                if expected_value.get("outside"):
+                    if (
+                        "min" in expected_value
+                        and actual_value >= expected_value["min"]
+                        and "max" in expected_value
+                        and actual_value <= expected_value["max"]
+                    ):
+                        return False
+                else:
+                    # Default: range condition — trigger when value is INSIDE [min, max]
+                    if "min" in expected_value and actual_value < expected_value["min"]:
+                        return False
+                    if "max" in expected_value and actual_value > expected_value["max"]:
+                        return False
             elif isinstance(expected_value, list):
                 # Enum condition: ["GREEN", "RED"]
                 if actual_value not in expected_value:

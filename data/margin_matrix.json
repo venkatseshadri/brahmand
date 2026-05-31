@@ -1,79 +1,79 @@
 {
-  "atm": 23900,
+  "atm": 23750,
   "expiry": "02-JUN-2026",
-  "timestamp": "2026-05-29T09:10:06.273768",
+  "timestamp": "2026-05-29T15:30:22.154646",
   "strike_step": 50,
   "lot_size": 65,
   "spreads": [
     {
       "type": "PE",
-      "sell_strike": 23900,
-      "buy_strike": 23850,
-      "wing_width": 50,
-      "margin": 142625.6
-    },
-    {
-      "type": "PE",
-      "sell_strike": 23900,
-      "buy_strike": 23800,
-      "wing_width": 100,
-      "margin": 145741.05
-    },
-    {
-      "type": "PE",
-      "sell_strike": 23900,
-      "buy_strike": 23750,
-      "wing_width": 150,
-      "margin": 148813.0
-    },
-    {
-      "type": "PE",
-      "sell_strike": 23900,
+      "sell_strike": 23750,
       "buy_strike": 23700,
-      "wing_width": 200,
-      "margin": 151852.0
+      "wing_width": 50,
+      "margin": 133504.0
     },
     {
       "type": "PE",
-      "sell_strike": 23900,
+      "sell_strike": 23750,
       "buy_strike": 23650,
-      "wing_width": 250,
-      "margin": 154850.8
-    },
-    {
-      "type": "CE",
-      "sell_strike": 23900,
-      "buy_strike": 23950,
-      "wing_width": 50,
-      "margin": 147176.25
-    },
-    {
-      "type": "CE",
-      "sell_strike": 23900,
-      "buy_strike": 24000,
       "wing_width": 100,
-      "margin": 150414.0
+      "margin": 136502.75
     },
     {
-      "type": "CE",
-      "sell_strike": 23900,
-      "buy_strike": 24050,
+      "type": "PE",
+      "sell_strike": 23750,
+      "buy_strike": 23600,
       "wing_width": 150,
-      "margin": 153726.95
+      "margin": 139457.25
     },
     {
-      "type": "CE",
-      "sell_strike": 23900,
-      "buy_strike": 24100,
+      "type": "PE",
+      "sell_strike": 23750,
+      "buy_strike": 23550,
       "wing_width": 200,
-      "margin": 156959.4
+      "margin": 142421.25
+    },
+    {
+      "type": "PE",
+      "sell_strike": 23750,
+      "buy_strike": 23500,
+      "wing_width": 250,
+      "margin": 145371.85
     },
     {
       "type": "CE",
-      "sell_strike": 23900,
-      "buy_strike": 24150,
+      "sell_strike": 23750,
+      "buy_strike": 23800,
+      "wing_width": 50,
+      "margin": 157851.0
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23750,
+      "buy_strike": 23850,
+      "wing_width": 100,
+      "margin": 161361.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23750,
+      "buy_strike": 23900,
+      "wing_width": 150,
+      "margin": 164655.75
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23750,
+      "buy_strike": 23950,
+      "wing_width": 200,
+      "margin": 167914.25
+    },
+    {
+      "type": "CE",
+      "sell_strike": 23750,
+      "buy_strike": 24000,
       "wing_width": 250,
-      "margin": 160107.5
+      "margin": 171152.0
     }
   ]
 }

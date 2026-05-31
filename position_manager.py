@@ -16,7 +16,6 @@ One system, one owner. No conflict with risk monitor — this IS the risk monito
 import json
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -43,9 +42,7 @@ CLOSE_SIDE = "CLOSE_SIDE"
 CLOSE_ALL = "CLOSE_ALL"
 NOTHING = "NOTHING"
 
-
-def now_str() -> str:
-    return datetime.now().strftime("%H:%M")
+from market_data import now_str
 
 
 def _get_ltp(con, expiry: str, strike: int, otype: str) -> float:

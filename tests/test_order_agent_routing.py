@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Test Order Agent Routing — Verify centralized order hub works correctly.
+Test Order Routing — Verify centralized order hub works correctly.
 
 Tests:
-  1. PlaceEntryOrdersTool can route through Order Agent
-  2. PlaceSLTPOrdersTool can route through Order Agent
+  1. PlaceEntryOrdersTool can route through order_routing
+  2. PlaceSLTPOrdersTool can route through order_routing
   3. order_ledger.json gets populated with PAPER orders
   4. Entry and Risk agents have correct tools
 
@@ -23,18 +23,20 @@ sys.path.insert(0, str(Path(__file__).parent))
 print("TEST 1: Importing order routing tools...")
 try:
     from tools.chain_tools import PlaceEntryOrdersTool, PlaceSLTPOrdersTool
+
     print("  ✅ PlaceEntryOrdersTool imported")
     print("  ✅ PlaceSLTPOrdersTool imported")
 except ImportError as e:
     print(f"  ❌ Import failed: {e}")
     sys.exit(1)
 
-# Test 2: Import order_agent
-print("\nTEST 2: Importing order_agent...")
+# Test 2: Import order_routing
+print("\nTEST 2: Importing order_routing...")
 try:
-    from order_agent import place_entry_orders, place_sl_tp_orders
-    print("  ✅ order_agent.place_entry_orders imported")
-    print("  ✅ order_agent.place_sl_tp_orders imported")
+    from order_routing import place_entry_orders, place_sl_tp_orders
+
+    print("  ✅ order_routing.place_entry_orders imported")
+    print("  ✅ order_routing.place_sl_tp_orders imported")
 except ImportError as e:
     print(f"  ❌ Import failed: {e}")
     sys.exit(1)
@@ -173,7 +175,7 @@ except Exception as e:
 print("\n" + "=" * 70)
 print("✅ ALL TESTS PASSED")
 print("=" * 70)
-print("\nOrder Agent routing refactoring is working correctly!")
+print("\nOrder routing refactoring is working correctly!")
 print("- Centralized order hub routes entry and SL/TP orders")
 print("- order_ledger.json tracks all orders in PAPER mode")
 print("- All three agents (execution, risk, order) properly configured")

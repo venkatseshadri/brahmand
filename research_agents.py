@@ -679,7 +679,7 @@ class EMAResearchAgent(ResearchAgentBase):
     def __init__(self):
         super().__init__()
         self.family = "ema"
-        self.weight = 0.77
+        self.weight = 0.0  # Option A: excluded — EMA double-counts Trend checkpoint
 
     def discover_patterns(self, date: str) -> List[DiscoveredPattern]:
         """Find patterns: EMA crossovers, RSI flips"""

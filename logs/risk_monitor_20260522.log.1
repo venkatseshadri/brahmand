@@ -1,0 +1,876 @@
+[09:00:06] 🔍 Risk Monitor: Checking active trades
+[09:00:06]   CALL_SPREAD | Entry: 14:01 | Open: -300m
+[09:00:07]   ✅ Position OK | 14:01
+[09:01:02] 🔍 Risk Monitor: Checking active trades
+[09:01:02]   CALL_SPREAD | Entry: 14:01 | Open: -299m
+[09:01:03]   ✅ Position OK | 14:01
+[09:02:03] 🔍 Risk Monitor: Checking active trades
+[09:02:03]   CALL_SPREAD | Entry: 14:01 | Open: -298m
+[09:02:03]   ✅ Position OK | 14:01
+[09:03:03] 🔍 Risk Monitor: Checking active trades
+[09:03:03]   CALL_SPREAD | Entry: 14:01 | Open: -297m
+[09:03:03]   ✅ Position OK | 14:01
+[09:04:03] 🔍 Risk Monitor: Checking active trades
+[09:04:03]   CALL_SPREAD | Entry: 14:01 | Open: -296m
+[09:04:03]   ✅ Position OK | 14:01
+[09:05:05] 🔍 Risk Monitor: Checking active trades
+[09:05:05]   CALL_SPREAD | Entry: 14:01 | Open: -295m
+[09:05:06]   ✅ Position OK | 14:01
+[09:06:03] 🔍 Risk Monitor: Checking active trades
+[09:06:03]   CALL_SPREAD | Entry: 14:01 | Open: -294m
+[09:06:03]   ✅ Position OK | 14:01
+[09:07:03] 🔍 Risk Monitor: Checking active trades
+[09:07:03]   CALL_SPREAD | Entry: 14:01 | Open: -293m
+[09:07:03]   ✅ Position OK | 14:01
+[09:08:03] 🔍 Risk Monitor: Checking active trades
+[09:08:03]   CALL_SPREAD | Entry: 14:01 | Open: -292m
+[09:08:03]   ✅ Position OK | 14:01
+[09:09:04] 🔍 Risk Monitor: Checking active trades
+[09:09:04]   CALL_SPREAD | Entry: 14:01 | Open: -291m
+[09:09:04]   ✅ Position OK | 14:01
+[09:10:06] 🔍 Risk Monitor: Checking active trades
+[09:10:06]   CALL_SPREAD | Entry: 14:01 | Open: -290m
+[09:10:07]   ✅ Position OK | 14:01
+[09:11:02] 🔍 Risk Monitor: Checking active trades
+[09:11:02]   CALL_SPREAD | Entry: 14:01 | Open: -289m
+[09:11:02]   ✅ Position OK | 14:01
+[09:12:03] 🔍 Risk Monitor: Checking active trades
+[09:12:03]   CALL_SPREAD | Entry: 14:01 | Open: -288m
+[09:12:03]   ✅ Position OK | 14:01
+[09:13:03] 🔍 Risk Monitor: Checking active trades
+[09:13:03]   CALL_SPREAD | Entry: 14:01 | Open: -287m
+[09:13:03]   ✅ Position OK | 14:01
+[09:14:04] 🔍 Risk Monitor: Checking active trades
+[09:14:04]   CALL_SPREAD | Entry: 14:01 | Open: -286m
+[09:14:13] ❌ Error: DuckDB locked by capture after 10 retries — skip this cycle
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/risk_monitor.py", line 192, in main
+    result = check_sl_tp_triggers(trade)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/risk_monitor.py", line 89, in check_sl_tp_triggers
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    raise IOError("DuckDB locked by capture after 10 retries — skip this cycle")
+OSError: DuckDB locked by capture after 10 retries — skip this cycle
+[09:15:08] 🔍 Risk Monitor: Checking active trades
+[09:15:08]   CALL_SPREAD | Entry: 14:01 | Open: -285m
+[09:15:17] ❌ Error: DuckDB locked by capture after 10 retries — skip this cycle
+Traceback (most recent call last):
+  File "/home/trading_ceo/brahmand/risk_monitor.py", line 192, in main
+    result = check_sl_tp_triggers(trade)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/risk_monitor.py", line 89, in check_sl_tp_triggers
+    con = _connect()
+          ^^^^^^^^^^
+  File "/home/trading_ceo/brahmand/duckdb_tool.py", line 36, in _connect
+    raise IOError("DuckDB locked by capture after 10 retries — skip this cycle")
+OSError: DuckDB locked by capture after 10 retries — skip this cycle
+[09:16:05] 🔍 Risk Monitor: Checking active trades
+[09:16:05]   CALL_SPREAD | Entry: 14:01 | Open: -284m
+[09:16:09]   ✅ Position OK | 14:01
+[09:58:04] 🔍 Risk Monitor: Checking active trades
+[09:58:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 25m
+[09:58:10] 🟢 TP HIT — ?: LTP=0 <= TP=74.09
+[09:58:10]   Closing trade 2026-05-22T09:33:04.862917: TP_HIT | PnL: ₹0
+[09:59:05] 🔍 Risk Monitor: Checking active trades
+[09:59:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 26m
+[09:59:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:00:10] 🔍 Risk Monitor: Checking active trades
+[10:00:10]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 27m
+[10:00:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:01:05] 🔍 Risk Monitor: Checking active trades
+[10:01:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 28m
+[10:01:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:02:04] 🔍 Risk Monitor: Checking active trades
+[10:02:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 29m
+[10:02:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:03:03] 🔍 Risk Monitor: Checking active trades
+[10:03:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 29m
+[10:03:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:04:03] 🔍 Risk Monitor: Checking active trades
+[10:04:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 30m
+[10:04:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:05:05] 🔍 Risk Monitor: Checking active trades
+[10:05:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 32m
+[10:05:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:06:05] 🔍 Risk Monitor: Checking active trades
+[10:06:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 33m
+[10:06:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:07:03] 🔍 Risk Monitor: Checking active trades
+[10:07:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 33m
+[10:07:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:08:03] 🔍 Risk Monitor: Checking active trades
+[10:08:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 34m
+[10:08:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:09:04] 🔍 Risk Monitor: Checking active trades
+[10:09:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 36m
+[10:09:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:10:04] 🔍 Risk Monitor: Checking active trades
+[10:10:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 37m
+[10:10:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:11:04] 🔍 Risk Monitor: Checking active trades
+[10:11:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 38m
+[10:11:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:12:03] 🔍 Risk Monitor: Checking active trades
+[10:12:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 38m
+[10:12:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:13:03] 🔍 Risk Monitor: Checking active trades
+[10:13:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 39m
+[10:13:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:14:03] 🔍 Risk Monitor: Checking active trades
+[10:14:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 40m
+[10:14:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:15:04] 🔍 Risk Monitor: Checking active trades
+[10:15:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 42m
+[10:15:04]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:16:03] 🔍 Risk Monitor: Checking active trades
+[10:16:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 42m
+[10:16:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:17:06] 🔍 Risk Monitor: Checking active trades
+[10:17:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 44m
+[10:17:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:18:04] 🔍 Risk Monitor: Checking active trades
+[10:18:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 45m
+[10:18:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:19:03] 🔍 Risk Monitor: Checking active trades
+[10:19:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 45m
+[10:19:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:20:04] 🔍 Risk Monitor: Checking active trades
+[10:20:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 47m
+[10:20:04]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:21:04] 🔍 Risk Monitor: Checking active trades
+[10:21:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 48m
+[10:21:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:22:04] 🔍 Risk Monitor: Checking active trades
+[10:22:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 49m
+[10:22:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:23:03] 🔍 Risk Monitor: Checking active trades
+[10:23:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 49m
+[10:23:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:24:03] 🔍 Risk Monitor: Checking active trades
+[10:24:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 50m
+[10:24:07]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:25:04] 🔍 Risk Monitor: Checking active trades
+[10:25:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 52m
+[10:25:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:26:05] 🔍 Risk Monitor: Checking active trades
+[10:26:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 53m
+[10:26:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:27:04] 🔍 Risk Monitor: Checking active trades
+[10:27:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 54m
+[10:27:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:28:02] 🔍 Risk Monitor: Checking active trades
+[10:28:02]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 54m
+[10:28:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:29:03] 🔍 Risk Monitor: Checking active trades
+[10:29:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 55m
+[10:29:07]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:30:07] 🔍 Risk Monitor: Checking active trades
+[10:30:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 57m
+[10:30:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:31:04] 🔍 Risk Monitor: Checking active trades
+[10:31:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 58m
+[10:31:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:32:04] 🔍 Risk Monitor: Checking active trades
+[10:32:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 59m
+[10:32:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:33:03] 🔍 Risk Monitor: Checking active trades
+[10:33:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 59m
+[10:33:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:34:04] 🔍 Risk Monitor: Checking active trades
+[10:34:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 61m
+[10:34:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:35:04] 🔍 Risk Monitor: Checking active trades
+[10:35:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 62m
+[10:35:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:36:06] 🔍 Risk Monitor: Checking active trades
+[10:36:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 63m
+[10:36:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:37:05] 🔍 Risk Monitor: Checking active trades
+[10:37:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 64m
+[10:37:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:38:04] 🔍 Risk Monitor: Checking active trades
+[10:38:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 65m
+[10:38:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:39:04] 🔍 Risk Monitor: Checking active trades
+[10:39:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 66m
+[10:39:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:40:08] 🔍 Risk Monitor: Checking active trades
+[10:40:08]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 67m
+[10:40:20]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:41:05] 🔍 Risk Monitor: Checking active trades
+[10:41:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 68m
+[10:41:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:42:05] 🔍 Risk Monitor: Checking active trades
+[10:42:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 69m
+[10:42:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:43:03] 🔍 Risk Monitor: Checking active trades
+[10:43:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 69m
+[10:43:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:44:03] 🔍 Risk Monitor: Checking active trades
+[10:44:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 70m
+[10:44:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:45:08] 🔍 Risk Monitor: Checking active trades
+[10:45:08]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 72m
+[10:45:19]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:46:07] 🔍 Risk Monitor: Checking active trades
+[10:46:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 73m
+[10:46:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:47:06] 🔍 Risk Monitor: Checking active trades
+[10:47:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 74m
+[10:47:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:48:04] 🔍 Risk Monitor: Checking active trades
+[10:48:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 75m
+[10:48:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:49:03] 🔍 Risk Monitor: Checking active trades
+[10:49:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 75m
+[10:49:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:50:05] 🔍 Risk Monitor: Checking active trades
+[10:50:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 77m
+[10:50:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:51:05] 🔍 Risk Monitor: Checking active trades
+[10:51:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 78m
+[10:51:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:52:04] 🔍 Risk Monitor: Checking active trades
+[10:52:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 79m
+[10:52:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:53:04] 🔍 Risk Monitor: Checking active trades
+[10:53:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 80m
+[10:53:07]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:54:03] 🔍 Risk Monitor: Checking active trades
+[10:54:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 80m
+[10:54:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:55:04] 🔍 Risk Monitor: Checking active trades
+[10:55:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 82m
+[10:55:04]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:56:05] 🔍 Risk Monitor: Checking active trades
+[10:56:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 83m
+[10:56:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:57:06] 🔍 Risk Monitor: Checking active trades
+[10:57:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 84m
+[10:57:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:58:06] 🔍 Risk Monitor: Checking active trades
+[10:58:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 85m
+[10:58:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[10:59:05] 🔍 Risk Monitor: Checking active trades
+[10:59:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 86m
+[10:59:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:00:07] 🔍 Risk Monitor: Checking active trades
+[11:00:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 87m
+[11:00:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:01:06] 🔍 Risk Monitor: Checking active trades
+[11:01:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 88m
+[11:01:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:02:05] 🔍 Risk Monitor: Checking active trades
+[11:02:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 89m
+[11:02:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:03:05] 🔍 Risk Monitor: Checking active trades
+[11:03:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 90m
+[11:03:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:04:05] 🔍 Risk Monitor: Checking active trades
+[11:04:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 91m
+[11:04:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:05:06] 🔍 Risk Monitor: Checking active trades
+[11:05:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 92m
+[11:05:06]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:06:07] 🔍 Risk Monitor: Checking active trades
+[11:06:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 93m
+[11:06:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:07:06] 🔍 Risk Monitor: Checking active trades
+[11:07:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 94m
+[11:07:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:08:05] 🔍 Risk Monitor: Checking active trades
+[11:08:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 95m
+[11:08:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:09:07] 🔍 Risk Monitor: Checking active trades
+[11:09:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 96m
+[11:09:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:10:09] 🔍 Risk Monitor: Checking active trades
+[11:10:09]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 97m
+[11:10:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:11:06] 🔍 Risk Monitor: Checking active trades
+[11:11:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 98m
+[11:11:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:12:06] 🔍 Risk Monitor: Checking active trades
+[11:12:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 99m
+[11:12:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:13:07] 🔍 Risk Monitor: Checking active trades
+[11:13:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 100m
+[11:13:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:14:08] 🔍 Risk Monitor: Checking active trades
+[11:14:08]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 101m
+[11:14:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:15:06] 🔍 Risk Monitor: Checking active trades
+[11:15:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 102m
+[11:15:06]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:16:07] 🔍 Risk Monitor: Checking active trades
+[11:16:07]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 103m
+[11:16:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:17:05] 🔍 Risk Monitor: Checking active trades
+[11:17:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 104m
+[11:17:08]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:18:04] 🔍 Risk Monitor: Checking active trades
+[11:18:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 105m
+[11:18:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:19:03] 🔍 Risk Monitor: Checking active trades
+[11:19:03]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 105m
+[11:19:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:20:06] 🔍 Risk Monitor: Checking active trades
+[11:20:06]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 107m
+[11:20:06]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:21:08] 🔍 Risk Monitor: Checking active trades
+[11:21:08]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 108m
+[11:21:13]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:22:05] 🔍 Risk Monitor: Checking active trades
+[11:22:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 109m
+[11:22:11]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:23:05] 🔍 Risk Monitor: Checking active trades
+[11:23:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 110m
+[11:23:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:24:04] 🔍 Risk Monitor: Checking active trades
+[11:24:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 111m
+[11:24:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:25:04] 🔍 Risk Monitor: Checking active trades
+[11:25:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 112m
+[11:25:05]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:26:05] 🔍 Risk Monitor: Checking active trades
+[11:26:05]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 113m
+[11:26:10]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:27:04] 🔍 Risk Monitor: Checking active trades
+[11:27:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 114m
+[11:27:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[11:28:04] 🔍 Risk Monitor: Checking active trades
+[11:28:04]   CALL_SPREAD | Entry: 2026-05-22T09:33:04.862917 | Open: 115m
+[11:28:09]   ✅ Position OK | 2026-05-22T09:33:04.862917
+[12:28:04] 🔍 Risk Monitor: Checking active trades
+[12:28:04]   CALL_SPREAD | Entry: 09:15 | Open: 193m
+[12:28:08]   ✅ Position OK | 09:15
+[12:29:03] 🔍 Risk Monitor: Checking active trades
+[12:29:03]   CALL_SPREAD | Entry: 09:15 | Open: 194m
+[12:29:08]   ✅ Position OK | 09:15
+[12:30:10] 🔍 Risk Monitor: Checking active trades
+[12:30:10]   CALL_SPREAD | Entry: 09:15 | Open: 195m
+[12:30:10]   ✅ Position OK | 09:15
+[12:31:03] 🔍 Risk Monitor: Checking active trades
+[12:31:03]   CALL_SPREAD | Entry: 09:15 | Open: 196m
+[12:31:08]   ✅ Position OK | 09:15
+[12:32:03] 🔍 Risk Monitor: Checking active trades
+[12:32:03]   CALL_SPREAD | Entry: 09:15 | Open: 197m
+[12:32:08]   ✅ Position OK | 09:15
+[12:33:03] 🔍 Risk Monitor: Checking active trades
+[12:33:03]   CALL_SPREAD | Entry: 09:15 | Open: 198m
+[12:33:08]   ✅ Position OK | 09:15
+[12:34:04] 🔍 Risk Monitor: Checking active trades
+[12:34:04]   CALL_SPREAD | Entry: 09:15 | Open: 199m
+[12:34:09]   ✅ Position OK | 09:15
+[12:35:04] 🔍 Risk Monitor: Checking active trades
+[12:35:04]   CALL_SPREAD | Entry: 09:15 | Open: 200m
+[12:35:04]   ✅ Position OK | 09:15
+[12:36:03] 🔍 Risk Monitor: Checking active trades
+[12:36:03]   CALL_SPREAD | Entry: 09:15 | Open: 201m
+[12:36:08]   ✅ Position OK | 09:15
+[12:37:04] 🔍 Risk Monitor: Checking active trades
+[12:37:04]   CALL_SPREAD | Entry: 09:15 | Open: 202m
+[12:37:09]   ✅ Position OK | 09:15
+[12:38:03] 🔍 Risk Monitor: Checking active trades
+[12:38:03]   CALL_SPREAD | Entry: 09:15 | Open: 203m
+[12:38:09]   ✅ Position OK | 09:15
+[12:39:04] 🔍 Risk Monitor: Checking active trades
+[12:39:04]   CALL_SPREAD | Entry: 09:15 | Open: 204m
+[12:39:10]   ✅ Position OK | 09:15
+[12:40:07] 🔍 Risk Monitor: Checking active trades
+[12:40:07]   CALL_SPREAD | Entry: 09:15 | Open: 205m
+[12:40:07]   ✅ Position OK | 09:15
+[12:41:03] 🔍 Risk Monitor: Checking active trades
+[12:41:03]   CALL_SPREAD | Entry: 09:15 | Open: 206m
+[12:41:08]   ✅ Position OK | 09:15
+[12:42:04] 🔍 Risk Monitor: Checking active trades
+[12:42:04]   CALL_SPREAD | Entry: 09:15 | Open: 207m
+[12:42:10]   ✅ Position OK | 09:15
+[12:43:03] 🔍 Risk Monitor: Checking active trades
+[12:43:03]   CALL_SPREAD | Entry: 09:15 | Open: 208m
+[12:43:09]   ✅ Position OK | 09:15
+[12:45:09] 🔍 Risk Monitor: Checking active trades
+[12:45:09]   CALL_SPREAD | Entry: 09:15 | Open: 210m
+[12:45:11]   ✅ Position OK | 09:15
+[12:46:24] 🔍 Risk Monitor: Checking active trades
+[12:46:24]   CALL_SPREAD | Entry: 09:15 | Open: 211m
+[12:46:32]   ✅ Position OK | 09:15
+[12:47:07] 🔍 Risk Monitor: Checking active trades
+[12:47:07]   CALL_SPREAD | Entry: 09:15 | Open: 212m
+[12:47:11]   ✅ Position OK | 09:15
+[12:48:07] 🔍 Risk Monitor: Checking active trades
+[12:48:07]   CALL_SPREAD | Entry: 09:15 | Open: 213m
+[12:48:10]   ✅ Position OK | 09:15
+[12:49:07] 🔍 Risk Monitor: Checking active trades
+[12:49:07]   CALL_SPREAD | Entry: 09:15 | Open: 214m
+[12:49:10]   ✅ Position OK | 09:15
+[12:50:13] 🔍 Risk Monitor: Checking active trades
+[12:50:13]   CALL_SPREAD | Entry: 09:15 | Open: 215m
+[12:50:24]   ✅ Position OK | 09:15
+[12:51:07] 🔍 Risk Monitor: Checking active trades
+[12:51:07]   CALL_SPREAD | Entry: 09:15 | Open: 216m
+[12:51:10]   ✅ Position OK | 09:15
+[12:52:06] 🔍 Risk Monitor: Checking active trades
+[12:52:06]   CALL_SPREAD | Entry: 09:15 | Open: 217m
+[12:52:10]   ✅ Position OK | 09:15
+[12:53:07] 🔍 Risk Monitor: Checking active trades
+[12:53:07]   CALL_SPREAD | Entry: 09:15 | Open: 218m
+[12:53:11]   ✅ Position OK | 09:15
+[12:54:07] 🔍 Risk Monitor: Checking active trades
+[12:54:07]   CALL_SPREAD | Entry: 09:15 | Open: 219m
+[12:54:11]   ✅ Position OK | 09:15
+[12:55:08] 🔍 Risk Monitor: Checking active trades
+[12:55:08]   CALL_SPREAD | Entry: 09:15 | Open: 220m
+[12:55:20]   ✅ Position OK | 09:15
+[12:56:06] 🔍 Risk Monitor: Checking active trades
+[12:56:06]   CALL_SPREAD | Entry: 09:15 | Open: 221m
+[12:56:10]   ✅ Position OK | 09:15
+[12:57:07] 🔍 Risk Monitor: Checking active trades
+[12:57:07]   CALL_SPREAD | Entry: 09:15 | Open: 222m
+[12:57:10]   ✅ Position OK | 09:15
+[12:58:08] 🔍 Risk Monitor: Checking active trades
+[12:58:08]   CALL_SPREAD | Entry: 09:15 | Open: 223m
+[12:58:14]   ✅ Position OK | 09:15
+[12:59:05] 🔍 Risk Monitor: Checking active trades
+[12:59:05]   CALL_SPREAD | Entry: 09:15 | Open: 224m
+[12:59:09]   ✅ Position OK | 09:15
+[13:00:12] 🔍 Risk Monitor: Checking active trades
+[13:00:12]   CALL_SPREAD | Entry: 09:15 | Open: 225m
+[13:00:23]   ✅ Position OK | 09:15
+[13:01:06] 🔍 Risk Monitor: Checking active trades
+[13:01:06]   CALL_SPREAD | Entry: 09:15 | Open: 226m
+[13:01:08]   ✅ Position OK | 09:15
+[13:02:07] 🔍 Risk Monitor: Checking active trades
+[13:02:07]   CALL_SPREAD | Entry: 09:15 | Open: 227m
+[13:02:10]   ✅ Position OK | 09:15
+[13:03:07] 🔍 Risk Monitor: Checking active trades
+[13:03:07]   CALL_SPREAD | Entry: 09:15 | Open: 228m
+[13:03:12]   ✅ Position OK | 09:15
+[13:04:07] 🔍 Risk Monitor: Checking active trades
+[13:04:07]   CALL_SPREAD | Entry: 09:15 | Open: 229m
+[13:04:10]   ✅ Position OK | 09:15
+[13:05:07] 🔍 Risk Monitor: Checking active trades
+[13:05:07]   CALL_SPREAD | Entry: 09:15 | Open: 230m
+[13:05:07]   ✅ Position OK | 09:15
+[13:08:07] 🔍 Risk Monitor: Checking active trades
+[13:08:07]   CALL_SPREAD | Entry: 09:15 | Open: 233m
+[13:08:11]   ✅ Position OK | 09:15
+[13:09:11] 🔍 Risk Monitor: Checking active trades
+[13:09:11]   CALL_SPREAD | Entry: 09:15 | Open: 234m
+[13:09:16]   ✅ Position OK | 09:15
+[13:10:09] 🔍 Risk Monitor: Checking active trades
+[13:10:09]   CALL_SPREAD | Entry: 09:15 | Open: 235m
+[13:10:26]   ✅ Position OK | 09:15
+[13:11:06] 🔍 Risk Monitor: Checking active trades
+[13:11:06]   CALL_SPREAD | Entry: 09:15 | Open: 236m
+[13:11:12]   ✅ Position OK | 09:15
+[13:12:06] 🔍 Risk Monitor: Checking active trades
+[13:12:06]   CALL_SPREAD | Entry: 09:15 | Open: 237m
+[13:13:07]   ✅ Position OK | 09:15
+[13:14:03] 🔍 Risk Monitor: Checking active trades
+[13:14:03]   CALL_SPREAD | Entry: 09:15 | Open: 239m
+[13:14:08]   ✅ Position OK | 09:15
+[13:15:04] 🔍 Risk Monitor: Checking active trades
+[13:15:04]   CALL_SPREAD | Entry: 09:15 | Open: 240m
+[13:15:04]   ✅ Position OK | 09:15
+[13:16:03] 🔍 Risk Monitor: Checking active trades
+[13:16:03]   CALL_SPREAD | Entry: 09:15 | Open: 241m
+[13:16:08]   ✅ Position OK | 09:15
+[13:17:05] 🔍 Risk Monitor: Checking active trades
+[13:17:05]   CALL_SPREAD | Entry: 09:15 | Open: 242m
+[13:17:08]   ✅ Position OK | 09:15
+[13:18:03] 🔍 Risk Monitor: Checking active trades
+[13:18:03]   CALL_SPREAD | Entry: 09:15 | Open: 243m
+[13:18:10]   ✅ Position OK | 09:15
+[13:19:03] 🔍 Risk Monitor: Checking active trades
+[13:19:03]   CALL_SPREAD | Entry: 09:15 | Open: 244m
+[13:19:08]   ✅ Position OK | 09:15
+[13:20:05] 🔍 Risk Monitor: Checking active trades
+[13:20:05]   CALL_SPREAD | Entry: 09:15 | Open: 245m
+[13:20:05]   ✅ Position OK | 09:15
+[13:21:04] 🔍 Risk Monitor: Checking active trades
+[13:21:04]   CALL_SPREAD | Entry: 09:15 | Open: 246m
+[13:21:09]   ✅ Position OK | 09:15
+[13:22:03] 🔍 Risk Monitor: Checking active trades
+[13:22:03]   CALL_SPREAD | Entry: 09:15 | Open: 247m
+[13:22:10]   ✅ Position OK | 09:15
+[13:23:03] 🔍 Risk Monitor: Checking active trades
+[13:23:03]   CALL_SPREAD | Entry: 09:15 | Open: 248m
+[13:23:08]   ✅ Position OK | 09:15
+[13:24:03] 🔍 Risk Monitor: Checking active trades
+[13:24:03]   CALL_SPREAD | Entry: 09:15 | Open: 249m
+[13:24:08]   ✅ Position OK | 09:15
+[13:25:05] 🔍 Risk Monitor: Checking active trades
+[13:25:05]   CALL_SPREAD | Entry: 09:15 | Open: 250m
+[13:25:16]   ✅ Position OK | 09:15
+[13:26:04] 🔍 Risk Monitor: Checking active trades
+[13:26:04]   CALL_SPREAD | Entry: 09:15 | Open: 251m
+[13:26:10]   ✅ Position OK | 09:15
+[13:27:03] 🔍 Risk Monitor: Checking active trades
+[13:27:03]   CALL_SPREAD | Entry: 09:15 | Open: 252m
+[13:27:08]   ✅ Position OK | 09:15
+[13:28:03] 🔍 Risk Monitor: Checking active trades
+[13:28:03]   CALL_SPREAD | Entry: 09:15 | Open: 253m
+[13:28:08]   ✅ Position OK | 09:15
+[13:29:04] 🔍 Risk Monitor: Checking active trades
+[13:29:04]   CALL_SPREAD | Entry: 09:15 | Open: 254m
+[13:29:09]   ✅ Position OK | 09:15
+[13:30:10] 🔍 Risk Monitor: Checking active trades
+[13:30:10]   CALL_SPREAD | Entry: 09:15 | Open: 255m
+[13:30:10]   ✅ Position OK | 09:15
+[13:31:04] 🔍 Risk Monitor: Checking active trades
+[13:31:04]   CALL_SPREAD | Entry: 09:15 | Open: 256m
+[13:31:09]   ✅ Position OK | 09:15
+[13:32:03] 🔍 Risk Monitor: Checking active trades
+[13:32:03]   CALL_SPREAD | Entry: 09:15 | Open: 257m
+[13:32:09]   ✅ Position OK | 09:15
+[13:33:03] 🔍 Risk Monitor: Checking active trades
+[13:33:03]   CALL_SPREAD | Entry: 09:15 | Open: 258m
+[13:33:08]   ✅ Position OK | 09:15
+[13:34:03] 🔍 Risk Monitor: Checking active trades
+[13:34:03]   CALL_SPREAD | Entry: 09:15 | Open: 259m
+[13:34:09]   ✅ Position OK | 09:15
+[13:35:05] 🔍 Risk Monitor: Checking active trades
+[13:35:05]   CALL_SPREAD | Entry: 09:15 | Open: 260m
+[13:35:05]   ✅ Position OK | 09:15
+[13:36:03] 🔍 Risk Monitor: Checking active trades
+[13:36:03]   CALL_SPREAD | Entry: 09:15 | Open: 261m
+[13:36:09]   ✅ Position OK | 09:15
+[13:37:03] 🔍 Risk Monitor: Checking active trades
+[13:37:03]   CALL_SPREAD | Entry: 09:15 | Open: 262m
+[13:37:09]   ✅ Position OK | 09:15
+[13:38:04] 🔍 Risk Monitor: Checking active trades
+[13:38:04]   CALL_SPREAD | Entry: 09:15 | Open: 263m
+[13:38:10]   ✅ Position OK | 09:15
+[13:39:05] 🔍 Risk Monitor: Checking active trades
+[13:39:05]   CALL_SPREAD | Entry: 09:15 | Open: 264m
+[13:39:10]   ✅ Position OK | 09:15
+[13:40:05] 🔍 Risk Monitor: Checking active trades
+[13:40:05]   CALL_SPREAD | Entry: 09:15 | Open: 265m
+[13:40:05]   ✅ Position OK | 09:15
+[13:41:02] 🔍 Risk Monitor: Checking active trades
+[13:41:02]   CALL_SPREAD | Entry: 09:15 | Open: 266m
+[13:41:08]   ✅ Position OK | 09:15
+[13:42:05] 🔍 Risk Monitor: Checking active trades
+[13:42:05]   CALL_SPREAD | Entry: 09:15 | Open: 267m
+[13:42:08]   ✅ Position OK | 09:15
+[13:43:04] 🔍 Risk Monitor: Checking active trades
+[13:43:04]   CALL_SPREAD | Entry: 09:15 | Open: 268m
+[13:43:09]   ✅ Position OK | 09:15
+[13:44:05] 🔍 Risk Monitor: Checking active trades
+[13:44:05]   CALL_SPREAD | Entry: 09:15 | Open: 269m
+[13:44:10]   ✅ Position OK | 09:15
+[13:45:06] 🔍 Risk Monitor: Checking active trades
+[13:45:06]   CALL_SPREAD | Entry: 09:15 | Open: 270m
+[13:45:07]   ✅ Position OK | 09:15
+[13:46:05] 🔍 Risk Monitor: Checking active trades
+[13:46:05]   CALL_SPREAD | Entry: 09:15 | Open: 271m
+[13:46:10]   ✅ Position OK | 09:15
+[13:47:06] 🔍 Risk Monitor: Checking active trades
+[13:47:06]   CALL_SPREAD | Entry: 09:15 | Open: 272m
+[13:47:10]   ✅ Position OK | 09:15
+[13:48:06] 🔍 Risk Monitor: Checking active trades
+[13:48:06]   CALL_SPREAD | Entry: 09:15 | Open: 273m
+[13:48:10]   ✅ Position OK | 09:15
+[13:49:06] 🔍 Risk Monitor: Checking active trades
+[13:49:06]   CALL_SPREAD | Entry: 09:15 | Open: 274m
+[13:49:09]   ✅ Position OK | 09:15
+[13:50:11] 🔍 Risk Monitor: Checking active trades
+[13:50:11]   CALL_SPREAD | Entry: 09:15 | Open: 275m
+[13:50:12]   ✅ Position OK | 09:15
+[13:51:06] 🔍 Risk Monitor: Checking active trades
+[13:51:06]   CALL_SPREAD | Entry: 09:15 | Open: 276m
+[13:51:11]   ✅ Position OK | 09:15
+[13:52:06] 🔍 Risk Monitor: Checking active trades
+[13:52:06]   CALL_SPREAD | Entry: 09:15 | Open: 277m
+[13:52:11]   ✅ Position OK | 09:15
+[13:53:05] 🔍 Risk Monitor: Checking active trades
+[13:53:05]   CALL_SPREAD | Entry: 09:15 | Open: 278m
+[13:53:09]   ✅ Position OK | 09:15
+[13:54:07] 🔍 Risk Monitor: Checking active trades
+[13:54:07]   CALL_SPREAD | Entry: 09:15 | Open: 279m
+[13:54:09]   ✅ Position OK | 09:15
+[13:55:08] 🔍 Risk Monitor: Checking active trades
+[13:55:08]   CALL_SPREAD | Entry: 09:15 | Open: 280m
+[13:55:09]   ✅ Position OK | 09:15
+[13:56:05] 🔍 Risk Monitor: Checking active trades
+[13:56:05]   CALL_SPREAD | Entry: 09:15 | Open: 281m
+[13:56:09]   ✅ Position OK | 09:15
+[13:57:04] 🔍 Risk Monitor: Checking active trades
+[13:57:04]   CALL_SPREAD | Entry: 09:15 | Open: 282m
+[13:57:08]   ✅ Position OK | 09:15
+[13:58:05] 🔍 Risk Monitor: Checking active trades
+[13:58:05]   CALL_SPREAD | Entry: 09:15 | Open: 283m
+[13:58:09]   ✅ Position OK | 09:15
+[13:59:05] 🔍 Risk Monitor: Checking active trades
+[13:59:05]   CALL_SPREAD | Entry: 09:15 | Open: 284m
+[13:59:08]   ✅ Position OK | 09:15
+[14:00:08] 🔍 Risk Monitor: Checking active trades
+[14:00:08]   CALL_SPREAD | Entry: 09:15 | Open: 285m
+[14:00:08]   ✅ Position OK | 09:15
+[14:01:05] 🔍 Risk Monitor: Checking active trades
+[14:01:05]   CALL_SPREAD | Entry: 09:15 | Open: 286m
+[14:01:09]   ✅ Position OK | 09:15
+[14:02:06] 🔍 Risk Monitor: Checking active trades
+[14:02:06]   CALL_SPREAD | Entry: 09:15 | Open: 287m
+[14:02:09]   ✅ Position OK | 09:15
+[14:03:05] 🔍 Risk Monitor: Checking active trades
+[14:03:05]   CALL_SPREAD | Entry: 09:15 | Open: 288m
+[14:03:08]   ✅ Position OK | 09:15
+[14:04:05] 🔍 Risk Monitor: Checking active trades
+[14:04:05]   CALL_SPREAD | Entry: 09:15 | Open: 289m
+[14:04:08]   ✅ Position OK | 09:15
+[14:05:06] 🔍 Risk Monitor: Checking active trades
+[14:05:06]   CALL_SPREAD | Entry: 09:15 | Open: 290m
+[14:05:06]   ✅ Position OK | 09:15
+[14:06:06] 🔍 Risk Monitor: Checking active trades
+[14:06:06]   CALL_SPREAD | Entry: 09:15 | Open: 291m
+[14:06:10]   ✅ Position OK | 09:15
+[14:07:22] 🔍 Risk Monitor: Checking active trades
+[14:07:22]   CALL_SPREAD | Entry: 09:15 | Open: 292m
+[14:07:28]   ✅ Position OK | 09:15
+[14:08:24] 🔍 Risk Monitor: Checking active trades
+[14:08:24]   CALL_SPREAD | Entry: 09:15 | Open: 293m
+[14:08:28]   ✅ Position OK | 09:15
+[14:09:08] 🔍 Risk Monitor: Checking active trades
+[14:09:08]   CALL_SPREAD | Entry: 09:15 | Open: 294m
+[14:09:12]   ✅ Position OK | 09:15
+[14:10:08] 🔍 Risk Monitor: Checking active trades
+[14:10:08]   CALL_SPREAD | Entry: 09:15 | Open: 295m
+[14:10:08]   ✅ Position OK | 09:15
+[14:11:10] 🔍 Risk Monitor: Checking active trades
+[14:11:10]   CALL_SPREAD | Entry: 09:15 | Open: 296m
+[14:11:53]   ✅ Position OK | 09:15
+[14:12:05] 🔍 Risk Monitor: Checking active trades
+[14:12:05]   CALL_SPREAD | Entry: 09:15 | Open: 297m
+[14:12:09]   ✅ Position OK | 09:15
+[14:13:06] 🔍 Risk Monitor: Checking active trades
+[14:13:06]   CALL_SPREAD | Entry: 09:15 | Open: 298m
+[14:14:13]   ✅ Position OK | 09:15
+[14:15:06] 🔍 Risk Monitor: Checking active trades
+[14:15:06]   CALL_SPREAD | Entry: 09:15 | Open: 300m
+[14:15:06]   ✅ Position OK | 09:15
+[14:17:07] 🔍 Risk Monitor: Checking active trades
+[14:17:07]   CALL_SPREAD | Entry: 09:15 | Open: 302m
+[14:17:09]   ✅ Position OK | 09:15
+[14:18:29] 🔍 Risk Monitor: Checking active trades
+[14:18:29]   CALL_SPREAD | Entry: 09:15 | Open: 303m
+Killed
+[14:20:07] 🔍 Risk Monitor: Checking active trades
+[14:20:07]   CALL_SPREAD | Entry: 09:15 | Open: 305m
+[14:20:08]   ✅ Position OK | 09:15
+[14:20:11] 🔍 Risk Monitor: Checking active trades
+[14:20:11]   CALL_SPREAD | Entry: 09:15 | Open: 305m
+[14:20:12]   ✅ Position OK | 09:15
+[14:21:07] 🔍 Risk Monitor: Checking active trades
+[14:21:07]   CALL_SPREAD | Entry: 09:15 | Open: 306m
+Killed
+[14:23:11] 🔍 Risk Monitor: Checking active trades
+[14:23:11]   CALL_SPREAD | Entry: 09:15 | Open: 308m
+Killed
+[14:24:13] 🔍 Risk Monitor: Checking active trades
+[14:24:13]   CALL_SPREAD | Entry: 09:15 | Open: 309m
+[14:24:26]   ✅ Position OK | 09:15
+[14:25:24] 🔍 Risk Monitor: Checking active trades
+[14:25:24]   CALL_SPREAD | Entry: 09:15 | Open: 310m
+[14:25:38]   ✅ Position OK | 09:15
+[14:26:09] 🔍 Risk Monitor: Checking active trades
+[14:26:09]   CALL_SPREAD | Entry: 09:15 | Open: 311m
+[14:26:14]   ✅ Position OK | 09:15
+[14:27:07] 🔍 Risk Monitor: Checking active trades
+[14:27:07]   CALL_SPREAD | Entry: 09:15 | Open: 312m
+[14:27:08]   ✅ Position OK | 09:15
+[14:28:09] 🔍 Risk Monitor: Checking active trades
+[14:28:09]   CALL_SPREAD | Entry: 09:15 | Open: 313m
+[14:28:10]   ✅ Position OK | 09:15
+[14:29:08] 🔍 Risk Monitor: Checking active trades
+[14:29:08]   CALL_SPREAD | Entry: 09:15 | Open: 314m
+[14:29:17]   ✅ Position OK | 09:15
+[14:30:16] 🔍 Risk Monitor: Checking active trades
+[14:30:16]   CALL_SPREAD | Entry: 09:15 | Open: 315m
+[14:30:27]   ✅ Position OK | 09:15
+[14:31:28] 🔍 Risk Monitor: Checking active trades
+[14:31:28]   CALL_SPREAD | Entry: 09:15 | Open: 316m
+[14:31:29]   ✅ Position OK | 09:15
+[14:32:11] 🔍 Risk Monitor: Checking active trades
+[14:32:11]   CALL_SPREAD | Entry: 09:15 | Open: 317m
+[14:32:25]   ✅ Position OK | 09:15
+[14:33:07] 🔍 Risk Monitor: Checking active trades
+[14:33:07]   CALL_SPREAD | Entry: 09:15 | Open: 318m
+[14:33:08]   ✅ Position OK | 09:15
+[14:34:13] 🔍 Risk Monitor: Checking active trades
+[14:34:13]   CALL_SPREAD | Entry: 09:15 | Open: 319m
+[14:34:15]   ✅ Position OK | 09:15
+[14:35:09] 🔍 Risk Monitor: Checking active trades
+[14:35:09]   CALL_SPREAD | Entry: 09:15 | Open: 320m
+[14:35:10]   ✅ Position OK | 09:15
+[14:36:07] 🔍 Risk Monitor: Checking active trades
+[14:36:07]   CALL_SPREAD | Entry: 09:15 | Open: 321m
+[14:36:08]   ✅ Position OK | 09:15
+[14:38:14] 🔍 Risk Monitor: Checking active trades
+[14:38:14]   CALL_SPREAD | Entry: 09:15 | Open: 323m
+[14:38:15]   ✅ Position OK | 09:15
+[14:38:17] 🔍 Risk Monitor: Checking active trades
+[14:38:17]   CALL_SPREAD | Entry: 09:15 | Open: 323m
+[14:38:17]   ✅ Position OK | 09:15
+[14:39:10] 🔍 Risk Monitor: Checking active trades
+[14:39:10]   CALL_SPREAD | Entry: 09:15 | Open: 324m
+[14:39:11]   ✅ Position OK | 09:15
+[14:40:09] 🔍 Risk Monitor: Checking active trades
+[14:40:09]   CALL_SPREAD | Entry: 09:15 | Open: 325m
+[14:40:10]   ✅ Position OK | 09:15
+[14:42:15] 🔍 Risk Monitor: Checking active trades
+[14:42:15]   CALL_SPREAD | Entry: 09:15 | Open: 327m
+[14:42:16]   ✅ Position OK | 09:15
+[14:42:16] 🔍 Risk Monitor: Checking active trades
+[14:42:16]   CALL_SPREAD | Entry: 09:15 | Open: 327m
+[14:42:17]   ✅ Position OK | 09:15
+[14:43:05] 🔍 Risk Monitor: Checking active trades
+[14:43:05]   CALL_SPREAD | Entry: 09:15 | Open: 328m
+[14:43:15]   ✅ Position OK | 09:15
+[14:45:14] 🔍 Risk Monitor: Checking active trades
+[14:45:14]   CALL_SPREAD | Entry: 09:15 | Open: 330m
+[14:45:16]   ✅ Position OK | 09:15
+[14:47:20] 🔍 Risk Monitor: Checking active trades
+[14:47:20]   CALL_SPREAD | Entry: 09:15 | Open: 332m
+[14:47:30]   ✅ Position OK | 09:15
+[14:48:06] 🔍 Risk Monitor: Checking active trades
+[14:48:06]   CALL_SPREAD | Entry: 09:15 | Open: 333m
+[14:48:07]   ✅ Position OK | 09:15
+[14:49:06] 🔍 Risk Monitor: Checking active trades
+[14:49:06]   CALL_SPREAD | Entry: 09:15 | Open: 334m
+[14:49:10]   ✅ Position OK | 09:15
+[14:50:14] 🔍 Risk Monitor: Checking active trades
+[14:50:14]   CALL_SPREAD | Entry: 09:15 | Open: 335m
+[14:50:23]   ✅ Position OK | 09:15
+[14:51:06] 🔍 Risk Monitor: Checking active trades
+[14:51:06]   CALL_SPREAD | Entry: 09:15 | Open: 336m
+[14:51:09]   ✅ Position OK | 09:15
+[14:52:08] 🔍 Risk Monitor: Checking active trades
+[14:52:08]   CALL_SPREAD | Entry: 09:15 | Open: 337m
+[14:52:13]   ✅ Position OK | 09:15
+[14:53:41] 🔍 Risk Monitor: Checking active trades
+[14:53:41]   CALL_SPREAD | Entry: 09:15 | Open: 338m
+[14:53:44]   ✅ Position OK | 09:15
+[14:54:06] 🔍 Risk Monitor: Checking active trades
+[14:54:06]   CALL_SPREAD | Entry: 09:15 | Open: 339m
+[14:54:10]   ✅ Position OK | 09:15
+[14:55:05] 🔍 Risk Monitor: Checking active trades
+[14:55:05]   CALL_SPREAD | Entry: 09:15 | Open: 340m
+[14:55:06]   ✅ Position OK | 09:15
+[14:56:03] 🔍 Risk Monitor: Checking active trades
+[14:56:03]   CALL_SPREAD | Entry: 09:15 | Open: 341m
+[14:56:09]   ✅ Position OK | 09:15
+[15:08:07] 🔍 Risk Monitor: Checking active trades
+[15:08:07]   CALL_SPREAD | Entry: 09:15 | Open: 353m
+[15:08:11]   ✅ Position OK | 09:15
+[15:09:06] 🔍 Risk Monitor: Checking active trades
+[15:09:06]   CALL_SPREAD | Entry: 09:15 | Open: 354m
+[15:09:13]   ✅ Position OK | 09:15
+[15:10:05] 🔍 Risk Monitor: Checking active trades
+[15:10:05]   CALL_SPREAD | Entry: 09:15 | Open: 355m
+[15:10:05]   ✅ Position OK | 09:15
+[15:11:04] 🔍 Risk Monitor: Checking active trades
+[15:11:04]   CALL_SPREAD | Entry: 09:15 | Open: 356m
+[15:11:10]   ✅ Position OK | 09:15
+[15:12:03] 🔍 Risk Monitor: Checking active trades
+[15:12:03]   CALL_SPREAD | Entry: 09:15 | Open: 357m
+[15:12:09]   ✅ Position OK | 09:15
+[15:13:03] 🔍 Risk Monitor: Checking active trades
+[15:13:03]   CALL_SPREAD | Entry: 09:15 | Open: 358m
+[15:13:09]   ✅ Position OK | 09:15
+[15:14:04] 🔍 Risk Monitor: Checking active trades
+[15:14:04]   CALL_SPREAD | Entry: 09:15 | Open: 359m
+[15:14:09]   ✅ Position OK | 09:15
+[15:15:04] 🔍 Risk Monitor: Checking active trades
+[15:15:04]   CALL_SPREAD | Entry: 09:15 | Open: 360m
+[15:15:05]   ✅ Position OK | 09:15
+[15:16:03] 🔍 Risk Monitor: Checking active trades
+[15:16:03]   CALL_SPREAD | Entry: 09:15 | Open: 361m
+[15:16:08]   ✅ Position OK | 09:15
+[15:17:03] 🔍 Risk Monitor: Checking active trades
+[15:17:03]   CALL_SPREAD | Entry: 09:15 | Open: 362m
+[15:17:08]   ✅ Position OK | 09:15
+[15:18:05] 🔍 Risk Monitor: Checking active trades
+[15:18:05]   CALL_SPREAD | Entry: 09:15 | Open: 363m
+[15:18:11]   ✅ Position OK | 09:15
+[15:19:03] 🔍 Risk Monitor: Checking active trades
+[15:19:03]   CALL_SPREAD | Entry: 09:15 | Open: 364m
+[15:19:09]   ✅ Position OK | 09:15
+[15:20:07] 🔍 Risk Monitor: Checking active trades
+[15:20:07]   CALL_SPREAD | Entry: 09:15 | Open: 365m
+[15:20:07]   ✅ Position OK | 09:15
+[15:21:04] 🔍 Risk Monitor: Checking active trades
+[15:21:04]   CALL_SPREAD | Entry: 09:15 | Open: 366m
+[15:21:09]   ✅ Position OK | 09:15
+[15:22:04] 🔍 Risk Monitor: Checking active trades
+[15:22:04]   CALL_SPREAD | Entry: 09:15 | Open: 367m
+[15:22:10]   ✅ Position OK | 09:15
+[15:23:03] 🔍 Risk Monitor: Checking active trades
+[15:23:03]   CALL_SPREAD | Entry: 09:15 | Open: 368m
+[15:23:08]   ✅ Position OK | 09:15
+[15:24:03] 🔍 Risk Monitor: Checking active trades
+[15:24:03]   CALL_SPREAD | Entry: 09:15 | Open: 369m
+[15:24:08]   ✅ Position OK | 09:15
+[15:25:04] 🔍 Risk Monitor: Checking active trades
+[15:25:04]   CALL_SPREAD | Entry: 09:15 | Open: 370m
+[15:25:04]   ✅ Position OK | 09:15
+[15:26:03] 🔍 Risk Monitor: Checking active trades
+[15:26:03]   CALL_SPREAD | Entry: 09:15 | Open: 371m
+[15:26:08]   ✅ Position OK | 09:15
+[15:27:04] 🔍 Risk Monitor: Checking active trades
+[15:27:04]   CALL_SPREAD | Entry: 09:15 | Open: 372m
+[15:27:10]   ✅ Position OK | 09:15
+[15:28:04] 🔍 Risk Monitor: Checking active trades
+[15:28:04]   CALL_SPREAD | Entry: 09:15 | Open: 373m
+[15:28:09]   ✅ Position OK | 09:15
+[15:29:04] 🔍 Risk Monitor: Checking active trades
+[15:29:04]   CALL_SPREAD | Entry: 09:15 | Open: 374m
+[15:29:08]   ✅ Position OK | 09:15
+[15:30:08] 🔍 Risk Monitor: Checking active trades
+[15:30:08]   CALL_SPREAD | Entry: 09:15 | Open: 375m
+[15:30:08]   ✅ Position OK | 09:15
+[15:31:04] 🔍 Risk Monitor: Checking active trades
+[15:31:04]   CALL_SPREAD | Entry: 09:15 | Open: 376m
+[15:31:18]   ✅ Position OK | 09:15
+[15:32:03] 🔍 Risk Monitor: Checking active trades
+[15:32:03]   CALL_SPREAD | Entry: 09:15 | Open: 377m
+[15:32:03]   ✅ Position OK | 09:15
+[15:33:03] 🔍 Risk Monitor: Checking active trades
+[15:33:03]   CALL_SPREAD | Entry: 09:15 | Open: 378m
+[15:33:03]   ✅ Position OK | 09:15
+[15:34:03] 🔍 Risk Monitor: Checking active trades
+[15:34:03]   CALL_SPREAD | Entry: 09:15 | Open: 379m
+[15:34:04]   ✅ Position OK | 09:15
+[15:35:04] 🔍 Risk Monitor: Checking active trades
+[15:35:04]   CALL_SPREAD | Entry: 09:15 | Open: 380m
+[15:35:05]   ✅ Position OK | 09:15
+[15:36:04] 🔍 Risk Monitor: Checking active trades
+[15:36:04]   CALL_SPREAD | Entry: 09:15 | Open: 381m
+[15:36:04]   ✅ Position OK | 09:15
+[15:37:04] 🔍 Risk Monitor: Checking active trades
+[15:37:04]   CALL_SPREAD | Entry: 09:15 | Open: 382m
+[15:37:04]   ✅ Position OK | 09:15
+[15:38:04] 🔍 Risk Monitor: Checking active trades
+[15:38:04]   CALL_SPREAD | Entry: 09:15 | Open: 383m
+[15:38:04]   ✅ Position OK | 09:15
+[15:39:04] 🔍 Risk Monitor: Checking active trades
+[15:39:04]   CALL_SPREAD | Entry: 09:15 | Open: 384m
+[15:39:04]   ✅ Position OK | 09:15
+[15:40:05] 🔍 Risk Monitor: Checking active trades
+[15:40:05]   CALL_SPREAD | Entry: 09:15 | Open: 385m
+[15:40:05]   ✅ Position OK | 09:15
+[15:41:04] 🔍 Risk Monitor: Checking active trades
+[15:41:04]   CALL_SPREAD | Entry: 09:15 | Open: 386m
+[15:41:05]   ✅ Position OK | 09:15
+[15:42:03] 🔍 Risk Monitor: Checking active trades
+[15:42:03]   CALL_SPREAD | Entry: 09:15 | Open: 387m
+[15:42:03]   ✅ Position OK | 09:15
+[15:43:03] 🔍 Risk Monitor: Checking active trades
+[15:43:03]   CALL_SPREAD | Entry: 09:15 | Open: 388m
+[15:43:03]   ✅ Position OK | 09:15
+[15:44:03] 🔍 Risk Monitor: Checking active trades
+[15:44:03]   CALL_SPREAD | Entry: 09:15 | Open: 389m
+[15:44:03]   ✅ Position OK | 09:15

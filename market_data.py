@@ -24,7 +24,17 @@ else:
 _IST = timezone(timedelta(hours=5, minutes=30))
 
 
-def _is_market_hours() -> bool:
+def now_str() -> str:
+    return datetime.now(_IST).strftime("%H:%M")
+
+
+def now_iso() -> str:
+    return datetime.now(_IST).strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def is_market_hours() -> bool:
+    if os.environ.get("BRAHMAND_SANDBOX"):
+        return True
     now = datetime.now(_IST)
     t = now.hour * 60 + now.minute
     return 555 <= t <= 1410

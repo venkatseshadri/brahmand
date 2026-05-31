@@ -1,6 +1,9 @@
 #!/bin/bash
 # Guard script for kickoff.py (one-shot, ~5-min cadence during market hours)
-# Sources antariksh + brahmand .env (matches prior inline cron), then runs kickoff.
+# Sources antariksh + brahmand .env, then:
+#   1. order_status.py  →  reads DuckDB order ledger, outputs JSON
+#   2. If active trade exists → skip kickoff.py entirely (Risk Monitor handles it)
+#   3. If no active trade      → run kickoff.py for entry
 #
 # Usage (cron):
 #   1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_kickoff.sh
@@ -32,4 +35,17 @@ if ! flock -n "$LOCK_FD"; then
 fi
 
 cd "$PROJECT_DIR"
+
+# ── Gate: check order ledger BEFORE calling kickoff ──────────────────────────
+# order_status.py --quiet: exits 0 if kickoff should be SKIPPED
+# (active trade exists OR max trades reached for today).
+ORDER_STATUS_OUT=$("$PYTHON_BIN" "$PROJECT_DIR/order_status.py" 2>/dev/null) || true
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] order_status: $ORDER_STATUS_OUT" >> "$LOG_FILE"
+
+if "$PYTHON_BIN" "$PROJECT_DIR/order_status.py" --quiet 2>/dev/null; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Gate blocked (active trade or max trades) → skipping kickoff" >> "$LOG_FILE"
+    exit 0
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] No active trade → running kickoff" >> "$LOG_FILE"
 "$PYTHON_BIN" "$PROJECT_DIR/kickoff.py" >> "$LOG_FILE" 2>&1
