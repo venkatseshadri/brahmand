@@ -27,10 +27,13 @@ def run_entry_pipeline(entry_time: str) -> dict | None:
         log_exception(get_logger("kickoff"), e, "Chain failed")
         return None
 
+    # None = chain returned nothing (entry gate: no signal or crew failure)
     if trade is None:
         return None
+    # regime agent recommended "skip" (low VIX, choppy, no-go regime)
     if isinstance(trade, dict) and trade.get("recommendation") == "skip":
         return None
+    # entry agent returned "no_go" (bearish/bullish entry blocked)
     if isinstance(trade, dict) and trade.get("recommendation") == "no_go":
         return None
 
