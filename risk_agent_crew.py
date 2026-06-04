@@ -528,7 +528,7 @@ def evaluate_trade(trade: dict) -> dict:
 
     try:
         from crewai import Crew, Process
-        from logger import _make_crew_step_callback, log_crew_telemetry
+        from logger import _make_crew_step_callback, _make_crew_after_callback
 
         morpher, shifter, risk = build_risk_crew(llm)
         tasks = build_tasks(morpher, shifter, risk, trade)
@@ -539,7 +539,7 @@ def evaluate_trade(trade: dict) -> dict:
             process=Process.sequential,
             verbose=False,
             step_callback=_make_crew_step_callback("risk"),
-            after_kickoff_callbacks=[lambda r: log_crew_telemetry("risk", r)],
+            after_kickoff_callbacks=[_make_crew_after_callback("risk")],
         )
         result = crew.kickoff()
         logger.info(f"Trade {trade.get('trade_id')} evaluated: {str(result)[:200]}")

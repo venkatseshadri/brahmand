@@ -22,7 +22,7 @@ def run_strategy_check(regime: dict) -> dict:
     from factory import AgentFactory
     from duckdb_tool import MarketDataQueryTool, get_latest_market_snapshot
     from crewai import Agent, Task, Crew, Process, LLM
-    from logger import _make_crew_step_callback, log_crew_telemetry
+    from logger import _make_crew_step_callback, _make_crew_after_callback
 
     api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     regime_type = regime.get("regime", "unknown")
@@ -69,7 +69,7 @@ Output JSON: {{'strategy_type', 'wing_width', 'sl_pct', 'tp_pct', 'entry_delay',
         process=Process.sequential,
         verbose=False,
         step_callback=_make_crew_step_callback("strategy_check"),
-        after_kickoff_callbacks=[lambda r: log_crew_telemetry("strategy_check", r)],
+        after_kickoff_callbacks=[_make_crew_after_callback("strategy_check")],
     )
     result = crew.kickoff()
 

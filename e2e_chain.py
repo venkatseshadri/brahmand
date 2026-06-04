@@ -25,7 +25,7 @@ load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
-from logger import _make_crew_step_callback, log_crew_telemetry
+from logger import _make_crew_step_callback, _make_crew_after_callback
 from llm import get_llm
 from parsing import parse_json_output
 from fallback import deterministic_fallback
@@ -365,7 +365,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 process=Process.sequential,
                 verbose=False,
                 step_callback=_make_crew_step_callback("regime"),
-                after_kickoff_callbacks=[lambda r: log_crew_telemetry("regime", r)],
+                after_kickoff_callbacks=[_make_crew_after_callback("regime")],
             )
             try:
                 regime_result = regime_crew.kickoff()
@@ -392,7 +392,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             process=Process.sequential,
             verbose=False,
             step_callback=_make_crew_step_callback("entry_legacy"),
-            after_kickoff_callbacks=[lambda r: log_crew_telemetry("entry_legacy", r)],
+            after_kickoff_callbacks=[_make_crew_after_callback("entry_legacy")],
         )
         try:
             entry_result = entry_crew.kickoff()
@@ -543,7 +543,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             process=Process.sequential,
             verbose=True,
             step_callback=_make_crew_step_callback("full"),
-            after_kickoff_callbacks=[lambda r: log_crew_telemetry("full", r)],
+            after_kickoff_callbacks=[_make_crew_after_callback("full")],
             context=[
                 not_up_entry_task,
                 not_down_entry_task,

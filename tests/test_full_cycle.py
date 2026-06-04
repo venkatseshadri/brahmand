@@ -16,16 +16,17 @@ def run_full_cycle_test():
     print("FULL TRADING CYCLE TEST")
     print("=" * 60)
 
-    ledger_path = PROJECT_ROOT / "data" / "order_ledger.json"
+    # Sandbox ledger — NEVER the live data/order_ledger.json (would block real entries).
+    ledger_path = PROJECT_ROOT / "tests" / "fixtures" / "sandbox_order_ledger.json"
     if not ledger_path.exists():
-        print(f"SKIP: order_ledger.json not found at {ledger_path}")
+        print(f"SKIP: sandbox ledger not found at {ledger_path}")
         return
 
     ledger = json.loads(ledger_path.read_text())
     test_trade = ledger["_trades"].get("TEST-KAGGLE-001")
 
     if not test_trade:
-        print("SKIP: Test trade not found in order_ledger")
+        print("SKIP: Test trade not found in sandbox ledger")
         return
 
     print("\nTEST TRADE LOADED")

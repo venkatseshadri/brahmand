@@ -19,8 +19,10 @@ print("=" * 70)
 
 # STEP 1: Verify test trade exists
 print("\n[1/5] Checking test trade...")
-ledger_path = Path("data/order_ledger.json")
-ledger = json.loads(ledger_path.read_text())
+# Sandbox ledger — NEVER the live data/order_ledger.json (would block real entries).
+ledger_path = Path(__file__).resolve().parent / "fixtures" / "sandbox_order_ledger.json"
+ledger_path.parent.mkdir(parents=True, exist_ok=True)
+ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {"_trades": {}}
 
 if "TEST-KAGGLE-001" not in ledger.get("_trades", {}):
     print("❌ Test trade not found. Creating it...")

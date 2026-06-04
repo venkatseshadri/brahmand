@@ -28,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import penguin_compat
 
 from dotenv import load_dotenv
-from logger import _make_crew_step_callback, log_crew_telemetry
+from logger import _make_crew_step_callback, _make_crew_after_callback
 
 load_dotenv()
 
@@ -518,7 +518,7 @@ OUTPUT FORMAT (JSON):
         process=Process.sequential,
         verbose=True,
         step_callback=_make_crew_step_callback("entry_research"),
-        after_kickoff_callbacks=[lambda r: log_crew_telemetry("entry_research", r)],
+        after_kickoff_callbacks=[_make_crew_after_callback("entry_research")],
     )
 
     result = crew.kickoff()

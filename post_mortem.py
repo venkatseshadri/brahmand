@@ -17,8 +17,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 load_dotenv()
 
 from state import load_state, save_state
-from logger import get_logger, log_exception
-from logger import _make_crew_step_callback, log_crew_telemetry
+from logger import (
+    get_logger,
+    log_exception,
+    _make_crew_step_callback,
+    _make_crew_after_callback,
+)
 
 _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if _SANDBOX:
@@ -108,7 +112,7 @@ def run_pm(state: dict):
             process=Process.sequential,
             verbose=False,
             step_callback=_make_crew_step_callback("post_mortem"),
-            after_kickoff_callbacks=[lambda r: log_crew_telemetry("post_mortem", r)],
+            after_kickoff_callbacks=[_make_crew_after_callback("post_mortem")],
         )
         crew.kickoff()
         _log("Post-Mortem complete — ChromaDB updated")

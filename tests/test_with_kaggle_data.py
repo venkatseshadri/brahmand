@@ -8,12 +8,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_create_test_trade_in_ledger():
-    ledger_path = PROJECT_ROOT / "data" / "order_ledger.json"
-    if not ledger_path.exists():
-        print(f"SKIP: order_ledger.json not found at {ledger_path}")
-        return
-
-    ledger = json.loads(ledger_path.read_text())
+    # Sandbox ledger — NEVER the live data/order_ledger.json (the live entry
+    # gate counts ACTIVE trades there; a test fixture would block real entries).
+    ledger_path = PROJECT_ROOT / "tests" / "fixtures" / "sandbox_order_ledger.json"
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {"_trades": {}}
 
     test_trade = {
         "trade_id": "TEST-KAGGLE-001",

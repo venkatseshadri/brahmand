@@ -242,6 +242,16 @@ def _make_crew_step_callback(crew_name: str):
     return _on_step
 
 
+def _make_crew_after_callback(crew_name: str):
+    """Returns a module-level named function for after_kickoff_callbacks.
+    Avoids Pydantic 'function callbacks cannot be serialized' warnings."""
+
+    def _after_kickoff(crew_result):
+        log_crew_telemetry(crew_name, crew_result)
+
+    return _after_kickoff
+
+
 def log_crew_telemetry(crew_name: str, crew_result):
     """Log per-crew usage metrics + cost after kickoff completes."""
     try:
