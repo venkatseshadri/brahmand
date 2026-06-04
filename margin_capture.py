@@ -56,15 +56,12 @@ def _load_cred() -> dict:
 def _get_expiry() -> str:
     """Get current weekly expiry from DuckDB or config."""
     try:
-        import duckdb
+        import penguin_compat
 
-        # Try DuckDB first
-        db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-            read_only=True,
-        )
+        # Live Penguin capture first
+        db = penguin_compat.connect_live("NIFTY")
         row = db.execute(
-            "SELECT expiry_weekly FROM market_data WHERE index_name='NIFTY' AND expiry_weekly IS NOT NULL ORDER BY id DESC LIMIT 1"
+            "SELECT expiry_weekly FROM market_data WHERE index_name='NIFTY' AND expiry_weekly IS NOT NULL ORDER BY timestamp DESC LIMIT 1"
         ).fetchone()
         db.close()
         if row:
@@ -82,14 +79,11 @@ def _get_expiry() -> str:
 def _get_atm() -> Optional[int]:
     """Get current ATM strike from DuckDB spot price."""
     try:
-        import duckdb
+        import penguin_compat
 
-        db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-            read_only=True,
-        )
+        db = penguin_compat.connect_live("NIFTY")
         row = db.execute(
-            "SELECT spot FROM market_data WHERE index_name='NIFTY' ORDER BY id DESC LIMIT 1"
+            "SELECT spot FROM market_data WHERE index_name='NIFTY' AND spot > 0 ORDER BY timestamp DESC LIMIT 1"
         ).fetchone()
         db.close()
         if row:

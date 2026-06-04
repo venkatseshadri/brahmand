@@ -18,6 +18,7 @@ load_dotenv()
 
 from state import load_state, save_state
 from logger import get_logger, log_exception
+from logger import _make_crew_step_callback, log_crew_telemetry
 
 _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if _SANDBOX:
@@ -56,7 +57,7 @@ def run_pm(state: dict):
         )
         if "DEEPSEEK_API_KEY" in os.environ:
             pm.llm = LLM(
-                model="deepseek/deepseek-chat",
+                model="deepseek-v4-pro",
                 base_url=os.environ.get(
                     "DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"
                 ),
@@ -102,7 +103,12 @@ def run_pm(state: dict):
             agent=pm,
         )
         crew = Crew(
-            agents=[pm], tasks=[task], process=Process.sequential, verbose=False
+            agents=[pm],
+            tasks=[task],
+            process=Process.sequential,
+            verbose=False,
+            step_callback=_make_crew_step_callback("post_mortem"),
+            after_kickoff_callbacks=[lambda r: log_crew_telemetry("post_mortem", r)],
         )
         crew.kickoff()
         _log("Post-Mortem complete — ChromaDB updated")

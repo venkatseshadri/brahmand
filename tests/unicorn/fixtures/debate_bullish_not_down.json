@@ -1,0 +1,93 @@
+{
+  "_description": "Synthetic debate fixture — NOT_DOWN gate scenario with strong bullish trend. Used for testing the debate verifier and scoring logic without live DuckDB.",
+  "_scenario": "strong_bullish_not_down",
+  "trend": {
+    "family": "Trend",
+    "index": "NIFTY",
+    "timeframes": {
+      "5m": {"sma20": 24950, "sma50": 24850, "sma_position": "bullish", "candle": "GREEN", "st_consensus": "bullish", "adx": 36.0, "di_plus": 28.0, "di_minus": 12.0},
+      "15m": {"sma20": 24980, "sma50": 24830, "sma_position": "bullish", "candle": "GREEN", "st_consensus": "bullish", "adx": 33.0, "di_plus": 30.0, "di_minus": 10.0},
+      "30m": {"sma20": 25000, "sma50": 24800, "sma_position": "bullish", "candle": "GREEN", "st_consensus": "bullish", "adx": 30.0, "di_plus": 32.0, "di_minus": 8.0},
+      "1m_v3.1": {"ema20": 24950, "ema5": 24980, "ema50": 24850, "ema_position": "bullish", "spot": 25000, "st_consensus": "bullish", "st_direction": "bullish", "st_5m_direction": "bullish", "st_15m_direction": "bullish", "adx": 36.0}
+    }
+  },
+  "momentum": {
+    "family": "Momentum",
+    "timeframes": {
+      "5m": {"rsi": 65.0, "rsi_zone": "neutral", "macd": 15.0, "macd_histogram": 4.5, "cci": 150.0},
+      "1m_v3.1": {"rsi": 65.0, "rsi_zone": "neutral", "bb_pct_b": 0.8, "bb_width": 3.0}
+    }
+  },
+  "volatility": {
+    "family": "Volatility",
+    "timeframes": {
+      "5m": {"atr": 15.0, "atr_pct": 0.06, "bb_lower": 24900, "bb_upper": 25100},
+      "1m_v3.1": {"atr": 15.0, "atr_pct": 0.06, "hv_20": 0.10, "hv_60": 0.13, "iv_current": 14.5, "iv_rank": 0.3}
+    }
+  },
+  "volume": {
+    "family": "Volume",
+    "indicators": {
+      "5m": {"cmf": 0.35, "cmf_signal": "accumulation", "obv": 80000, "volume": 55000}
+    }
+  },
+  "options": {
+    "family": "Options",
+    "indicators": {
+      "pcr_total": 0.85,
+      "pcr_atm": 0.7,
+      "oi_skew": -0.4,
+      "max_pain_strike": 25000,
+      "iv_current": 14.5,
+      "iv_percentile": 0.3,
+      "iv_regime": "normal",
+      "sentiment": "bullish",
+      "pcr_signal": "bullish",
+      "oi_price_signal": "bullish",
+      "greeks": {"delta": 0.55, "gamma": 0.002, "vega": 3.8, "theta": -1.9},
+      "call_oi_concentration": 0.6,
+      "put_oi_concentration": 0.4
+    }
+  },
+  "flow": {
+    "family": "Flow",
+    "indicators": {
+      "pcr_total": 0.85,
+      "pcr_change": -0.10,
+      "fii_fut_5d_change": 4500,
+      "fii_data_note": "FII buying futures"
+    }
+  },
+  "macro": {
+    "family": "Macro",
+    "indicators": {
+      "spot": 25000,
+      "vix": 14.2,
+      "vix_level": "low",
+      "vix_change": -0.3,
+      "gap_pct": 0.4,
+      "open_price": 24900,
+      "prev_close": 24850,
+      "prev_day_high": 25100,
+      "prev_day_low": 24750,
+      "prev_day_range": 350,
+      "pivot_pp": 24920,
+      "pivot_r1": 25050,
+      "pivot_s1": 24780,
+      "session_phase": "mid_session",
+      "open_to_current_pct": 0.4,
+      "distance_to_pivot_pct": 0.3,
+      "gift_premium": 15,
+      "gift_premium_note": "GIFT positive",
+      "banknifty_nifty_ratio": 2.1,
+      "banknifty_nifty_ratio_note": "normal"
+    }
+  },
+  "candles": {
+    "family": "Candles",
+    "candles": {
+      "5m": {"color": "GREEN", "body_pct": 0.65, "upper_wick_pct": 0.2, "lower_wick_pct": 0.15},
+      "15m": {"color": "GREEN", "body_pct": 0.7, "upper_wick_pct": 0.1, "lower_wick_pct": 0.2}
+    }
+  }
+}

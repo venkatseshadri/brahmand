@@ -10,7 +10,7 @@
 
 # 09:12 AM — Legacy Varaha token refresh (backup)
 
-# 09:14 AM — Data capture (NIFTY + SENSEX)
+# 09:14 AM — Penguin data pipeline (managed by systemd timers: feed/consumer/enricher)
 
 # 09:15 AM — Session orchestrator — market entry
 15 9 * * 1-5 /usr/bin/python3 /home/trading_ceo/antariksh/tools/session_orchestrator.py --action entry >> /home/trading_ceo/antariksh/logs/session_entry_cron.log 2>&1
@@ -64,3 +64,6 @@
 @daily /usr/bin/python3 /home/trading_ceo/antariksh/tools/log_cleanup.py >> /home/trading_ceo/antariksh/logs/log_cleanup_cron.log 2>&1
 
 0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
+
+# Every 15 min 9:15-15:30 — UNICORN research (LLM debate point generation, cached for 5-min entry)
+0,15,30,45 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_unicorn_research.sh

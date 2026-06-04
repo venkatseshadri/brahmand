@@ -30,6 +30,7 @@ from dotenv import load_dotenv
 sys.path.insert(0, str(Path(__file__).parent))
 
 from entry_agent import EntryAgent, EntrySignal
+import penguin_compat
 
 load_dotenv()
 
@@ -41,7 +42,9 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("/tmp/entry_signal_broker.log"),
+        logging.FileHandler(
+            str(Path(__file__).parent / "logs" / "entry_signal_broker.log")
+        ),
         logging.StreamHandler(),
     ],
 )
@@ -112,17 +115,16 @@ Ready to execute ✓
 class MarketDataFeed:
     """Access real-time or historical market data"""
 
-    def __init__(
-        self,
-        db_path: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-    ):
-        self.db_path = db_path
-        self.db = duckdb.connect(db_path, read_only=True)
+    def __init__(self):
+        # Live Penguin capture is per-index (capture_{index}.sqlite), so connections
+        # are opened per-call via penguin_compat — no single shared handle.
+        pass
 
     def get_latest_candle(self, index_name: str = "NIFTY") -> Optional[Dict]:
         """Get the most recent 1-min candle"""
         try:
-            result = self.db.execute(f"""
+            con = penguin_compat.connect_live(index_name)
+            result = con.execute(f"""
                 SELECT * FROM market_data
                 WHERE index_name = '{index_name}'
                 ORDER BY timestamp DESC
@@ -132,8 +134,9 @@ class MarketDataFeed:
             if not result:
                 return None
 
-            columns = [desc[0] for desc in self.db.description]
+            columns = [desc[0] for desc in con.description]
             candle = dict(zip(columns, result[0]))
+            con.close()
             return candle
 
         except Exception as e:
@@ -145,7 +148,8 @@ class MarketDataFeed:
     ) -> Optional[Dict]:
         """Get candle at specific timestamp"""
         try:
-            result = self.db.execute(f"""
+            con = penguin_compat.connect_live(index_name)
+            result = con.execute(f"""
                 SELECT * FROM market_data
                 WHERE index_name = '{index_name}'
                   AND timestamp <= '{timestamp}'
@@ -156,8 +160,9 @@ class MarketDataFeed:
             if not result:
                 return None
 
-            columns = [desc[0] for desc in self.db.description]
+            columns = [desc[0] for desc in con.description]
             candle = dict(zip(columns, result[0]))
+            con.close()
             return candle
 
         except Exception as e:
@@ -167,15 +172,17 @@ class MarketDataFeed:
     def get_candles_for_date(self, date: str, index_name: str = "NIFTY") -> list:
         """Get all candles for a specific date"""
         try:
-            result = self.db.execute(f"""
+            con = penguin_compat.connect_live(index_name)
+            result = con.execute(f"""
                 SELECT * FROM market_data
                 WHERE index_name = '{index_name}'
                   AND date = '{date}'
                 ORDER BY timestamp ASC
             """).fetchall()
 
-            columns = [desc[0] for desc in self.db.description]
+            columns = [desc[0] for desc in con.description]
             candles = [dict(zip(columns, row)) for row in result]
+            con.close()
             return candles
 
         except Exception as e:
@@ -196,7 +203,7 @@ class EntrySignalBroker:
         self.market_feed = MarketDataFeed()
         self.last_signal_timestamp = None
         self.signals_generated = 0
-        self.signals_file = "/tmp/entry_signals.jsonl"
+        self.signals_file = str(Path(__file__).parent / "logs" / "entry_signals.jsonl")
 
         logger.info("=" * 70)
         logger.info("ENTRY SIGNAL BROKER INITIALIZED")

@@ -14,6 +14,7 @@ Contract/Execution/Risk are pure Python (no LLM, no CrewAI overhead).
 """
 
 import json
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -24,6 +25,7 @@ load_dotenv()
 
 
 from logger import get_logger, agent_log, chain_summary, log_exception
+from logger import _make_crew_step_callback, log_crew_telemetry
 from llm import get_llm
 from parsing import parse_json_output
 from fallback import deterministic_fallback
@@ -33,6 +35,12 @@ from verification import (
     verify_strategy_provenance,
 )
 
+# ── UNICORN Integration ───────────────────────────────────────────────
+# USE_UNICORN=True  → Entry gate runs adversarial debate pipeline
+# USE_UNICORN=False → Entry gate runs legacy CrewAI deterministic tools
+USE_UNICORN = True
+_UNICORN_RESEARCH_LOCK = Path(__file__).parent / "data" / ".unicorn_research.lock"
+
 _log = get_logger("chain").info
 _agent = get_logger("chain")
 _err = lambda msg, exc=None: (
@@ -40,6 +48,42 @@ _err = lambda msg, exc=None: (
     if exc
     else get_logger("chain").error(msg)
 )
+
+
+def _trigger_unicorn_research(gate_type: str):
+    """Spawn background research subprocess. Non-blocking. Lock-guarded.
+    Called when cache is empty or expired to generate fresh LLM points
+    for the next 5-min cycle. Does NOT block this cycle's execution."""
+    import subprocess
+    import fcntl
+
+    lock = _UNICORN_RESEARCH_LOCK
+    lock.parent.mkdir(parents=True, exist_ok=True)
+
+    # Guard: if research is already running, skip
+    try:
+        lf = open(str(lock), "w")
+        fcntl.flock(lf, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (IOError, BlockingIOError, PermissionError):
+        return  # already running
+
+    # Release lock before spawning (child will reacquire)
+    fcntl.flock(lf, fcntl.LOCK_UN)
+    lf.close()
+
+    _log(f"  Spawning background UNICORN research for {gate_type}")
+    subprocess.Popen(
+        [
+            sys.executable,
+            str(Path(__file__).parent / "unicorn_research.py"),
+            "--gate",
+            gate_type,
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+        env={**os.environ, "UNICORN_RESEARCH_LOCK": str(lock)},
+    )
 
 
 def run_sequential_crew(entry_time: str) -> dict | None:
@@ -252,47 +296,140 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         context=[execution_task],
     )
 
-    # ── ENTRY GATE: Run dual Entry Agents sequentially (deterministic check) ─────────
-    entry_crew = Crew(
-        agents=[not_up_entry_agent, not_down_entry_agent, regime_agent],
-        tasks=[not_up_entry_task, not_down_entry_task, regime_task],
-        process=Process.sequential,
-        verbose=False,
-    )
-    try:
-        entry_result = entry_crew.kickoff()
-    except Exception as e:
-        _log(f"  Entry Crew failed: {e}")
-        return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+    # ── ENTRY GATE ─────────────────────────────────────────────────────────
+    # USE_UNICORN: Adversarial debate pipeline. Entry agents replaced;
+    #   Regime agent still runs separately. Downstream processing unchanged.
+    # !USE_UNICORN: Legacy CrewAI entry agents with deterministic tools.
 
-    # Parse dual Entry Agents output
-    not_up_decision = {}
-    not_down_decision = {}
-    regime = {}
-    if hasattr(entry_result, "tasks_output"):
+    if USE_UNICORN:
+        _log("  Entry Gate: UNICORN (cached LLM research + deterministic execute)")
         try:
-            not_up_decision = parse_json_output(
-                str(entry_result.tasks_output[0])
-            )  # NOT_UP agent
-            not_down_decision = parse_json_output(
-                str(entry_result.tasks_output[1])
-            )  # NOT_DOWN agent
-            regime = (
-                parse_json_output(str(entry_result.tasks_output[2]))
-                if len(entry_result.tasks_output) > 2
-                else {}
-            )  # Regime
+            from unicorn_raw_query import UnicornRawQuery
+            from unicorn_debate import run_unicorn_debate
+            from unicorn_anomaly import safe_debate
+            from unicorn_research_cache import (
+                load_debate_points,
+                save_debate_points,
+                compute_signature,
+                cache_age_sec,
+            )
 
-            # Provenance guard: clamp hallucinated numbers to deterministic tool values
-            verify_provenance(not_up_decision, "NOT_UP") if not_up_decision else None
-            verify_provenance(
-                not_down_decision, "NOT_DOWN"
-            ) if not_down_decision else None
+            raw_query = UnicornRawQuery()
+            raw_json = raw_query._run("NIFTY")
+            raw_data = json.loads(raw_json)
+            sig = compute_signature(raw_data)
+
+            def _debate_or_fallback(raw, gate, label):
+                """Load cached LLM points → verify (Python) → decide (Python).
+                If cache miss → deterministic fallback + trigger async research.
+                ALL paths sub-second, zero LLM API calls on this execution path."""
+                import time as _time
+
+                t0 = _time.time()
+                advocate_pts, skeptic_pts = load_debate_points(gate, raw_signature=sig)
+                if advocate_pts and skeptic_pts:
+                    age = cache_age_sec(gate)
+                    _log(
+                        f"    {label}: Cache HIT ({age:.0f}s old, "
+                        f"{len(advocate_pts)}a+{len(skeptic_pts)}s points)"
+                    )
+                    result = run_unicorn_debate(raw, gate, advocate_pts, skeptic_pts)
+                    _log(
+                        f"    {label}: → {result.get('signal', '?')} "
+                        f"go={result.get('go')} conf={result.get('confidence')} "
+                        f"({_time.time() - t0:.2f}s)"
+                    )
+                    return result
+                else:
+                    age = cache_age_sec(gate)
+                    reason = f"expired ({age:.0f}s)" if age is not None else "empty"
+                    _log(
+                        f"    {label}: Cache MISS ({reason}) → deterministic + async research"
+                    )
+                    _trigger_unicorn_research(gate)
+                    result = run_unicorn_debate(raw, gate)
+                    _log(
+                        f"    {label}: → {result.get('signal', '?')} "
+                        f"go={result.get('go')} conf={result.get('confidence')} "
+                        f"({_time.time() - t0:.2f}s)"
+                    )
+                    return result
+
+            not_up_decision = _debate_or_fallback(raw_data, "NOT_UP", "NOT_UP")
+            not_down_decision = _debate_or_fallback(raw_data, "NOT_DOWN", "NOT_DOWN")
+
+            # Run regime agent separately (unchanged CrewAI)
+            regime_crew = Crew(
+                agents=[regime_agent],
+                tasks=[regime_task],
+                process=Process.sequential,
+                verbose=False,
+                step_callback=_make_crew_step_callback("regime"),
+                after_kickoff_callbacks=[lambda r: log_crew_telemetry("regime", r)],
+            )
+            try:
+                regime_result = regime_crew.kickoff()
+                regime = (
+                    parse_json_output(str(regime_result.tasks_output[0]))
+                    if hasattr(regime_result, "tasks_output")
+                    and len(regime_result.tasks_output) > 0
+                    else {}
+                )
+            except Exception as e:
+                _log(f"  Regime agent failed: {e}")
+                regime = {}
             verify_regime_provenance(regime, vix, adx) if regime else None
 
         except Exception as e:
-            _err(f"Entry gate parse failed: {e}")
+            _err(f"UNICORN entry gate failed: {e}")
             return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+
+    else:
+        # ── Legacy ENTRY GATE: Run dual Entry Agents sequentially ─────────
+        entry_crew = Crew(
+            agents=[not_up_entry_agent, not_down_entry_agent, regime_agent],
+            tasks=[not_up_entry_task, not_down_entry_task, regime_task],
+            process=Process.sequential,
+            verbose=False,
+            step_callback=_make_crew_step_callback("entry_legacy"),
+            after_kickoff_callbacks=[lambda r: log_crew_telemetry("entry_legacy", r)],
+        )
+        try:
+            entry_result = entry_crew.kickoff()
+        except Exception as e:
+            _log(f"  Entry Crew failed: {e}")
+            return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
+
+        # Parse dual Entry Agents output
+        not_up_decision = {}
+        not_down_decision = {}
+        regime = {}
+        if hasattr(entry_result, "tasks_output"):
+            try:
+                not_up_decision = parse_json_output(
+                    str(entry_result.tasks_output[0])
+                )  # NOT_UP agent
+                not_down_decision = parse_json_output(
+                    str(entry_result.tasks_output[1])
+                )  # NOT_DOWN agent
+                regime = (
+                    parse_json_output(str(entry_result.tasks_output[2]))
+                    if len(entry_result.tasks_output) > 2
+                    else {}
+                )  # Regime
+
+                # Provenance guard: clamp hallucinated numbers to deterministic tool values
+                verify_provenance(
+                    not_up_decision, "NOT_UP"
+                ) if not_up_decision else None
+                verify_provenance(
+                    not_down_decision, "NOT_DOWN"
+                ) if not_down_decision else None
+                verify_regime_provenance(regime, vix, adx) if regime else None
+
+            except Exception as e:
+                _err(f"Entry gate parse failed: {e}")
+                return deterministic_fallback(entry_time, spot, atm, vix, adx, snap)
 
     agent_log(_agent, "NotUpEntry_Agent", not_up_decision)
     agent_log(_agent, "NotDownEntry_Agent", not_down_decision)
@@ -405,6 +542,8 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             ],
             process=Process.sequential,
             verbose=True,
+            step_callback=_make_crew_step_callback("full"),
+            after_kickoff_callbacks=[lambda r: log_crew_telemetry("full", r)],
             context=[
                 not_up_entry_task,
                 not_down_entry_task,

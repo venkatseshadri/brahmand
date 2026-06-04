@@ -32,6 +32,7 @@ def run_crewai_chain(trade: dict) -> dict:
     """
     try:
         from crewai import Agent, Task, Crew, Process, LLM
+        from logger import _make_crew_step_callback, log_crew_telemetry
         from tools.execution_tools import ExecuteTradeTool
         from tools.risk_tools import MonitorPnLGreeksTool
     except ImportError as e:
@@ -42,7 +43,7 @@ def run_crewai_chain(trade: dict) -> dict:
         return {"status": "skipped", "reason": "DEEPSEEK_API_KEY not set"}
 
     llm = LLM(
-        model="deepseek/deepseek-chat",
+        model="deepseek-v4-pro",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=api_key,
         temperature=0,
@@ -136,6 +137,8 @@ STEP 6: Output risk_decision JSON with all order_ids, pattern guidance, P&L, and
         tasks=[exec_task, risk_task],
         process=Process.sequential,
         verbose=False,
+        step_callback=_make_crew_step_callback("crewai_chain"),
+        after_kickoff_callbacks=[lambda r: log_crew_telemetry("crewai_chain", r)],
     )
     result = crew.kickoff()
 

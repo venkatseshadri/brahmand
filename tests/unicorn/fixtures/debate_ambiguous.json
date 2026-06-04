@@ -1,0 +1,92 @@
+{
+  "_description": "Synthetic debate fixture — Ambiguous/sideways market. Both Advocate and Skeptic have weak evidence. Used for testing tie/ambiguous scenarios.",
+  "_scenario": "ambiguous_sideways",
+  "trend": {
+    "family": "Trend",
+    "index": "NIFTY",
+    "timeframes": {
+      "5m": {"sma20": 24850, "sma50": 24840, "sma_position": "neutral", "candle": "GREEN", "st_consensus": "neutral", "adx": 18.0, "di_plus": 15.0, "di_minus": 14.0},
+      "15m": {"sma20": 24840, "sma50": 24850, "sma_position": "neutral", "candle": "RED", "st_consensus": "neutral", "adx": 16.0, "di_plus": 13.0, "di_minus": 15.0},
+      "1m_v3.1": {"ema20": 24850, "ema5": 24860, "ema50": 24840, "ema_position": "neutral", "spot": 24845, "st_consensus": "neutral", "st_direction": "neutral", "st_5m_direction": "neutral", "st_15m_direction": "neutral", "adx": 18.0}
+    }
+  },
+  "momentum": {
+    "family": "Momentum",
+    "timeframes": {
+      "5m": {"rsi": 50.0, "rsi_zone": "neutral", "macd": 0.5, "macd_histogram": 0.1, "cci": 10.0},
+      "1m_v3.1": {"rsi": 50.0, "rsi_zone": "neutral", "bb_pct_b": 0.5, "bb_width": 2.8}
+    }
+  },
+  "volatility": {
+    "family": "Volatility",
+    "timeframes": {
+      "5m": {"atr": 12.0, "atr_pct": 0.05, "bb_lower": 24700, "bb_upper": 25000},
+      "1m_v3.1": {"atr": 12.0, "atr_pct": 0.05, "hv_20": 0.08, "hv_60": 0.10, "iv_current": 14.5, "iv_rank": 0.35}
+    }
+  },
+  "volume": {
+    "family": "Volume",
+    "indicators": {
+      "5m": {"cmf": 0.01, "cmf_signal": "neutral", "obv": 5000, "volume": 30000}
+    }
+  },
+  "options": {
+    "family": "Options",
+    "indicators": {
+      "pcr_total": 1.05,
+      "pcr_atm": 1.0,
+      "oi_skew": 0.0,
+      "max_pain_strike": 24850,
+      "iv_current": 14.5,
+      "iv_percentile": 0.35,
+      "iv_regime": "normal",
+      "sentiment": "neutral",
+      "pcr_signal": "neutral",
+      "oi_price_signal": "neutral",
+      "greeks": {"delta": 0.01, "gamma": 0.002, "vega": 4.0, "theta": -2.0},
+      "call_oi_concentration": 0.5,
+      "put_oi_concentration": 0.5
+    }
+  },
+  "flow": {
+    "family": "Flow",
+    "indicators": {
+      "pcr_total": 1.05,
+      "pcr_change": 0.0,
+      "fii_fut_5d_change": 100,
+      "fii_data_note": "FII flat"
+    }
+  },
+  "macro": {
+    "family": "Macro",
+    "indicators": {
+      "spot": 24845,
+      "vix": 15.0,
+      "vix_level": "low",
+      "vix_change": 0.1,
+      "gap_pct": 0.0,
+      "open_price": 24850,
+      "prev_close": 24840,
+      "prev_day_high": 25000,
+      "prev_day_low": 24700,
+      "prev_day_range": 300,
+      "pivot_pp": 24850,
+      "pivot_r1": 24980,
+      "pivot_s1": 24720,
+      "session_phase": "mid_session",
+      "open_to_current_pct": -0.02,
+      "distance_to_pivot_pct": -0.02,
+      "gift_premium": 0,
+      "gift_premium_note": "GIFT flat",
+      "banknifty_nifty_ratio": 2.1,
+      "banknifty_nifty_ratio_note": "normal"
+    }
+  },
+  "candles": {
+    "family": "Candles",
+    "candles": {
+      "5m": {"color": "GREEN", "body_pct": 0.1, "upper_wick_pct": 0.3, "lower_wick_pct": 0.3},
+      "15m": {"color": "RED", "body_pct": 0.15, "upper_wick_pct": 0.2, "lower_wick_pct": 0.4}
+    }
+  }
+}

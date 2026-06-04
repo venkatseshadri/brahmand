@@ -61,7 +61,7 @@ class AgentFactory:
         role = _resolve_variables(blueprint["role"], variables)
         goal = _resolve_variables(blueprint["goal"], variables)
         backstory = _resolve_variables(blueprint["backstory"], variables)
-        llm = blueprint.get("llm", "deepseek/deepseek-chat")
+        llm = blueprint.get("llm", "deepseek-v4-pro")
 
         return Agent(
             role=role,

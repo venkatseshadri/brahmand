@@ -278,7 +278,7 @@ def report_position_closed(trade_id: str, reason: str, final_pnl: float = 0) -> 
 
     # Also clear kickoff JSON state so kickoff can enter next trade
     try:
-        STATE_FILE = Path("/tmp/brahmand_kickoff.json")
+        STATE_FILE = Path(__file__).parent / "data" / "brahmand_entry.json"
         if STATE_FILE.exists():
             state = json.loads(STATE_FILE.read_text())
             if state.get("active_trade"):
@@ -528,6 +528,7 @@ def evaluate_trade(trade: dict) -> dict:
 
     try:
         from crewai import Crew, Process
+        from logger import _make_crew_step_callback, log_crew_telemetry
 
         morpher, shifter, risk = build_risk_crew(llm)
         tasks = build_tasks(morpher, shifter, risk, trade)
@@ -537,6 +538,8 @@ def evaluate_trade(trade: dict) -> dict:
             tasks=tasks,
             process=Process.sequential,
             verbose=False,
+            step_callback=_make_crew_step_callback("risk"),
+            after_kickoff_callbacks=[lambda r: log_crew_telemetry("risk", r)],
         )
         result = crew.kickoff()
         logger.info(f"Trade {trade.get('trade_id')} evaluated: {str(result)[:200]}")

@@ -52,20 +52,24 @@ YF_TICKER = {
 
 # ── DuckDB helpers ──────────────────────────────────────────
 
-def _load_1min_closes_duckdb(index: str, db_path: str, limit: int = 10000) -> List[float]:
-    """Load last N 1-min closes from DuckDB. Returns oldest→newest."""
+def _load_1min_closes_duckdb(index: str, db_path: str = None, limit: int = 10000) -> List[float]:
+    """Load last N 1-min closes from Penguin SQLite capture. Returns oldest→newest.
+
+    Penguin migration: source is now capture_{index}.sqlite (market_data.close),
+    not varaha_data.duckdb. db_path kept for caller compatibility but unused.
+    """
+    import sqlite3
+    cap = f"/home/trading_ceo/python-trader/varaha/data/capture_{index.lower()}.sqlite"
     try:
-        import duckdb
-        db = duckdb.connect(db_path, read_only=True)
-        rows = db.execute(
-            f"SELECT spot FROM market_data "
-            f"WHERE index_name = '{index}' "
-            f"ORDER BY timestamp DESC LIMIT {limit}"
+        con = sqlite3.connect(f"file:{cap}?mode=ro", uri=True, timeout=5)
+        rows = con.execute(
+            "SELECT close FROM market_data ORDER BY timestamp DESC LIMIT ?",
+            (limit,),
         ).fetchall()
-        db.close()
-        return [float(r[0]) for r in reversed(rows)]
+        con.close()
+        return [float(r[0]) for r in reversed(rows) if r[0] is not None]
     except Exception as e:
-        print(f"[EMA BACKFILL] DuckDB error: {e}")
+        print(f"[EMA BACKFILL] capture SQLite error: {e}")
         return []
 
 

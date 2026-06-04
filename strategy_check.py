@@ -22,6 +22,7 @@ def run_strategy_check(regime: dict) -> dict:
     from factory import AgentFactory
     from duckdb_tool import MarketDataQueryTool, get_latest_market_snapshot
     from crewai import Agent, Task, Crew, Process, LLM
+    from logger import _make_crew_step_callback, log_crew_telemetry
 
     api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     regime_type = regime.get("regime", "unknown")
@@ -31,7 +32,7 @@ def run_strategy_check(regime: dict) -> dict:
         return _fallback_strategy(regime_type, vix)
 
     llm = LLM(
-        model="deepseek/deepseek-chat",
+        model="deepseek-v4-pro",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=api_key,
         temperature=0,
@@ -62,7 +63,14 @@ Output JSON: {{'strategy_type', 'wing_width', 'sl_pct', 'tp_pct', 'entry_delay',
         agent=agent,
     )
 
-    crew = Crew(agents=[agent], tasks=[task], process=Process.sequential, verbose=False)
+    crew = Crew(
+        agents=[agent],
+        tasks=[task],
+        process=Process.sequential,
+        verbose=False,
+        step_callback=_make_crew_step_callback("strategy_check"),
+        after_kickoff_callbacks=[lambda r: log_crew_telemetry("strategy_check", r)],
+    )
     result = crew.kickoff()
 
     try:

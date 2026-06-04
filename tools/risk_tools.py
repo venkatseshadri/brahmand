@@ -20,22 +20,7 @@ from typing import Type, List, Optional, Any
 from pydantic import BaseModel, Field
 from crewai.tools import BaseTool
 
-LIVE_DB = {
-    "NIFTY": Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"),
-    "SENSEX": Path(
-        "/home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb"
-    ),
-}
-
-
-def _get_greeks_conn(live_db_path: Path):
-    """Open ATTACH connection to live DuckDB (READ_ONLY — no lock contention)."""
-    import duckdb
-
-    con = duckdb.connect(":memory:")
-    if live_db_path.exists():
-        con.execute(f"ATTACH '{live_db_path}' AS live (READ_ONLY)")
-    return con
+import penguin_compat
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -72,34 +57,33 @@ class MonitorPnLGreeksTool(BaseTool):
 
     def _run(self, symbol: str = "NIFTY", legs: list = None) -> str:
         safe = symbol.upper().strip()
-        db_path = LIVE_DB.get(safe)
-        if not db_path or not db_path.exists():
-            return json.dumps({"error": f"Database not found for {safe}"})
+        if not penguin_compat.capture_path(safe).exists():
+            return json.dumps({"error": f"Penguin capture not found for {safe}"})
 
         if not legs:
             return json.dumps({"error": "No position legs provided"})
 
         try:
-            con = _get_greeks_conn(db_path)
+            con = penguin_compat.connect_live(safe)
 
             spot_row = con.execute(
-                "SELECT spot FROM live.market_data WHERE spot IS NOT NULL ORDER BY id DESC LIMIT 1"
+                "SELECT spot FROM market_data WHERE spot IS NOT NULL AND spot > 0 ORDER BY timestamp DESC LIMIT 1"
             ).fetchone()
             spot = float(spot_row[0]) if spot_row else 0
 
             greeks_row = con.execute(
                 "SELECT agg_delta, agg_gamma, agg_vega, agg_theta, wings_delta, body_delta "
-                "FROM live.market_data WHERE agg_delta IS NOT NULL ORDER BY id DESC LIMIT 1"
+                "FROM market_data WHERE agg_delta IS NOT NULL ORDER BY timestamp DESC LIMIT 1"
             ).fetchone()
 
             snapshot = con.execute(
-                "SELECT strike, option_type, ltp FROM live.option_snapshots "
-                "WHERE timestamp = (SELECT MAX(timestamp) FROM live.option_snapshots)"
+                "SELECT strike, option_type, ltp FROM option_snapshots "
+                "WHERE timestamp = (SELECT MAX(timestamp) FROM option_snapshots)"
             ).fetchdf()
 
             # Try VIX from market_data
             vix_row = con.execute(
-                "SELECT india_vix FROM live.market_data WHERE india_vix IS NOT NULL ORDER BY id DESC LIMIT 1"
+                "SELECT india_vix FROM market_data WHERE india_vix IS NOT NULL ORDER BY timestamp DESC LIMIT 1"
             ).fetchone()
             vix = float(vix_row[0]) if vix_row else 0
 
@@ -208,7 +192,7 @@ class MonitorPnLGreeksTool(BaseTool):
                 },
                 "legs": leg_results,
                 "greeks": net_greeks,
-                "mode": "LIVE_DUCKDB",
+                "mode": "LIVE_PENGUIN",
             },
             indent=2,
         )

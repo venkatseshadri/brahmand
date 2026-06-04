@@ -64,8 +64,12 @@ def _load_ledger() -> dict:
 
 
 def _save_ledger(ledger: dict):
-    """Save order ledger to disk."""
-    LEDGER_FILE.write_text(json.dumps(ledger, indent=2, default=str))
+    """Save order ledger to disk atomically (temp + rename)."""
+    import os
+
+    tmp = LEDGER_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(ledger, indent=2, default=str))
+    os.replace(tmp, LEDGER_FILE)
 
 
 def _generate_order_id() -> str:
@@ -432,9 +436,11 @@ def get_trade_orders(trade_id: str) -> List[Dict]:
 
 def clear_ledger():
     """Clear order ledger (for testing only)."""
-    LEDGER_FILE.write_text(
-        json.dumps({"orders": {}, "order_counter": 0, "_trades": {}})
-    )
+    import os
+
+    tmp = LEDGER_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps({"orders": {}, "order_counter": 0, "_trades": {}}))
+    os.replace(tmp, LEDGER_FILE)
 
 
 # ── Trade-level ledger management ──────────────────────────────────────────

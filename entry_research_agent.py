@@ -25,7 +25,10 @@ import duckdb
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import penguin_compat
+
 from dotenv import load_dotenv
+from logger import _make_crew_step_callback, log_crew_telemetry
 
 load_dotenv()
 
@@ -52,18 +55,8 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
         JSON string with all v3.1 market_data columns
     """
     try:
-        db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-            read_only=True,
-        )
-
-        # Get schema to understand all available columns
-        schema_result = db.execute("""
-            SELECT column_name, data_type FROM information_schema.columns
-            WHERE table_name='market_data' ORDER BY ordinal_position
-        """).fetchall()
-
-        columns = [col[0] for col in schema_result]
+        # Penguin: EOD warehouse for the date (live capture if date is today).
+        db = penguin_compat.connect_research(index, date)
 
         query = f"""
         SELECT * FROM market_data
@@ -73,13 +66,14 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
         """
 
         result = db.execute(query).fetchall()
+        columns = [d[0] for d in db.description]
 
         if not result:
             return json.dumps(
                 {
-                    "error": f"No v3.1 data for {date}",
+                    "error": f"No data for {date}",
                     "count": 0,
-                    "database": "varaha_v3.1",
+                    "database": "penguin",
                 }
             )
 
@@ -100,15 +94,15 @@ def query_1min_candles_v31(date: str, index: str = "NIFTY", limit: int = None) -
                 "count": len(candles),
                 "date": date,
                 "index": index,
-                "database": "varaha_v3.1",
+                "database": "penguin",
                 "available_columns": columns,
                 "candles": candles,
-                "note": "All columns from v3.1 market_data table included",
+                "note": "All enriched market_data columns (Penguin warehouse/live capture)",
             }
         )
 
     except Exception as e:
-        return json.dumps({"error": str(e), "database": "varaha_v3.1"})
+        return json.dumps({"error": str(e), "database": "penguin"})
 
 
 @tool
@@ -396,7 +390,7 @@ def create_entry_research_agent(
         date = datetime.now().strftime("%Y-%m-%d")
 
     llm = LLM(
-        model="deepseek/deepseek-chat",
+        model="deepseek-v4-pro",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
         temperature=0,
@@ -523,6 +517,8 @@ OUTPUT FORMAT (JSON):
         tasks=[task],
         process=Process.sequential,
         verbose=True,
+        step_callback=_make_crew_step_callback("entry_research"),
+        after_kickoff_callbacks=[lambda r: log_crew_telemetry("entry_research", r)],
     )
 
     result = crew.kickoff()

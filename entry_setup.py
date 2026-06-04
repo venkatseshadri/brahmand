@@ -71,7 +71,9 @@ def _already_running() -> bool:
 
 
 def _has_active_order() -> tuple[bool, str]:
-    """Check order_ledger.json for active trades. Returns (blocked, reason)."""
+    """Check order_ledger.json for active trades. Returns (blocked, reason).
+    Auto-clears stale test trades (>2 days) and aged trades (>7 days)
+    before the blocking check so they don't jam the entry gate."""
     if not ORDER_LEDGER.exists():
         return False, "no ledger"
 
@@ -81,7 +83,55 @@ def _has_active_order() -> tuple[bool, str]:
         return False, "ledger unreadable"
 
     trades = ledger.get("_trades", {})
-    today = datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    ledger_dirty = False
+
+    for tid in list(trades):
+        t = trades[tid]
+        if t.get("status") != "ACTIVE":
+            continue
+        entry_str = t.get("entry_time", "")
+        entry_dt = None
+        if isinstance(entry_str, str) and entry_str:
+            try:
+                entry_dt = datetime.fromisoformat(entry_str)
+            except (ValueError, TypeError):
+                pass
+
+        if entry_dt is None:
+            continue
+
+        age_days = (now - entry_dt).days
+        if tid.startswith("TEST-") and age_days > 2:
+            t["status"] = "CLOSED"
+            t["exit_reason"] = "AUTO_CLEAR_STALE_TEST"
+            t["exit_time"] = now.isoformat()
+            ledger_dirty = True
+            _log(
+                "AUTO_CLEAR_STALE_TEST: %s (entry=%s, age=%dd)",
+                tid,
+                entry_str,
+                age_days,
+            )
+        elif age_days > 7:
+            t["status"] = "CLOSED"
+            t["exit_reason"] = "AUTO_CLEAR_AGED"
+            t["exit_time"] = now.isoformat()
+            ledger_dirty = True
+            _log(
+                "AUTO_CLEAR_AGED: %s (entry=%s, age=%dd)",
+                tid,
+                entry_str,
+                age_days,
+            )
+
+    if ledger_dirty:
+        tmp = ORDER_LEDGER.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(ledger, indent=2, default=str))
+        os.replace(tmp, ORDER_LEDGER)
+        _log("ledger updated: auto-cleared stale trades")
+
     active = []
     today_count = 0
 
@@ -119,6 +169,7 @@ def main():
     from lock import acquire_lock, release_lock
     from market_data import is_market_hours
     from state import load_state, save_state, rollover_if_new_day
+    from agentops_compat import init_agentops_if_enabled
 
     dry = "--dry-run" in sys.argv
 
@@ -146,6 +197,8 @@ def main():
             if dry:
                 print("SKIP: market closed")
             return
+
+        init_agentops_if_enabled()
 
         blocked, reason = _has_active_order()
         if blocked:

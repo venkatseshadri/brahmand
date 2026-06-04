@@ -1,0 +1,27 @@
+{
+  "orders": {},
+  "order_counter": 0,
+  "_trades": {
+    "TEST-KAGGLE-001": {
+      "trade_id": "TEST-KAGGLE-001",
+      "entry_time": "2024-10-31T09:16:00",
+      "status": "ACTIVE",
+      "legs": [
+        {
+          "action": "SELL",
+          "strike": 11750,
+          "type": "PE",
+          "fill_price": 2.35,
+          "tsym": "BANKNIFTY31OCT24P11750",
+          "quantity": 75
+        }
+      ],
+      "sl": {
+        "pe": 4.0
+      },
+      "tp": {
+        "pe": 1.0
+      }
+    }
+  }
+}

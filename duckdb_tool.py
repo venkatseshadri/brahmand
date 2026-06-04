@@ -110,6 +110,23 @@ def _connect_sqlite_intraday() -> duckdb.DuckDBPyConnection | None:
             LEFT JOIN sqlite_scan('{enr_src}', 'market_data_enriched') e
                 ON m.timestamp = e.timestamp AND m.instrument = e.instrument
         """)
+        con.execute(f"""
+            CREATE VIEW option_snapshots AS
+            SELECT
+                substr(timestamp, 1, 10) AS date,
+                substr(timestamp, 12, 8) AS time,
+                strike,
+                option_type,
+                ltp,
+                volume,
+                oi,
+                CAST(NULL AS DOUBLE) AS iv,
+                CAST(NULL AS TEXT) AS expiry_label,
+                CAST(NULL AS TEXT) AS expiry_date,
+                tsym,
+                CAST(NULL AS INTEGER) AS strike_offset
+            FROM sqlite_scan('{src}', 'option_prices')
+        """)
         return con
     except Exception:
         return None

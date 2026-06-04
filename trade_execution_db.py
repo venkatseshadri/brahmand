@@ -298,7 +298,8 @@ def has_active_trades() -> bool:
 def update_active_trade(
     trade_id: str, legs: List[Dict] = None, sl: Dict = None, tp: Dict = None
 ):
-    """Update active trade legs/SL/TP after morph or roll."""
+    """Update active trade legs/SL/TP after morph or roll.
+    Syncs BOTH DuckDB active_trades AND order_ledger.json."""
     init_db()
     with _connect() as conn:
         if legs is not None:
@@ -317,4 +318,25 @@ def update_active_trade(
                 [json.dumps(tp), trade_id],
             )
         conn.commit()
-        return True
+
+    # Write-through to order_ledger.json so the audit trail reflects
+    # morph/roll/shift state changes — not just the original entry.
+    try:
+        from datetime import datetime
+        from order_routing import _load_ledger, _save_ledger
+
+        led = _load_ledger()
+        jt = led.get("_trades", {}).get(trade_id)
+        if jt:
+            if legs is not None:
+                jt["legs"] = legs
+            if sl is not None:
+                jt["sl"] = sl
+            if tp is not None:
+                jt["tp"] = tp
+            jt["last_updated"] = datetime.now().isoformat()
+            _save_ledger(led)
+    except Exception:
+        pass
+
+    return True

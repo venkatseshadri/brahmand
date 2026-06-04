@@ -461,17 +461,43 @@ def _square_off(legs: list, trade_id: str, reason: str) -> float:
 
 
 def _close_in_db(trade_id: str, reason: str, trade: dict):
-    """Archive the trade to history and mark it CLOSED so the 5-min flow can re-enter."""
+    """Mark the trade CLOSED in BOTH stores so the 5-min entry flow can re-enter.
+
+    Writing only DuckDB (the old behaviour) left order_ledger.json._trades stuck
+    ACTIVE, so entry_setup's single-position / MAX_TRADES guard blocked every new
+    entry — the JSON<->DuckDB split-brain. Closes now propagate to both.
+    """
+    code = _norm_close_reason(reason)
     try:
         from trade_execution_db import close_trade
 
         close_trade(
             trade_id,
-            close_reason=_norm_close_reason(reason),
+            close_reason=code,
             final_pnl=trade.get("cumulative_pnl"),
         )
-    except Exception:
-        pass
+    except Exception as e:
+        # Do NOT swallow silently: a failed DuckDB close while the JSON close
+        # below still runs recreates the JSON<->DuckDB split-brain this function
+        # exists to prevent. Surface it in the position-manager log.
+        print(f"[{now_str()}] PM: ⚠️ DuckDB close_trade failed for {trade_id}: {e}")
+
+    # Write-through to order_ledger.json — the store entry_setup's guard reads.
+    try:
+        from datetime import datetime
+        from order_routing import _load_ledger, _save_ledger
+
+        led = _load_ledger()
+        jt = led.get("_trades", {}).get(trade_id)
+        if jt and jt.get("status") != "CLOSED":
+            jt["status"] = "CLOSED"
+            jt["exit_reason"] = code
+            jt["exit_time"] = datetime.now().isoformat()
+            _save_ledger(led)
+    except Exception as e:
+        print(
+            f"[{now_str()}] PM: ⚠️ JSON ledger close write-through failed for {trade_id}: {e}"
+        )
 
 
 def execute_action(action: dict, trade: dict) -> dict:
@@ -832,6 +858,47 @@ def _check_sl_tp(trade: dict) -> dict:
     return {"action": "ACTIVE", "mtm": round(mtm, 2)}
 
 
+def _mark_legs_to_ltp(legs: list) -> None:
+    """Set each leg's live 'ltp' from SQLite option_prices (same source as
+    _check_sl_tp), so square-off books real P&L instead of the entry fill."""
+    import sqlite3
+
+    try:
+        from antariksh.config.sqlite_schema import get_sqlite_capture_path
+
+        db_path = get_sqlite_capture_path("NIFTY")
+    except Exception:
+        return
+    if not db_path.exists():
+        return
+    conn = sqlite3.connect(str(db_path))
+    try:
+        for leg in legs:
+            row = conn.execute(
+                "SELECT ltp FROM option_prices WHERE tsym = ?", (leg.get("tsym", ""),)
+            ).fetchone()
+            if row and row[0] is not None:
+                leg["ltp"] = float(row[0])
+    finally:
+        conn.close()
+
+
+def _close_side(trade: dict, side: str) -> dict:
+    """Square off one side (CE/PE) on an SL/TP hit, booking real P&L, and close
+    the trade in both stores if no short legs remain.
+
+    Was referenced by run_bridge() but never defined — every SL_HIT/TP_HIT raised
+    NameError, so the intraday SL/TP exit never completed. Marks the side's legs to
+    live LTP, then delegates to the existing CLOSE_SIDE action (square-off + persist).
+    """
+    side_legs = [l for l in trade.get("legs", []) if l.get("type") == side]
+    _mark_legs_to_ltp(side_legs)
+    return execute_action(
+        {"type": CLOSE_SIDE, "side": side, "legs": side_legs, "reason": "SL_TP_EXIT"},
+        trade,
+    )
+
+
 def run_bridge():
     """Read active trades from order_ledger (DuckDB), dispatch to risk_agent_crew.
 
@@ -863,6 +930,20 @@ def run_bridge():
         print(
             f"[{now_str()}] PM: Evaluating trade {trade_id} ({trade.get('strategy', '?')})"
         )
+
+        # ── Deterministic EOD square-off (hard rule, NOT LLM discretion) ──
+        # Index positions must be flat by the cash close. This is the operational
+        # close-out; the LLM still owns all discretionary intraday exits. Restores
+        # the MARKET_CLOSE rule that was stranded in the dead run() path, so trades
+        # no longer carry over ACTIVE (and a post-close entry is squared off next
+        # minute). MARKET_CLOSE=15:30 is correct for the only traded indices
+        # (NIFTY/SENSEX); make it per-index if MCX trading is ever added.
+        if now_str() >= MARKET_CLOSE:
+            print(f"  🕒 EOD {MARKET_CLOSE} → square-off CLOSE_ALL")
+            execute_action(
+                {"type": CLOSE_ALL, "reason": f"Market close ({MARKET_CLOSE})"}, trade
+            )
+            continue
 
         # ── DETERMINISTIC SL/TP CHECK (reads SQLite option_prices) ─────────
         sl_result = _check_sl_tp(trade)

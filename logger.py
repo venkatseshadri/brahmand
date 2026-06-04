@@ -204,3 +204,70 @@ def log_monitoring_event(event_type: str, trade_id: str, **details):
     except Exception as e:
         _err = logging.getLogger("brahmand.kickoff").error
         _err(f"Failed to log monitoring event: {e}")
+
+
+# ── CrewAI Telemetry (P7) ────────────────────────────────────────────────
+
+DEEPSEEK_PRICING = {
+    "deepseek-v4-pro": (0.89, 2.99),  # input, output per 1M tokens
+    "deepseek-v4-flash": (0.27, 1.10),
+    "default": (0.89, 2.99),
+}
+
+
+def _estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+    in_price, out_price = DEEPSEEK_PRICING.get(model, DEEPSEEK_PRICING["default"])
+    return round(
+        (prompt_tokens * in_price + completion_tokens * out_price) / 1_000_000, 6
+    )
+
+
+def _make_crew_step_callback(crew_name: str):
+    """Returns a step_callback that logs per-step timing + agent name to JSONL."""
+
+    def _on_step(step_output):
+        try:
+            log_monitoring_event(
+                "CREW_STEP",
+                "NO_TRADE",
+                crew=crew_name,
+                agent=getattr(step_output, "agent", "unknown"),
+                task=getattr(step_output, "name", None)
+                or getattr(step_output, "description", "unknown"),
+                output_len=len(getattr(step_output, "raw", "") or ""),
+            )
+        except Exception:
+            pass
+
+    return _on_step
+
+
+def log_crew_telemetry(crew_name: str, crew_result):
+    """Log per-crew usage metrics + cost after kickoff completes."""
+    try:
+        metrics = {}
+        if hasattr(crew_result, "usage_metrics") and crew_result.usage_metrics:
+            um = crew_result.usage_metrics
+            metrics = {
+                "total_tokens": um.total_tokens,
+                "prompt_tokens": um.prompt_tokens,
+                "completion_tokens": um.completion_tokens,
+                "successful_requests": um.successful_requests,
+            }
+        if hasattr(crew_result, "token_usage") and crew_result.token_usage:
+            tu = crew_result.token_usage
+            cost = _estimate_cost(
+                "default",
+                tu.prompt_tokens,
+                tu.completion_tokens,
+            )
+            metrics["estimated_cost_usd"] = cost
+
+        log_monitoring_event(
+            "CREW_TELEMETRY",
+            "NO_TRADE",
+            crew=crew_name,
+            **metrics,
+        )
+    except Exception:
+        pass

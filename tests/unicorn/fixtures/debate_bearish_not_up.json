@@ -1,0 +1,93 @@
+{
+  "_description": "Synthetic debate fixture — NOT_UP gate scenario with strong bearish trend. Used for testing the debate verifier and scoring logic without live DuckDB.",
+  "_scenario": "strong_bearish_not_up",
+  "trend": {
+    "family": "Trend",
+    "index": "NIFTY",
+    "timeframes": {
+      "5m": {"sma20": 24850, "sma50": 24950, "sma_position": "bearish", "candle": "RED", "st_consensus": "bearish", "adx": 38.0, "di_plus": 15.0, "di_minus": 28.0},
+      "15m": {"sma20": 24830, "sma50": 24980, "sma_position": "bearish", "candle": "RED", "st_consensus": "bearish", "adx": 35.0, "di_plus": 12.0, "di_minus": 30.0},
+      "30m": {"sma20": 24800, "sma50": 25000, "sma_position": "bearish", "candle": "RED", "st_consensus": "bearish", "adx": 32.0, "di_plus": 10.0, "di_minus": 32.0},
+      "1m_v3.1": {"ema20": 24880, "ema5": 24850, "ema50": 24950, "ema_position": "bearish", "spot": 24800, "st_consensus": "bearish", "st_direction": "bearish", "st_5m_direction": "bearish", "st_15m_direction": "bearish", "adx": 38.0}
+    }
+  },
+  "momentum": {
+    "family": "Momentum",
+    "timeframes": {
+      "5m": {"rsi": 35.0, "rsi_zone": "neutral", "macd": -12.5, "macd_histogram": -3.2, "cci": -120.0},
+      "1m_v3.1": {"rsi": 35.0, "rsi_zone": "neutral", "bb_pct_b": 0.2, "bb_width": 3.5}
+    }
+  },
+  "volatility": {
+    "family": "Volatility",
+    "timeframes": {
+      "5m": {"atr": 18.0, "atr_pct": 0.07, "bb_lower": 24700, "bb_upper": 24950},
+      "1m_v3.1": {"atr": 18.0, "atr_pct": 0.07, "hv_20": 0.12, "hv_60": 0.15, "iv_current": 16.5, "iv_rank": 0.4}
+    }
+  },
+  "volume": {
+    "family": "Volume",
+    "indicators": {
+      "5m": {"cmf": -0.3, "cmf_signal": "distribution", "obv": -50000, "volume": 45000}
+    }
+  },
+  "options": {
+    "family": "Options",
+    "indicators": {
+      "pcr_total": 1.25,
+      "pcr_atm": 1.4,
+      "oi_skew": 0.6,
+      "max_pain_strike": 24850,
+      "iv_current": 16.5,
+      "iv_percentile": 0.4,
+      "iv_regime": "normal",
+      "sentiment": "bearish",
+      "pcr_signal": "bearish",
+      "oi_price_signal": "bearish",
+      "greeks": {"delta": -0.6, "gamma": 0.002, "vega": 4.5, "theta": -2.1},
+      "call_oi_concentration": 0.4,
+      "put_oi_concentration": 0.6
+    }
+  },
+  "flow": {
+    "family": "Flow",
+    "indicators": {
+      "pcr_total": 1.25,
+      "pcr_change": 0.15,
+      "fii_fut_5d_change": -3500,
+      "fii_data_note": "FII selling futures"
+    }
+  },
+  "macro": {
+    "family": "Macro",
+    "indicators": {
+      "spot": 24800,
+      "vix": 15.2,
+      "vix_level": "low",
+      "vix_change": -0.5,
+      "gap_pct": -0.3,
+      "open_price": 24950,
+      "prev_close": 25000,
+      "prev_day_high": 25100,
+      "prev_day_low": 24750,
+      "prev_day_range": 350,
+      "pivot_pp": 24920,
+      "pivot_r1": 25050,
+      "pivot_s1": 24780,
+      "session_phase": "mid_session",
+      "open_to_current_pct": -0.6,
+      "distance_to_pivot_pct": -0.5,
+      "gift_premium": -10,
+      "gift_premium_note": "GIFT slightly negative",
+      "banknifty_nifty_ratio": 2.1,
+      "banknifty_nifty_ratio_note": "normal"
+    }
+  },
+  "candles": {
+    "family": "Candles",
+    "candles": {
+      "5m": {"color": "RED", "body_pct": 0.6, "upper_wick_pct": 0.1, "lower_wick_pct": 0.3},
+      "15m": {"color": "RED", "body_pct": 0.7, "upper_wick_pct": 0.05, "lower_wick_pct": 0.25}
+    }
+  }
+}

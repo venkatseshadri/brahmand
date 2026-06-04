@@ -38,7 +38,7 @@ not_up_entry_agent:
   tools:
     - check_active_spreads
     - evaluate_not_up_rejection
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 not_down_entry_agent:
   role: "NOT_DOWN Entry Gatekeeper"
@@ -74,7 +74,7 @@ not_down_entry_agent:
   tools:
     - check_active_spreads
     - evaluate_not_down_rejection
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 volume_research_agent:
   role: "Volume & VWAP Pattern Researcher"
@@ -196,7 +196,7 @@ volume_research_agent:
     disagreement = uncertainty = Iron Butterfly opportunity.
   tools:
     - query_market_data
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 morpher_agent:
   role: "Position Morpher"
@@ -244,7 +244,7 @@ morpher_agent:
     - place_sl_order
     - place_tp_order
     - cancel_order
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 shifter_agent:
   role: "Leg Shifter"
@@ -289,7 +289,7 @@ shifter_agent:
     - place_sl_order
     - place_tp_order
     - cancel_order
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 postmortem_agent:
   role: "Post-Mortem Analyst"
@@ -343,7 +343,7 @@ postmortem_agent:
     - update_daily_config
   # Phase 2: these tools need CrewAI wrappers. Currently postmortem runs via kickoff.run_pm()
   # with deterministic Python code. YAML is blueprint only.
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 regime_agent:
   role: "Market Regime Detector"
@@ -378,7 +378,7 @@ regime_agent:
     Include VIX and ADX in output so Strategy can optimize parameters.
   tools:
     - query_market_data
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 strategy_agent:
   role: "Strategy Architect (Rejection-Based)"
@@ -414,7 +414,7 @@ strategy_agent:
      "wing_width": 200, "sl_pct": 0.25, "tp_pct": 0.50, "reason": "..."}
   tools:
     - query_market_data
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 contract_agent:
   role: "Contract Specialist"
@@ -447,7 +447,7 @@ contract_agent:
      "count": 2 or 4, "note": "all live" or "some synthetic"} 
   tools:
     - resolve_option_contracts
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 execution_agent:
   role: "Paper Trade Executor"
@@ -490,7 +490,7 @@ execution_agent:
   tools:
     - execute_paper_trade
     - place_entry_orders
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 order_agent:
   role: "Order Router"
@@ -529,7 +529,7 @@ order_agent:
   tools:
     - place_entry_orders
     - place_sl_tp_orders
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"
 
 risk_agent:
   role: "Risk Commander"
@@ -567,4 +567,4 @@ risk_agent:
     - cancel_sl_order
     - modify_sl_order
     - tsl_engine
-  llm: "deepseek/deepseek-chat"
+  llm: "deepseek-v4-pro"

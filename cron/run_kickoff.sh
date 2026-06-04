@@ -17,4 +17,12 @@ set -a
 set +a
 
 cd "$PROJECT_DIR"
+
+# Singleton guard — bail if a previous entry_setup.py is still running.
+# Prevents the pile-up that pegs CPU when a run hangs (load-leak incident 2026-06-01).
+if pgrep -f "$PROJECT_DIR/entry_setup.py" >/dev/null 2>&1; then
+  echo "$(date '+%F %T') skip: entry_setup.py already running" >> "$LOG_FILE"
+  exit 0
+fi
+
 /usr/bin/python3 "$PROJECT_DIR/entry_setup.py" >> "$LOG_FILE" 2>&1

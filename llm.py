@@ -11,7 +11,7 @@ def get_llm():
     if not api_key:
         return None
     return LLM(
-        model="deepseek/deepseek-chat",
+        model="deepseek-v4-pro",
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
         api_key=api_key,
         temperature=0,

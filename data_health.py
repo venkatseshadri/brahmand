@@ -317,12 +317,81 @@ def check_redis() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_penguin() -> Tuple[bool, list]:
+    """Check Penguin pipeline health via Redis queues + SQLite."""
+    warnings = []
+    try:
+        import redis as rds
+        import sqlite3
+
+        r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+        r.ping()
+
+        prev_state = {}
+        if STATE_FILE.exists():
+            prev_state = json.loads(STATE_FILE.read_text())
+
+        penguin_queues = [
+            ("bars:NIFTY:1", "NIFTY"),
+            ("bars:SENSEX:1", "SENSEX"),
+            ("bars:MCX:1", "MCX"),
+        ]
+        for qkey, label in penguin_queues:
+            n = r.llen(qkey)
+            prev_n = prev_state.get(f"penguin_{label}_len", 0)
+            if _is_market_hours() and n > 0 and n == prev_n:
+                warnings.append(f"Penguin [{label}]: NOT GROWING — stuck at {n} bars")
+            prev_state[f"penguin_{label}_len"] = n
+
+        db_paths = [
+            (
+                Path(
+                    "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite"
+                ),
+                "NIFTY",
+            ),
+            (
+                Path("/home/trading_ceo/python-trader/varaha/data/capture_mcx.sqlite"),
+                "MCX",
+            ),
+        ]
+        for db_path, label in db_paths:
+            if not db_path.exists():
+                warnings.append(f"Penguin [{label}]: DB missing — {db_path}")
+                continue
+            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+            try:
+                row = conn.execute(
+                    "SELECT COUNT(*), MAX(timestamp) FROM market_data WHERE date = DATE('now')"
+                ).fetchone()
+                if row and row[1]:
+                    try:
+                        t = datetime.fromisoformat(row[1].replace(" ", "T"))
+                        age = (datetime.now() - t).total_seconds() / 60
+                        if _is_market_hours() and age > 10:
+                            warnings.append(
+                                f"Penguin [{label}]: stale — last bar {age:.0f} min ago"
+                            )
+                    except (ValueError, AttributeError):
+                        pass
+            finally:
+                conn.close()
+
+        STATE_FILE.write_text(json.dumps(prev_state))
+    except Exception as e:
+        warnings.append(f"Penguin: check failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
 def run_all() -> Tuple[bool, list]:
     """Run all health checks. Returns (healthy, all_warnings)."""
     results = []
     all_warnings = []
 
     for name, fn in [
+        ("Penguin", check_penguin),
         ("v3.1", check_v31),
         ("v4_NIFTY", lambda: check_v4("NIFTY")),
         ("v4_SENSEX", lambda: check_v4("SENSEX")),
