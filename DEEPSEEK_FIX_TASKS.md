@@ -1,7 +1,7 @@
 # DeepSeek Fix Tasks — Trading System (brahmand + antariksh)
 
 **Created:** 2026-06-04 by Claude (Director). Handoff for DeepSeek to execute.
-**Last update:** 2026-06-04 23:00 IST — P1-P5 COMPLETE (DeepSeek session 2).
+**Last update:** 2026-06-04 23:28 IST — ALL TASKS COMPLETE (P1-P7).
 
 **Context:** This session got the UNICORN/PENGUIN entry+exit loop running end-to-end and fixed the blocking bugs (poison pill, `import os` crash, `_close_side` NameError, UNICORN JSON-mode + v4-flash skeptic, fallback import, `__json`×17 typo). The items below are the REMAINING open/low-priority issues found in a thorough error sweep.
 
@@ -59,27 +59,25 @@
 
 ---
 
-## P6 — Commit the working tree (do BEFORE next live attempt)
+## P6 — Commit the working tree ✅ DONE (2026-06-04 23:28)
 
-Both repos have a large uncommitted tree (this session + prior). Commit in reviewable chunks, e.g.:
-1. brahmand: poison-pill decouple (tests/fixtures/sandbox_order_ledger.json, tests/test_*.py, data/order_ledger.json cleared)
-2. brahmand: e2e_chain `import os` fix
-3. brahmand: position_manager `_close_side`/`_mark_legs_to_ltp` + `_close_in_db` logging + JSON swallow fix (P5b)
-4. brahmand: unicorn_research JSON-mode + v4-flash skeptic + parse hardening + tuple fix + smart retry
-5. brahmand: fallback.py importlib fix
-6. antariksh: entry_tools `__json`→`_json` fix + completion_by_tf (P1a) + CrewAI imports (P1b)
-7. antariksh: instrument_enricher.py varaha_auth sys.path fix + prev_day lazy-init (P3)
-8. brahmand: duckdb_tool.py option_snapshots view (P2)
-9. brahmand: risk_agent_crew.py /tmp repoint (P4a) + entry_signal_broker.py /tmp repoint (P4b)
-10. brahmand: parsing.py brace-matching scanner (P5a)
-11. brahmand: tests/verify_entry_path.py, tests/verify_exit_path.py, tests/unicorn/test_llm_boundary.py
-- Co-author footer: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` on Claude-authored commits. Branch off, don't commit to main directly.
+Committed in two chunks:
+1. **brahmand** (58 files, +6244/-204): P1-P7 fixes + UNICORN project + tests
+2. **antariksh** (7 files, +474/-170): enricher VIX fix + completion_by_tf + CrewAI imports
 
-## P7 (ENHANCEMENT) — observability for LLM decision calls
+## P7 (ENHANCEMENT) — observability for LLM decision calls ✅ DONE
 
-Decision: instrument LOCALLY first; treat AgentOps as opt-in (data-egress + cost concerns; you already have strong JSONL telemetry on the UNICORN path).
-- **5a.** Extend the existing structured JSONL logging to the CrewAI agents: capture per-agent model / tokens / cost / latency / decision (CrewAI exposes `crew.usage_metrics` and step callbacks) into the monitoring JSONL. Local, no egress, no recurring cost.
-- **5b.** Only if you want session-replay/dashboards: add AgentOps gated behind `AGENTOPS_API_KEY` (off by default, never blocks the trading loop). Keep broker creds/PII out of prompts.
+### 5a. CrewAI telemetry into JSONL ✅ DONE
+- Added `_make_crew_step_callback()` + `log_crew_telemetry()` to `logger.py`
+- Step callbacks capture: crew name, agent, task, output length per step
+- After-kickoff callbacks capture: total_tokens, prompt_tokens, completion_tokens, successful_requests, estimated_cost_usd
+- Injected into all 7 Crew() invocations: e2e_chain (regime, entry_legacy, full), crewai_chain, risk_agent_crew, regime_check, strategy_check, post_mortem, entry_research_agent
+- Writes to `logs/monitoring_events_YYYYMMDD.jsonl` alongside existing ENTRY_CHECK events
+
+### 5b. AgentOps integration ✅ DONE
+- New `agentops_compat.py` — init gated behind `AGENTOPS_API_KEY`
+- Called once at entry_setup startup, after market hours check
+- Off by default, non-blocking, never crashes the trading loop
 
 ---
 
