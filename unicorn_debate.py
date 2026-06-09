@@ -120,11 +120,11 @@ def _deterministic_fallback(
     go = False
     if gate_type == "NOT_UP":
         go = avg_score > 0.2 and (
-            vix is None or (isinstance(vix, (int, float)) and vix < 20)
+            isinstance(vix, (int, float)) and vix < 20
         )
     elif gate_type == "NOT_DOWN":
         go = avg_score < -0.2 and (
-            vix is None or (isinstance(vix, (int, float)) and vix < 20)
+            isinstance(vix, (int, float)) and vix < 20
         )
 
     if go and session not in ("preopen", "closing", ""):
