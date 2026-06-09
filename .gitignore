@@ -5,3 +5,4 @@ data/
 data/ema_state/
 logs/
 tests/_tmp_position_cache/
+tests/_tmp_stale_cleanup/

@@ -560,9 +560,16 @@ def update_trade_in_duckdb(
             return False
 
         params.append(trade_id)
-        query = f"UPDATE active_trades SET {', '.join(updates)} WHERE trade_id = ?"
+        # CLOSED is TERMINAL: never resurrect a closed trade. A stray
+        # place_sl_tp_orders → update_trade_in_duckdb(status="SL_TP_PLACED") after a
+        # close was flipping archived trades back to SL_TP_PLACED, leaving them in
+        # trade_history AND active (status != CLOSED) forever — jamming the
+        # single-position entry guard every session. The guard makes that impossible.
+        query = (f"UPDATE active_trades SET {', '.join(updates)} "
+                 f"WHERE trade_id = ? AND status != 'CLOSED'")
         with _connect() as con:
             con.execute(query, params)
+            con.commit()  # don't rely on autocommit (close_trade commits explicitly)
         return True
     except Exception as e:
         import logging
