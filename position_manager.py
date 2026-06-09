@@ -899,6 +899,36 @@ def _close_side(trade: dict, side: str) -> dict:
     )
 
 
+def _discretionary_actions(trade: dict, trade_id: str, mtm: float) -> list:
+    """Return the DISCRETIONARY (morph/roll/tighten) actions for this cycle.
+
+    Prefer the cached position-research assessment (fresh + signature-matched);
+    on a cache miss / material change / any error, fall back to a LIVE deterministic
+    P1–P7 recompute (today's behaviour). Protective triggers (SL/TP/floor/EOD) are
+    handled by run_bridge directly and are NOT routed through this path.
+    Extracted from run_bridge so the cache HIT/MISS branch is unit-testable."""
+    try:
+        from position_research_cache import (
+            load_assessment,
+            compute_position_signature,
+            cache_age_sec,
+        )
+
+        sig = compute_position_signature(trade, mtm=mtm)
+        assessment = load_assessment(trade_id, signature=sig)
+        if assessment is not None:
+            age = cache_age_sec(trade_id) or 0
+            print(f"  🧠 Research cache HIT ({age:.0f}s): "
+                  f"{assessment.get('recommendation', '?')} "
+                  f"— {str(assessment.get('reason', ''))[:80]}")
+            return assessment.get("actions", []) or []
+        print("  Research cache MISS/stale → live deterministic P1-P7")
+        return run(trade)
+    except Exception as e:
+        print(f"  ⚠️  Research path failed: {e} → live deterministic P1-P7")
+        return run(trade)
+
+
 def run_bridge():
     """Read active trades from order_ledger (DuckDB), dispatch to risk_agent_crew.
 
@@ -968,36 +998,31 @@ def run_bridge():
 
         print(f"  📊 MTM = {sl_result['mtm']:.2f}  (ACTIVE)")
 
-        actions = []
-        llm_ok = False
-        # ── Try LLM path (now only for morph/shift/TSL decisions) ──
-        try:
-            from risk_agent_crew import evaluate_trade as llm_evaluate
+        # ── PROTECTIVE: cumulative P&L floor (P6), live every cycle, NEVER cached ──
+        # SL/TP (P4/P5) and EOD (P7) are already handled above; the floor is the
+        # remaining protective trigger, so evaluate it live here before any cached
+        # discretionary action — same formula as run()'s P6 (realized + unrealized).
+        cumulative = trade.get("cumulative_pnl", 0) + sl_result["mtm"]
+        if cumulative <= FLOOR:
+            print(f"  🔴 P&L floor: cumulative ₹{cumulative:.0f} ≤ ₹{FLOOR} → CLOSE ALL")
+            execute_action(
+                {"type": CLOSE_ALL, "reason": f"Cumulative P&L ₹{cumulative:.0f} ≤ floor ₹{FLOOR}"},
+                trade,
+            )
+            continue
 
-            # Inject real-time MTM into trade context for LLM
-            trade["current_mtm"] = sl_result["mtm"]
-            result = llm_evaluate(trade)
-            if result.get("status") == "ok":
-                llm_ok = True
-                llm_actions = result.get("result", [])
-                if isinstance(llm_actions, list):
-                    actions = llm_actions
-                print(f"  ✅ LLM: {str(result.get('result', ''))[:120]}")
-            elif result.get("error"):
-                print(
-                    f"  ⚠️  LLM failed: {result['error'][:80]} → falling back to P1-P7"
-                )
-                actions = run(trade)
-        except ImportError:
-            print(f"  ⚠️  risk_agent_crew not available → P1-P7 fallback")
-            actions = run(trade)
-        except Exception as e:
-            print(f"  ❌ LLM exception: {e} → P1-P7 fallback")
-            actions = run(trade)
+        # ── DISCRETIONARY: cached position research (morph/roll/tighten — P1–P3) ──
+        # The slow research cron (position_research.py, every 15 min) caches a
+        # per-trade assessment; here we apply it in sub-second time. This is the
+        # UNICORN entry pattern (cached LLM research → fast deterministic apply)
+        # ported to the position manager: the LLM (future) owns the discretionary
+        # judgement; the hot path just executes it. Cache miss OR a material
+        # change (signature) → live deterministic P1–P7 recompute (today's behaviour).
+        actions = _discretionary_actions(trade, trade_id, sl_result["mtm"])
 
-        # The LLM (primary placer) was unavailable → ensure resting SL/TP exist.
-        if not llm_ok:
-            _ensure_sl_tp_orders(trade, trade_id)
+        # Discretionary research never places protective orders → always ensure
+        # resting SL/TP exist (idempotent). Also covers the cache-HIT path.
+        _ensure_sl_tp_orders(trade, trade_id)
 
         # Execute all actions and persist
         for action in actions:

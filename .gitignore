@@ -4,3 +4,4 @@ __pycache__/
 data/
 data/ema_state/
 logs/
+tests/_tmp_position_cache/
