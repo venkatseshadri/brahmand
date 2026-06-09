@@ -27,7 +27,7 @@ load_dotenv()
 from logger import get_logger, agent_log, chain_summary, log_exception
 from logger import _make_crew_step_callback, _make_crew_after_callback
 from llm import get_llm
-from parsing import parse_json_output
+from parsing import extract_task_output
 from fallback import deterministic_fallback
 from verification import (
     verify_provenance,
@@ -370,7 +370,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             try:
                 regime_result = regime_crew.kickoff()
                 regime = (
-                    parse_json_output(str(regime_result.tasks_output[0]))
+                    extract_task_output(regime_result.tasks_output[0])
                     if hasattr(regime_result, "tasks_output")
                     and len(regime_result.tasks_output) > 0
                     else {}
@@ -406,14 +406,14 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         regime = {}
         if hasattr(entry_result, "tasks_output"):
             try:
-                not_up_decision = parse_json_output(
-                    str(entry_result.tasks_output[0])
+                not_up_decision = extract_task_output(
+                    entry_result.tasks_output[0]
                 )  # NOT_UP agent
-                not_down_decision = parse_json_output(
-                    str(entry_result.tasks_output[1])
+                not_down_decision = extract_task_output(
+                    entry_result.tasks_output[1]
                 )  # NOT_DOWN agent
                 regime = (
-                    parse_json_output(str(entry_result.tasks_output[2]))
+                    extract_task_output(entry_result.tasks_output[2])
                     if len(entry_result.tasks_output) > 2
                     else {}
                 )  # Regime
@@ -561,16 +561,19 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     if hasattr(result, "tasks_output"):
         for i, name in enumerate(agent_names):
             if i < len(result.tasks_output):
-                raw = str(result.tasks_output[i])
                 try:
-                    parsed = parse_json_output(raw)
+                    parsed = extract_task_output(result.tasks_output[i])
                     parsed_outputs[i] = parsed
                     agent_log(_agent, f"{name}_Agent", parsed)
-                except Exception:
-                    _err(f"{name} Agent parse failed: {raw[:200]}")
+                    if not parsed:
+                        _err(f"{name} Agent extracted empty: "
+                             f"{str(result.tasks_output[i])[:200]}")
+                except Exception as e:
+                    _err(f"{name} Agent parse failed: {e} :: "
+                         f"{str(result.tasks_output[i])[:200]}")
     else:
-        raw_str = str(result)
-        _err(f"Crew raw output (no tasks_output): {raw_str[:500]}")
+        _err(f"Strategy crew returned no tasks_output: type={type(result).__name__} "
+             f"repr={repr(result)[:300]}")
 
     strategy = parsed_outputs[0]
     contracts_data = parsed_outputs[1]
