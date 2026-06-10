@@ -352,6 +352,10 @@ class BuildAndExecuteTradeTool(BaseTool):
             from order_routing import place_entry_orders
 
             result = place_entry_orders(legs)
+            if result.get("status") == "REJECTED":
+                return json.dumps(
+                    {"error": f"entry rejected: {result.get('error', 'no live LTP')}"}
+                )
             trade["trade_id"] = result.get("trade_id", "")
             trade["entry_orders"] = result.get("entry_orders", [])
             trade["order_status"] = result.get("status", "")

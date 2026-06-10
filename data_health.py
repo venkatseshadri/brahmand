@@ -362,7 +362,8 @@ def check_penguin() -> Tuple[bool, list]:
             conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
             try:
                 row = conn.execute(
-                    "SELECT COUNT(*), MAX(timestamp) FROM market_data WHERE date = DATE('now')"
+                    "SELECT COUNT(*), MAX(timestamp) FROM market_data "
+                    "WHERE date(timestamp) = date('now')"
                 ).fetchone()
                 if row and row[1]:
                     try:
@@ -385,13 +386,125 @@ def check_penguin() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_porcupine() -> Tuple[bool, list]:
+    """PORCUPINE invariants — guard the bugs the harness caught (must stay fixed).
+
+    Tags onto the existing data-health cron so a regression alerts via the same
+    Telegram path. Guards:
+      - feed lp-less filter (the 87%-of-bars low<=0 corruption, fixed 2026-06-05)
+      - enricher lock fix (heartbeat fresh = not crash-looping)
+      - enrichment not badly lagging raw
+    See antariksh/docs/PORCUPINE_STATE.md.
+    """
+    warnings = []
+    if not _is_market_hours():
+        return True, warnings
+    try:
+        import redis as rds
+        import sqlite3
+
+        dbs = {
+            "NIFTY": "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite",
+            "SENSEX": "/home/trading_ceo/python-trader/varaha/data/capture_sensex.sqlite",
+        }
+        for label, path in dbs.items():
+            if not Path(path).exists():
+                continue
+            conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+            try:
+                low_zero = conn.execute(
+                    "SELECT COUNT(*) FROM market_data "
+                    "WHERE date(timestamp)=date('now') AND low<=0"
+                ).fetchone()[0]
+                if low_zero > 0:
+                    warnings.append(
+                        f"PORCUPINE [{label}]: low<=0 REGRESSION — {low_zero} bars "
+                        "(feed lp-less filter broken; poisons ATR/SuperTrend/pivots)"
+                    )
+                raw = conn.execute(
+                    "SELECT COUNT(*) FROM market_data WHERE date(timestamp)=date('now')"
+                ).fetchone()[0]
+                enr = conn.execute(
+                    "SELECT COUNT(*) FROM market_data_enriched "
+                    "WHERE date(timestamp)=date('now')"
+                ).fetchone()[0]
+                if raw > 15 and enr < raw // 2:
+                    warnings.append(
+                        f"PORCUPINE [{label}]: enriched lagging raw ({enr}/{raw}) — enricher stalled?"
+                    )
+            finally:
+                conn.close()
+
+        r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+        for label in ("NIFTY", "SENSEX"):
+            hb = r.get(f"enricher:{label}:heartbeat")
+            if not hb:
+                warnings.append(
+                    f"PORCUPINE [{label}]: enricher heartbeat MISSING (crash-loop?)"
+                )
+                continue
+            try:
+                age = (datetime.now() - datetime.fromisoformat(hb)).total_seconds() / 60
+                if age > 5:
+                    warnings.append(
+                        f"PORCUPINE [{label}]: enricher heartbeat stale {age:.0f}m (lock crash?)"
+                    )
+            except (ValueError, TypeError):
+                pass
+    except Exception as e:
+        warnings.append(f"PORCUPINE: check failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
+def check_llm() -> Tuple[bool, list]:
+    """LLM availability — scan today's kickoff/chain logs (passive, no API cost).
+
+    A 402 means the DeepSeek balance is empty: the chain silently degrades to
+    the deterministic fallback and every NO-GO that day is false evidence about
+    the strategy (2026-06-10 incident — full day on fallback, no alert).
+    Also reports which brain made today's entry decisions (LLM vs fallback).
+    """
+    warnings = []
+    if not _is_market_hours():
+        return True, warnings
+    day = datetime.now().strftime("%Y%m%d")
+    log_dir = Path(__file__).parent / "logs"
+    try:
+        kickoff = log_dir / f"kickoff_{day}.log"
+        if kickoff.exists():
+            n402 = kickoff.read_text(errors="replace").count("Error code: 402")
+            if n402:
+                warnings.append(
+                    f"LLM 402 Insufficient Balance — {n402} failed calls today; "
+                    "chain running on deterministic fallback (top up DeepSeek)"
+                )
+        chain = log_dir / f"chain_{day}.log"
+        if chain.exists():
+            ctext = chain.read_text(errors="replace")
+            fb = ctext.count('"source": "deterministic_fallback"')
+            agents = ctext.count("| AGENT  |")
+            if agents and fb * 2 > agents:
+                warnings.append(
+                    f"Entry decisions today: {fb}/{agents} from deterministic "
+                    "fallback (LLM mostly absent)"
+                )
+    except OSError as e:
+        warnings.append(f"LLM check failed: {e}")
+        return False, warnings
+    return len(warnings) == 0, warnings
+
+
 def run_all() -> Tuple[bool, list]:
     """Run all health checks. Returns (healthy, all_warnings)."""
     results = []
     all_warnings = []
 
     for name, fn in [
+        ("LLM", check_llm),
         ("Penguin", check_penguin),
+        ("PORCUPINE", check_porcupine),
         ("v3.1", check_v31),
         ("v4_NIFTY", lambda: check_v4("NIFTY")),
         ("v4_SENSEX", lambda: check_v4("SENSEX")),
@@ -421,6 +534,16 @@ if __name__ == "__main__":
         print(f"[{datetime.now().strftime('%H:%M')}] DATA HEALTH:")
         for w in warnings:
             print(f"  ⚠️  {w}")
+        try:
+            from notify import send_telegram
+
+            send_telegram(
+                "⚠️ DATA HEALTH:\n" + "\n".join(f"• {w}" for w in warnings),
+                dedupe_key="data_health",
+                throttle_min=60,
+            )
+        except Exception:
+            pass  # alerting must never break the health check itself
         if args.alert:
             sys.exit(1)
     elif args.alert:

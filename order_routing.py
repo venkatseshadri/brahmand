@@ -81,6 +81,30 @@ def _generate_order_id() -> str:
     return f"ORD-{datetime.now().strftime('%Y%m%d')}-{order_counter:04d}"
 
 
+def _live_ltp(tsym: str) -> float:
+    """Latest captured LTP for an option symbol (same option_prices source the
+    exit path marks against). 0.0 when unavailable."""
+    import sqlite3
+
+    try:
+        from antariksh.config.sqlite_schema import get_sqlite_capture_path
+
+        index = "SENSEX" if tsym.upper().startswith("SENSEX") else "NIFTY"
+        db_path = get_sqlite_capture_path(index)
+        if not db_path.exists():
+            return 0.0
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        try:
+            row = conn.execute(
+                "SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)
+            ).fetchone()
+            return float(row[0]) if row and row[0] else 0.0
+        finally:
+            conn.close()
+    except Exception:
+        return 0.0
+
+
 def place_entry_orders(legs: List[Dict]) -> Dict:
     """
     Place all entry orders for a trade (4 legs: 2 SELL, 2 BUY).
@@ -96,9 +120,29 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
             "entry_orders": [order_id, ...],
             "total_orders": int,
             "mode": "PAPER" | "LIVE",
-            "status": "FILLED" | "PLACED"
+            "status": "FILLED" | "PLACED" | "REJECTED"
         }
     """
+    # Honest fills: a paper trade FILLED at price 0 fabricates P&L (06-05 trade
+    # booked execution_price 0.0). Mark any priceless leg to the live captured
+    # LTP; if none exists, reject the whole entry — fail closed on data.
+    for leg in legs:
+        if not leg.get("fill_price") or leg["fill_price"] <= 0:
+            ltp = _live_ltp(leg.get("tsym", ""))
+            if ltp <= 0:
+                return {
+                    "trade_id": "",
+                    "entry_orders": [],
+                    "total_orders": 0,
+                    "mode": "LIVE" if LIVE_MODE else "PAPER",
+                    "status": "REJECTED",
+                    "error": (
+                        f"no live LTP for {leg.get('tsym', '?')} — "
+                        "refusing 0-price fill"
+                    ),
+                }
+            leg["fill_price"] = ltp
+
     trade_id = f"TRD-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     entry_time = datetime.now().isoformat()
     entry_orders = []
