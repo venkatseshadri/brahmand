@@ -11,8 +11,6 @@ Wires the full adversarial debate pipeline:
 Supports LLM-based and deterministic modes.
 """
 
-import json
-from pathlib import Path
 
 from unicorn_judge import judge as _judge_decision, GATE_MAP
 from unicorn_logger import log_debate, log_error, PHASE_DEBATE
@@ -89,93 +87,9 @@ def _deterministic_fallback(
     gate_type: str,
     gate: dict,
 ) -> dict:
-    """Fallback when no advocate/skeptic points provided.
-    Uses SuperTrend consensus + VIX + session phase for direction check."""
-    trend = raw_data.get("trend", {})
-    timeframes = trend.get("timeframes", {})
-    macro = raw_data.get("macro", {})
-    mac_indicators = macro.get("indicators", {})
+    """Shim — the deterministic gate decision lives ONLY in canonical_strategy
+    (SHERPA Phase 1). Do not add decision logic here."""
+    import canonical_strategy
 
-    st_scores = {"bearish": 1, "neutral": 0, "bullish": -1}
-    total = 0
-    count = 0
-    for tf, tf_data in timeframes.items():
-        if isinstance(tf_data, dict):
-            st = tf_data.get("st_consensus", "neutral")
-            total += st_scores.get(str(st).lower(), 0)
-            count += 1
+    return canonical_strategy.decide_gate(gate_type, raw_data, gate)
 
-    tf_1m = timeframes.get("1m_v3.1", {})
-    if isinstance(tf_1m, dict):
-        ema_pos = tf_1m.get("ema_position", "neutral")
-        st_pos = tf_1m.get("st_consensus", "neutral")
-        total += st_scores.get(str(ema_pos).lower(), 0)
-        total += st_scores.get(str(st_pos).lower(), 0)
-        count += 2
-
-    avg_score = total / max(count, 1)
-    vix = mac_indicators.get("vix", 15)
-    session = mac_indicators.get("session_phase", "")
-
-    go = False
-    if gate_type == "NOT_UP":
-        go = avg_score > 0.2 and (
-            isinstance(vix, (int, float)) and vix < 20
-        )
-    elif gate_type == "NOT_DOWN":
-        go = avg_score < -0.2 and (
-            isinstance(vix, (int, float)) and vix < 20
-        )
-
-    if go and session not in ("preopen", "closing", ""):
-        confidence = min(abs(avg_score) * 0.5, 0.5)
-        return _make_fallback_decision(
-            gate,
-            confidence,
-            f"Deterministic fallback: avg_super_trend={avg_score:.2f}, vix={vix}",
-        )
-
-    return _make_fallback_decision(
-        gate=None,
-        confidence=0.0,
-        reason=f"Deterministic fallback: avg_super_trend={avg_score:.2f}, vix={vix}, session={session}",
-    )
-
-
-def _make_fallback_decision(gate: dict, confidence: float, reason: str) -> dict:
-    """Build fallback entry_decision dict."""
-    if gate and confidence > 0:
-        sig = gate["signal"]
-        strat = gate["strategy"]
-        go = True
-    else:
-        sig = "NONE"
-        strat = "NONE"
-        go = False
-
-    result = {
-        "go": go,
-        "signal": sig,
-        "confidence": confidence,
-        "strategy_to_execute": strat,
-        "reasoning": reason,
-        "source": "deterministic_fallback",
-    }
-
-    if sig == "NOT_UP":
-        result["not_up_signal"] = "NOT_UP"
-        result["not_up_confidence"] = confidence
-        result["not_down_signal"] = "NONE"
-        result["not_down_confidence"] = 0
-    elif sig == "NOT_DOWN":
-        result["not_down_signal"] = "NOT_DOWN"
-        result["not_down_confidence"] = confidence
-        result["not_up_signal"] = "NONE"
-        result["not_up_confidence"] = 0
-    else:
-        result["not_up_signal"] = "NONE"
-        result["not_up_confidence"] = 0
-        result["not_down_signal"] = "NONE"
-        result["not_down_confidence"] = 0
-
-    return result

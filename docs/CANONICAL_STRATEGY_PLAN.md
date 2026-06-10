@@ -1,6 +1,13 @@
 # Project SHERPA — Canonical Deterministic Strategy (Option A)
 
-**Date:** 2026-06-11 · **Status:** Board-approved direction (Option A chosen); plan pending Board sign-off on open calls in §6
+**Date:** 2026-06-11 · **Status:** Board approved 2026-06-11; build in progress
+
+## Progress log
+
+| Date | Phase | Status |
+|---|---|---|
+| 2026-06-11 | Phase 0 — fail-loud + honest fills | ✅ DONE commit `1c377b9`: `notify.py` Telegram channel (verified live); `data_health.check_llm` (402 scan + fallback-ratio counter, Telegram-alerted, throttled 1/hr); `place_entry_orders` marks ₹0 legs to live LTP or REJECTs (regression `tests/test_honest_entry_fills.py` 3/3). OPEN: user to top up DeepSeek balance. |
+| 2026-06-11 | Phase 1 — canonical consolidation | 🔨 IN PROGRESS |
 **Decision:** The deterministic logic IS the trading system. The LLM is an overlay that optimizes parameters — it can never be required for the system to trade, and its absence can never silently change behavior.
 
 ---
