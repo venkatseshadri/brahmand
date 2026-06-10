@@ -6,9 +6,9 @@
 
 | Date | Phase | Status |
 |---|---|---|
-| 2026-06-11 | Phase 0 — fail-loud + honest fills | ✅ DONE commit `1c377b9`: `notify.py` Telegram channel (verified live); `data_health.check_llm` (402 scan + fallback-ratio counter, Telegram-alerted, throttled 1/hr); `place_entry_orders` marks ₹0 legs to live LTP or REJECTs (regression `tests/test_honest_entry_fills.py` 3/3). OPEN: user to top up DeepSeek balance. |
+| 2026-06-11 | Phase 0 — fail-loud + honest fills | ✅ DONE commit `1c377b9`: `notify.py` Telegram channel (verified live); `data_health.check_llm` (402 scan + fallback-ratio counter, Telegram-alerted, throttled 1/hr); `place_entry_orders` marks ₹0 legs to live LTP or REJECTs (regression `tests/test_honest_entry_fills.py` 3/3). DeepSeek topped up + verified live 2026-06-11 00:48. |
 | 2026-06-11 | Phase 1 — canonical consolidation | ✅ CORE DONE commit `c23f40b`: `canonical_strategy.py` (entry_tools decision core; fixes live wrong-side bug — old fallback sent BULLISH→CALL_SPREAD; VIX-null fails closed; params via `data/strategy_params.json` = future LLM seam); `fallback.py` + `unicorn_debate._deterministic_fallback` now shims; golden tests 10/10. PORCUPINE `llm_down` scenario PASS 4/4 (antariksh `8413418`, driver `a906948`). **PHASE 1 COMPLETE.** |
-| 2026-06-11 | Phase 2 — validate edge (backtest canonical, 3 Board numbers) | ⏳ NEXT |
+| 2026-06-11 | Phase 2 — validate edge (backtest canonical, 3 Board numbers) | 🔨 IN PROGRESS. Data inventory: Kaggle NIFTY-50 minute bars 2015→2026-05 + INDIA VIX minute (Tier A); real options only 13 days Oct-Nov 2024 (Tier B anchor). **Bonus live fix `bb8c9ef` (antariksh):** traffic-light scorer ignored get_live_candles' string shape → TL family was permanently NEUTRAL 0% (half the entry signal dead); fixed + 3/3 regression; verify TL non-zero in chain logs at next market open. NEXT: replay engine (write EMA-state + Redis keys per historical bar, drive REAL canonical_strategy.decide_entry; PORCUPINE philosophy — inject at I/O seams only). Known seam issues to handle: get_live_candles/_compute_completion_by_tf use datetime.now() (bug-#3a class). |
 **Decision:** The deterministic logic IS the trading system. The LLM is an overlay that optimizes parameters — it can never be required for the system to trade, and its absence can never silently change behavior.
 
 ---
