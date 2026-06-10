@@ -7,7 +7,8 @@
 | Date | Phase | Status |
 |---|---|---|
 | 2026-06-11 | Phase 0 — fail-loud + honest fills | ✅ DONE commit `1c377b9`: `notify.py` Telegram channel (verified live); `data_health.check_llm` (402 scan + fallback-ratio counter, Telegram-alerted, throttled 1/hr); `place_entry_orders` marks ₹0 legs to live LTP or REJECTs (regression `tests/test_honest_entry_fills.py` 3/3). OPEN: user to top up DeepSeek balance. |
-| 2026-06-11 | Phase 1 — canonical consolidation | 🔨 IN PROGRESS |
+| 2026-06-11 | Phase 1 — canonical consolidation | ✅ CORE DONE commit `c23f40b`: `canonical_strategy.py` (entry_tools decision core; fixes live wrong-side bug — old fallback sent BULLISH→CALL_SPREAD; VIX-null fails closed; params via `data/strategy_params.json` = future LLM seam); `fallback.py` + `unicorn_debate._deterministic_fallback` now shims; golden tests 10/10. PORCUPINE `llm_down` scenario PASS 4/4 (antariksh `8413418`, driver `a906948`). **PHASE 1 COMPLETE.** |
+| 2026-06-11 | Phase 2 — validate edge (backtest canonical, 3 Board numbers) | ⏳ NEXT |
 **Decision:** The deterministic logic IS the trading system. The LLM is an overlay that optimizes parameters — it can never be required for the system to trade, and its absence can never silently change behavior.
 
 ---
