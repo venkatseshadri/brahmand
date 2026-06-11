@@ -545,9 +545,9 @@ def run_all() -> Tuple[bool, list]:
         ("Penguin", check_penguin),
         ("PORCUPINE", check_porcupine),
         ("DAMBUILDER", check_dambuilder),
-        ("v3.1", check_v31),
-        ("v4_NIFTY", lambda: check_v4("NIFTY")),
-        ("v4_SENSEX", lambda: check_v4("SENSEX")),
+        # ("v3.1", check_v31),                # ARCHIVED: DAMBUILDER T1-T4 live
+        # ("v4_NIFTY", lambda: check_v4("NIFTY")),  # ARCHIVED: DAMBUILDER T1-T4 live
+        # ("v4_SENSEX", lambda: check_v4("SENSEX")),  # ARCHIVED: DAMBUILDER T1-T4 live
         ("Redis", check_redis),
     ]:
         ok, warnings = fn()
