@@ -1,1 +1,0 @@
-_CLEANUP_ of old EMA backfill from DuckDB/yfinance. Replaced by DAMBUILDER EMA in SQLite. Safe to delete after 2026-06-13.
