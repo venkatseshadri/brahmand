@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/MARGIN_AND_WING_OPTIMIZER_CODE_REFERENCE.md
+/home/trading_ceo/brahmand/docs/ORDER_AGENT_REFACTORING.md
+/home/trading_ceo/brahmand/docs/KICKOFF_VERIFICATION.md
+/home/trading_ceo/brahmand/docs/OPEN_CONCERNS_BACKTEST_AND_AGENTS.md
+/home/trading_ceo/brahmand/docs/EXECUTION_AGENT_MULTI_ASSET_ROADMAP.md
+/home/trading_ceo/brahmand/docs/RESEARCH_REFERENCES.md
+/home/trading_ceo/brahmand/docs/MARGIN_CALCULATION_FIXES.md
+/home/trading_ceo/brahmand/docs/REVIEW_BEFORE_WAVE1.md
+/home/trading_ceo/brahmand/docs/RL_CAPABILITY_SUMMARY.md
+/home/trading_ceo/brahmand/docs/BUILD_PLAN.md
+/home/trading_ceo/brahmand/docs/PROJECT_UNICORN_TDD.md
+/home/trading_ceo/brahmand/docs/NEXT_STEPS.md

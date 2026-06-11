@@ -24,18 +24,36 @@ else:
 _IST = timezone(timedelta(hours=5, minutes=30))
 
 
+def now_dt() -> datetime:
+    """Current time — the single clock the system reads. Honors SIM_NOW (an ISO
+    timestamp the PORCUPINE timed-replay harness steps through a scripted day) so
+    entry windows / cooldown / EOD square-off act at SIMULATED time. Falls back to
+    real wall-clock (IST) when SIM_NOW is unset — prod is unaffected."""
+    sim = os.environ.get("SIM_NOW")
+    if sim:
+        try:
+            dt = datetime.fromisoformat(sim)
+            return dt if dt.tzinfo else dt.replace(tzinfo=_IST)
+        except ValueError:
+            pass
+    return datetime.now(_IST)
+
+
 def now_str() -> str:
-    return datetime.now(_IST).strftime("%H:%M")
+    return now_dt().strftime("%H:%M")
 
 
 def now_iso() -> str:
-    return datetime.now(_IST).strftime("%Y-%m-%dT%H:%M:%S")
+    return now_dt().strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def is_market_hours() -> bool:
-    if os.environ.get("BRAHMAND_SANDBOX"):
+    # Sandbox WITHOUT an explicit sim-clock: always open (lifecycle/unit scenarios).
+    # With SIM_NOW set (timed replay): gate on simulated time so the session
+    # boundary and EOD behave correctly. Prod: real wall-clock.
+    if os.environ.get("BRAHMAND_SANDBOX") and not os.environ.get("SIM_NOW"):
         return True
-    now = datetime.now(_IST)
+    now = now_dt()
     t = now.hour * 60 + now.minute
     return 555 <= t <= 1410
 
@@ -56,9 +74,15 @@ def _connect() -> sqlite3.Connection:
 def get_latest_market_snapshot() -> dict:
     conn = _connect()
     try:
+        # INNER JOIN, not LEFT: the entry snapshot is only usable if it has
+        # enriched fields (atm_strike, vix, adx…). Enrichment always lags the
+        # raw feed by ≥1 bar, so a LEFT JOIN on the latest *raw* bar reliably
+        # returns NULL enriched cols → NULL atm_strike → "No market data" even
+        # when enriched data exists. Select the latest fully-enriched bar.
+        # (Caught by PORCUPINE harness 2026-06-05.)
         row = conn.execute(
             "SELECT m.*, e.* FROM market_data m "
-            "LEFT JOIN market_data_enriched e "
+            "JOIN market_data_enriched e "
             "ON m.timestamp = e.timestamp AND m.instrument = e.instrument "
             "ORDER BY m.timestamp DESC LIMIT 1"
         ).fetchone()

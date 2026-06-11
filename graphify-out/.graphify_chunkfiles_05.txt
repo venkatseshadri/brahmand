@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/backtest/BACKTEST_2024_WITH_RISK_MGMT.py
+/home/trading_ceo/brahmand/backtest/SCALING_REINVESTMENT_MODEL.py
+/home/trading_ceo/brahmand/backtest/REPLAY_REDIS_DRYRUN.py
+/home/trading_ceo/brahmand/backtest/MONTHLY_PROFIT_BREAKDOWN.py
+/home/trading_ceo/brahmand/backtest/PRODUCTION_BACKTEST_FROM_SCRATCH.py
+/home/trading_ceo/brahmand/backtest/SCALING_REALISTIC_MODEL.py
+/home/trading_ceo/brahmand/backtest/RISK_COMPONENT_IMPACT_ANALYSIS.py
+/home/trading_ceo/brahmand/backtest/BACKTEST_2024_WITH_LEG_SHIFTING.py
+/home/trading_ceo/brahmand/backtest/STEP1_LOAD_NIFTY_2024_DATA.py
+/home/trading_ceo/brahmand/backtest/SIMULATE_LEG_SHIFT_MECHANICS.py
+/home/trading_ceo/brahmand/backtest/LEG_SHIFT_SCENARIO_ANALYSIS.py
+/home/trading_ceo/brahmand/backtest/NIFTY_BACKTEST_AGENT_TOOLS.py

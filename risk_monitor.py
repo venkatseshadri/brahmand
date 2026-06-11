@@ -105,8 +105,10 @@ def get_active_trade() -> dict:
         active = get_active_trades()
         if active:
             return active[0]
-    except Exception:
-        pass
+    except Exception as e:
+        logging.getLogger("brahmand.risk_monitor").debug(
+            "Order ledger fallback failed: %s", e
+        )
     return {}
 
 
@@ -138,8 +140,10 @@ def _get_ltp_from_csv(strike: int, option_type: str, expiry: str = None) -> floa
                 if expiry and parts[3] != expiry:
                     continue
                 return float(parts[7])
-    except Exception:
-        pass
+    except Exception as e:
+        logging.getLogger("brahmand.risk_monitor").debug(
+            "CSV LTP read failed for %s %s: %s", strike, option_type, e
+        )
     return 0
 
 

@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/tests/phase/test_post_trade_phase.py
+/home/trading_ceo/brahmand/tests/phase/test_monitoring_phase.py
+/home/trading_ceo/brahmand/tests/phase/__init__.py
+/home/trading_ceo/brahmand/cron/run_autonomous_dryrun.sh
+/home/trading_ceo/brahmand/cron/run_pattern_enricher.sh
+/home/trading_ceo/brahmand/cron/run_kickoff.sh
+/home/trading_ceo/brahmand/cron/run_position_manager.sh
+/home/trading_ceo/brahmand/cron/run_data_health.sh
+/home/trading_ceo/brahmand/cron/run_risk_monitor.sh
+/home/trading_ceo/brahmand/cron/run_margin_capture.sh
+/home/trading_ceo/brahmand/cron/cleanup_zombies.sh
+/home/trading_ceo/brahmand/docs/STEP1_REVIEW_SUMMARY.md

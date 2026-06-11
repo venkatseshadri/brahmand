@@ -45,13 +45,15 @@ logging.Logger.chain = _chain_method
 
 
 class DailyRotatingFileHandler(logging.FileHandler):
-    """File handler that rotates daily — filename includes YYYYMMDD."""
+    """File handler that rotates daily — filename includes YYYYMMDD.
+    Retains up to `backup_count` days of logs (default 30)."""
 
-    def __init__(self, base_name: str, mode="a"):
+    def __init__(self, base_name: str, mode="a", backup_count: int = 30):
         self._base_name = base_name
         self._today = None
         self._mode = mode
         self._dir = LOG_DIR
+        self._backup_count = backup_count
         path = self._today_path()
         super().__init__(path, mode=mode, encoding="utf-8")
 
@@ -68,9 +70,30 @@ class DailyRotatingFileHandler(logging.FileHandler):
             self.close()
             self.baseFilename = self._today_path()
             self._open()
+            self._purge_old_logs()
         if not self.stream or self.stream.closed:
             self._open()
         super().emit(record)
+
+    def _purge_old_logs(self):
+        if self._backup_count <= 0:
+            return
+        import re
+
+        pattern = re.compile(
+            re.escape(f"{self._base_name}_") + r"(\d{8})\.log(?:\.\d+(?:\.gz)?)?$"
+        )
+        files = []
+        for p in self._dir.iterdir():
+            m = pattern.match(p.name)
+            if m:
+                files.append((m.group(1), p))
+        files.sort(key=lambda x: x[0], reverse=True)
+        for _, p in files[self._backup_count :]:
+            try:
+                p.unlink()
+            except OSError:
+                pass
 
 
 class _AgentFilter(logging.Filter):
@@ -188,11 +211,11 @@ def log_exception(logger: logging.Logger, error: Exception, context: str = ""):
 
 
 def log_monitoring_event(event_type: str, trade_id: str, **details):
-    """Append a structured monitoring event (JSONL) to the daily events file."""
+    """Append a structured monitoring event (JSONL) to the daily events file.
+    Purges events files older than 60 days."""
     try:
-        events_file = (
-            LOG_DIR / f"monitoring_events_{datetime.now().strftime('%Y%m%d')}.jsonl"
-        )
+        today_str = datetime.now().strftime("%Y%m%d")
+        events_file = LOG_DIR / f"monitoring_events_{today_str}.jsonl"
         event = {
             "timestamp": datetime.now().isoformat(),
             "event_type": event_type,
@@ -201,6 +224,17 @@ def log_monitoring_event(event_type: str, trade_id: str, **details):
         }
         with open(events_file, "a") as f:
             f.write(json.dumps(event) + "\n")
+
+        import re
+
+        cutoff = datetime.now().strftime("%Y%m%d")
+        for p in LOG_DIR.glob("monitoring_events_*.jsonl"):
+            m = re.match(r"monitoring_events_(\d{8})\.jsonl", p.name)
+            if m and m.group(1) < str(int(cutoff) - 60):
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
     except Exception as e:
         _err = logging.getLogger("brahmand.kickoff").error
         _err(f"Failed to log monitoring event: {e}")
@@ -236,8 +270,10 @@ def _make_crew_step_callback(crew_name: str):
                 or getattr(step_output, "description", "unknown"),
                 output_len=len(getattr(step_output, "raw", "") or ""),
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logging.getLogger("brahmand.chain").debug(
+                "CREW_STEP callback failed for %s: %s", crew_name, e
+            )
 
     return _on_step
 
@@ -259,25 +295,27 @@ def log_crew_telemetry(crew_name: str, crew_result):
         if hasattr(crew_result, "usage_metrics") and crew_result.usage_metrics:
             um = crew_result.usage_metrics
             metrics = {
-                "total_tokens": um.total_tokens,
-                "prompt_tokens": um.prompt_tokens,
-                "completion_tokens": um.completion_tokens,
-                "successful_requests": um.successful_requests,
+                "total_tokens": getattr(um, "total_tokens", 0),
+                "prompt_tokens": getattr(um, "prompt_tokens", 0),
+                "completion_tokens": getattr(um, "completion_tokens", 0),
+                "successful_requests": getattr(um, "successful_requests", 0),
             }
         if hasattr(crew_result, "token_usage") and crew_result.token_usage:
             tu = crew_result.token_usage
-            cost = _estimate_cost(
-                "default",
-                tu.prompt_tokens,
-                tu.completion_tokens,
-            )
-            metrics["estimated_cost_usd"] = cost
+            prompt_tk = getattr(tu, "prompt_tokens", 0)
+            completion_tk = getattr(tu, "completion_tokens", 0)
+            if prompt_tk or completion_tk:
+                cost = _estimate_cost("default", prompt_tk, completion_tk)
+                metrics["estimated_cost_usd"] = cost
 
-        log_monitoring_event(
-            "CREW_TELEMETRY",
-            "NO_TRADE",
-            crew=crew_name,
-            **metrics,
+        if metrics:
+            log_monitoring_event(
+                "CREW_TELEMETRY",
+                "NO_TRADE",
+                crew=crew_name,
+                **metrics,
+            )
+    except Exception as e:
+        logging.getLogger("brahmand.chain").debug(
+            "CREW_TELEMETRY failed for %s: %s", crew_name, e
         )
-    except Exception:
-        pass

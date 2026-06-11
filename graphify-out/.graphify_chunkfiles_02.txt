@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/market_data.py
+/home/trading_ceo/brahmand/e2e_chain.py
+/home/trading_ceo/brahmand/pull_all.sh
+/home/trading_ceo/brahmand/entry_research_agent.py
+/home/trading_ceo/brahmand/risk_monitor.py
+/home/trading_ceo/brahmand/regime_check.py
+/home/trading_ceo/brahmand/order_status.py
+/home/trading_ceo/brahmand/risk_agent_crew.py
+/home/trading_ceo/brahmand/trade_execution_db.py
+/home/trading_ceo/brahmand/position_manager.py
+/home/trading_ceo/brahmand/nightly_research_scheduler.py
+/home/trading_ceo/brahmand/fallback.py

@@ -21,7 +21,6 @@ Usage:
 
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -54,22 +53,6 @@ MAX_TRADES = int(os.environ.get("BRAHMAND_MAX_TRADES", 4))
 COOLDOWN_MIN = int(os.environ.get("BRAHMAND_COOLDOWN_MIN", 15))
 
 
-def _already_running() -> bool:
-    try:
-        result = subprocess.run(
-            ["pgrep", "-f", "entry_setup.py|kickoff.py"],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        pids = [
-            p for p in result.stdout.strip().split("\n") if p and p != str(os.getpid())
-        ]
-        return len(pids) > 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
-
-
 def _has_active_order() -> tuple[bool, str]:
     """Check order_ledger.json for active trades. Returns (blocked, reason).
     Auto-clears stale test trades (>2 days) and aged trades (>7 days)
@@ -83,7 +66,9 @@ def _has_active_order() -> tuple[bool, str]:
         return False, "ledger unreadable"
 
     trades = ledger.get("_trades", {})
-    now = datetime.now()
+    from market_data import now_dt
+
+    now = now_dt()
     today = now.strftime("%Y-%m-%d")
     ledger_dirty = False
 
@@ -156,7 +141,11 @@ def _has_active_order() -> tuple[bool, str]:
             if isinstance(entry, str) and entry.startswith(today):
                 try:
                     entry_dt = datetime.fromisoformat(entry)
-                    since = (datetime.now() - entry_dt).total_seconds() / 60
+                    # entry_time is stamped naive (now_iso has no tz); keep the
+                    # delta naive so it works under SIM_NOW too.
+                    since = (
+                        now_dt().replace(tzinfo=None) - entry_dt
+                    ).total_seconds() / 60
                     if since < COOLDOWN_MIN:
                         return True, f"cooldown: {since:.0f}m < {COOLDOWN_MIN}m"
                 except (ValueError, TypeError):
@@ -171,20 +160,8 @@ def main():
     from state import load_state, save_state, rollover_if_new_day
     from agentops_compat import init_agentops_if_enabled
 
-    dry = "--dry-run" in sys.argv
-
-    if _already_running():
-        msg = "Already running — exiting"
-        _log(msg)
-        if dry:
-            print(f"BLOCKED: {msg}")
-        sys.exit(0)
-
     if not acquire_lock(LOCK_FILE):
-        msg = "Lock held — exiting"
-        _log(msg)
-        if dry:
-            print(f"BLOCKED: {msg}")
+        _log("Lock held — exiting")
         sys.exit(0)
 
     try:
@@ -194,8 +171,6 @@ def main():
 
         if not is_market_hours():
             _log("Market closed — exiting")
-            if dry:
-                print("SKIP: market closed")
             return
 
         init_agentops_if_enabled()
@@ -203,13 +178,11 @@ def main():
         blocked, reason = _has_active_order()
         if blocked:
             _log(f"SKIP: {reason}")
-            if dry:
-                print(f"SKIP: {reason}")
             return
 
         _log(f"Entry run | Today: {state['trades_today']}")
-        if dry:
-            print("WOULD RUN: all gates clear")
+        if "--dry-run" in sys.argv:
+            _log("WOULD RUN: all gates clear")
             return
 
         from kickoff import run_entry_pipeline

@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/SYSTEM_TEST_REPORT_20260523.md
+/home/trading_ceo/brahmand/docs/OPEN_TASKS_FOR_DEEPSEEK.md
+/home/trading_ceo/brahmand/docs/POSTMORTEM_KNOWLEDGE_SCAFFOLD.md
+/home/trading_ceo/brahmand/docs/SYSTEM_OVERVIEW.txt
+/home/trading_ceo/brahmand/docs/AGENT_ARCHITECTURE_COMPLETE.md
+/home/trading_ceo/brahmand/docs/SESSION_COMPLETION.md
+/home/trading_ceo/brahmand/docs/TEST_STRATEGY.md
+/home/trading_ceo/brahmand/docs/TAURIC_REUSE_PLAN.md
+/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_AGENT_SUMMARY.md
+/home/trading_ceo/brahmand/docs/MORPH_AGENT_ENHANCEMENT.md
+/home/trading_ceo/brahmand/docs/MORPHING_STATE_MACHINE.md
+/home/trading_ceo/brahmand/docs/RESEARCH_PATTERNS_WIRED.md

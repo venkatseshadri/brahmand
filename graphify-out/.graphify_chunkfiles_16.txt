@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/AUTONOMOUS_RESEARCH_WORKFLOW.md
+/home/trading_ceo/brahmand/docs/ENTRY_SYSTEM_ARCHITECTURE.md
+/home/trading_ceo/brahmand/docs/PROJECT_UNICORN.md
+/home/trading_ceo/brahmand/docs/RESEARCH_AGENT_ENTRY_GATE_GAPS.md
+/home/trading_ceo/brahmand/docs/SCHEMAS.md
+/home/trading_ceo/brahmand/docs/BACKTEST_2024_MINI_SUMMARY.md
+/home/trading_ceo/brahmand/docs/fix_research_agent_indicator_mismatch.md
+/home/trading_ceo/brahmand/docs/SESSION_20260519.md
+/home/trading_ceo/brahmand/docs/POSTMORTEM_AGENT_ARCHITECTURE.md
+/home/trading_ceo/brahmand/docs/DESIGN_OPTION_FEED.md
+/home/trading_ceo/brahmand/docs/HANDOFF_TO_DEEPSEEK.md
+/home/trading_ceo/brahmand/docs/EXECUTION_vs_ORDER_AGENT_ANALYSIS.md

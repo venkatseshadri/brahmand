@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/tests/unit/test_execution_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_contract_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_morpher_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_strategy_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_entry_agents.py
+/home/trading_ceo/brahmand/tests/unit/test_shifter_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_regime_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_order_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_postmortem_agent.py
+/home/trading_ceo/brahmand/tests/unit/test_tedb_concurrent_writes.py
+/home/trading_ceo/brahmand/tests/unit/__init__.py
+/home/trading_ceo/brahmand/tests/phase/test_entry_phase.py

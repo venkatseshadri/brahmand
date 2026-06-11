@@ -1,16 +1,16 @@
-# Graph Report - brahmand  (2026-06-04)
+# Graph Report - brahmand  (2026-06-11)
 
 ## Corpus Check
-- 248 files · ~236,215 words
+- 287 files · ~783,884 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 5371 nodes · 7225 edges · 410 communities (365 shown, 45 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 283 edges (avg confidence: 0.59)
+- 5746 nodes · 7748 edges · 424 communities (378 shown, 46 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 278 edges (avg confidence: 0.59)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1b300ac4`
+- Built from commit: `34959f12`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -314,7 +314,6 @@
 - [[_COMMUNITY_Community 330|Community 330]]
 - [[_COMMUNITY_Community 333|Community 333]]
 - [[_COMMUNITY_Community 334|Community 334]]
-- [[_COMMUNITY_Community 335|Community 335]]
 - [[_COMMUNITY_Community 336|Community 336]]
 - [[_COMMUNITY_Community 337|Community 337]]
 - [[_COMMUNITY_Community 338|Community 338]]
@@ -344,7 +343,6 @@
 - [[_COMMUNITY_Community 363|Community 363]]
 - [[_COMMUNITY_Community 364|Community 364]]
 - [[_COMMUNITY_Community 365|Community 365]]
-- [[_COMMUNITY_Community 366|Community 366]]
 - [[_COMMUNITY_Community 367|Community 367]]
 - [[_COMMUNITY_Community 368|Community 368]]
 - [[_COMMUNITY_Community 369|Community 369]]
@@ -382,62 +380,78 @@
 - [[_COMMUNITY_Community 401|Community 401]]
 - [[_COMMUNITY_Community 402|Community 402]]
 - [[_COMMUNITY_Community 403|Community 403]]
-- [[_COMMUNITY_Community 404|Community 404]]
+- [[_COMMUNITY_Community 405|Community 405]]
+- [[_COMMUNITY_Community 406|Community 406]]
 - [[_COMMUNITY_Community 408|Community 408]]
 - [[_COMMUNITY_Community 409|Community 409]]
+- [[_COMMUNITY_Community 410|Community 410]]
 - [[_COMMUNITY_Community 412|Community 412]]
 - [[_COMMUNITY_Community 413|Community 413]]
+- [[_COMMUNITY_Community 415|Community 415]]
+- [[_COMMUNITY_Community 417|Community 417]]
+- [[_COMMUNITY_Community 419|Community 419]]
+- [[_COMMUNITY_Community 420|Community 420]]
+- [[_COMMUNITY_Community 421|Community 421]]
+- [[_COMMUNITY_Community 422|Community 422]]
+- [[_COMMUNITY_Community 423|Community 423]]
+- [[_COMMUNITY_Community 424|Community 424]]
+- [[_COMMUNITY_Community 425|Community 425]]
+- [[_COMMUNITY_Community 426|Community 426]]
+- [[_COMMUNITY_Community 427|Community 427]]
+- [[_COMMUNITY_Community 431|Community 431]]
+- [[_COMMUNITY_Community 432|Community 432]]
+- [[_COMMUNITY_Community 433|Community 433]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `run_sequential_crew()` - 42 edges
-2. `AgentFactory` - 38 edges
-3. `PatternAnalyzer` - 38 edges
+1. `run_sequential_crew()` - 44 edges
+2. `AgentFactory` - 37 edges
+3. `PatternAnalyzer` - 37 edges
 4. `MarketDataQueryTool` - 31 edges
 5. `EntryAgent` - 31 edges
 6. `ExecutionReport` - 29 edges
 7. `verify_points()` - 26 edges
-8. `OptionSnapshotQueryTool` - 23 edges
-9. `1m_v3.1` - 23 edges
+8. `bool` - 23 edges
+9. `OptionSnapshotQueryTool` - 23 edges
 10. `1m_v3.1` - 23 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `run_crewai_chain()` --calls--> `Task`  [INFERRED]
-  crewai_chain.py → factory.py
-- `bool` --uses--> `MarketDataQueryTool`  [INFERRED]
-  autonomous_dryrun.py → duckdb_tool.py
-- `float` --uses--> `MarketDataQueryTool`  [INFERRED]
-  autonomous_dryrun.py → duckdb_tool.py
-- `int` --uses--> `MarketDataQueryTool`  [INFERRED]
-  autonomous_dryrun.py → duckdb_tool.py
-- `str` --uses--> `MarketDataQueryTool`  [INFERRED]
-  autonomous_dryrun.py → duckdb_tool.py
+- `build_risk_crew()` --calls--> `Agent`  [INFERRED]
+  risk_agent_crew.py → entry_research_agent.py
+- `bool` --uses--> `UnicornRawQuery`  [INFERRED]
+  unicorn_research.py → unicorn_raw_query.py
+- `bool` --uses--> `EntryAgent`  [INFERRED]
+  data_health.py → entry_agent.py
+- `bool` --uses--> `AgentFactory`  [INFERRED]
+  data_health.py → factory.py
+- `bool` --uses--> `TaskFactory`  [INFERRED]
+  data_health.py → factory.py
 
 ## Hyperedges (group relationships)
 - **6-Agent Sequential Entry Pipeline** — entry_agent, regime_agent, strategy_agent, contract_agent, execution_agent, risk_agent [EXTRACTED 1.00]
 - **6-Position Morph Transition Scenarios** — morph_state_machine, position_manager_py, morpher_agent, risk_agent [EXTRACTED 1.00]
 - **Entry Check Fresh Signal Pipeline** — datacapture_v3_1, redis_queue, datacapture_v4, entry_check_py, entry_signals_json, kickoff_py, entry_check_tool, regime_agent [EXTRACTED 1.00]
 
-## Communities (410 total, 45 thin omitted)
+## Communities (424 total, 46 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.24
-Nodes (17): get_active_trades(), Get all active (ACTIVE status) trades today., acquire_lock(), check_sl_tp_triggers(), close_trade_and_cleanup(), get_active_trade(), _get_ltp_from_csv(), has_active_trade() (+9 more)
+Cohesion: 0.06
+Nodes (33): board_numbers, 1_return_on_capital_pct_per_month, 1b_return_on_avg_margin_pct_per_month, 2_avg_loss, 2_avg_win, 2_win_rate_pct, 3_margin_per_lot, 3_max_lots_on_capital (+25 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.24
-Nodes (19): bool, float, int, str, duckdb_has_data(), DuckDBMarket, get_today_str(), log() (+11 more)
+Cohesion: 0.21
+Nodes (13): Agent, correlate_move_with_indicators(), create_entry_research_agent(), detect_significant_moves(), query_1min_candles_v31(), query_1min_candles_v4(), Query ALL 1-min candles from Varaha v4 DuckDB (multitimeframe aggregator)., Detect all moves >= min_move_points in the candle data.      Args:         candl (+5 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.18
 Nodes (9): Runs all 5 research agents and aggregates findings, ResearchAgentOrchestrator, BacktestEngine, BacktestResult, main(), PatternBacktestSummary, ResearchBacktestOrchestrator, bool (+1 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.07
-Nodes (48): add_order_to_trade(), cancel_order(), clear_ledger(), _generate_order_id(), get_order(), get_trade(), get_trade_orders(), get_trades_by_strategy() (+40 more)
+Cohesion: 0.06
+Nodes (50): execute_sell_shift(), add_order_to_trade(), cancel_order(), clear_ledger(), _generate_order_id(), get_order(), get_trade(), get_trade_orders() (+42 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.18
-Nodes (13): EntryAgent, EntrySignal, get_research_consensus(), Main entry check method called every 1-minute candle.          Args:, Calculate weighted confidence score from matching patterns.          Formula:, Map confidence score to traffic light color (MEDIUM gate: >= 0.75), Determine trade direction from stored predicted_direction in matched patterns., Loads patterns from ChromaDB and generates entry signals based on real-time mark (+5 more)
+Cohesion: 0.06
+Nodes (42): EntryAgent, EntrySignal, get_research_consensus(), Main entry check method called every 1-minute candle.          Args:, Check if current candle state matches pattern trigger conditions, Calculate weighted confidence score from matching patterns.          Formula:, Map confidence score to traffic light color (MEDIUM gate: >= 0.75), Determine trade direction from stored predicted_direction in matched patterns. (+34 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.16
@@ -453,7 +467,7 @@ Nodes (48): _build_position(), capture_margins(), _get_atm(), _get_expiry(), _lo
 
 ### Community 8 - "Community 8"
 Cohesion: 0.05
-Nodes (54): any, _find_raw_value(), _flatten_dict_value(), _get_tolerance(), _is_direction_field(), If a field value is itself a dict, try to find the most representative     numer, Direct lookup: raw[family][timeframes][tf][field]., Verify a list of claim points against raw data.      Args:         raw: dict fro (+46 more)
+Nodes (40): _find_raw_value(), Search raw data for a field value.      Tries: raw[family][field], raw[family][t, frozen_raw(), _load_raw(), Project UNICORN — Phase 2 Tests: unicorn_verify.py  Tests for the deterministic, Citing a field not in raw data = UNVERIFIABLE, scores 0.5 weight., Non-numeric field that doesn't exist = UNVERIFIABLE., Multiple verified points across families produce correct tagging. (+32 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.15
@@ -461,27 +475,27 @@ Nodes (20): aggregate_tf(), candle_color(), compute_emas(), compute_tf_colors(),
 
 ### Community 11 - "Community 11"
 Cohesion: 0.09
-Nodes (30): Backtest Approval Criteria, BrahmandKnowledge (knowledge.py), ChromaDB Pattern Storage, combine_entry_scores(), CrewAI Knowledge API, daily_config.json, EMAResearchAgent, entry_agent.py (+22 more)
+Nodes (29): Backtest Approval Criteria, BrahmandKnowledge (knowledge.py), ChromaDB Pattern Storage, combine_entry_scores(), CrewAI Knowledge API, daily_config.json, EMAResearchAgent, entry_agent.py (+21 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.19
-Nodes (30): CrewAI Execution→Risk Chain — Test module for agent dependencies.  Creates Execu, Run the Execution→Risk CrewAI chain with context passing.      Execution Agent p, run_crewai_chain(), build_risk_crew(), detect_morph(), detect_theta_decay(), DetectMorphInput, DetectThetaInput (+22 more)
+Cohesion: 0.21
+Nodes (6): _median(), _v4_db_path(), float, int, Path, str
 
 ### Community 13 - "Community 13"
-Cohesion: 0.09
-Nodes (29): BaseModel, _median(), PatternAnalyzer, _v4_db_path(), float, int, Path, str (+21 more)
+Cohesion: 0.18
+Nodes (12): BrokerManager, Flattrade, get_broker_manager(), get_current_vix(), get_nifty_spot(), place_order(), Shoonya, bool (+4 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.10
-Nodes (18): _load_yaml(), Brahmand Agent, Task & Tool Factory — Dynamic CrewAI creation from YAML registri, Return available market types., Create a CrewAI Task from its YAML blueprint.          Args:             task_ke, Return available task keys., Load and parse a YAML registry file., Replace {variable} slots in template string with values from variables dict., Create a CrewAI Agent from its YAML blueprint.          Args:             role_k (+10 more)
+Cohesion: 0.06
+Nodes (33): board_numbers, 1_return_on_capital_pct_per_month, 1b_return_on_avg_margin_pct_per_month, 2_avg_loss, 2_avg_win, 2_win_rate_pct, 3_margin_per_lot, 3_max_lots_on_capital (+25 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.11
-Nodes (27): agents_registry.yaml, Build Plan MVC, Execution Agent (CrewAI), Iron Butterfly Strategy, Leg Shifting, Live Trading Mode, Position Morphing State Machine, Morpher Agent (Monitoring) (+19 more)
+Cohesion: 0.13
+Nodes (24): agents_registry.yaml, Build Plan MVC, Execution Agent (CrewAI), Iron Butterfly Strategy, Leg Shifting, Live Trading Mode, Order Agent, order_agent.py — Centralized Order Hub (+16 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.11
-Nodes (22): _build_tsym(), CancelBrokerOrderTool, CancelOrderInput, ExecutionPayload, _get_api(), GetOrderStatusTool, GetPositionsTool, ModifyOrderInput (+14 more)
+Cohesion: 0.08
+Nodes (35): int, Path, str, build_tsym(), EnrichTradePlanTool, get_lot_size(), _get_nonblocking_conn(), get_weekly_expiry() (+27 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.04
@@ -500,20 +514,20 @@ Cohesion: 0.27
 Nodes (17): compute_forward_outcomes(), compute_gap(), _compute_partial_candle(), compute_pattern(), enrich_bars(), get_latest_bar_per_tf(), init_pattern_table(), init_trade_outcomes_table() (+9 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.21
-Nodes (20): DeepSeek Build Specification, ChromaDB Research Pattern Store, Circadian Rhythm Loop, daily_config.json — Learned Parameters, Daily Config Updater Agent, Daily Plan Synthesizer Agent, daily_trade_plan.json, DuckDB Columns for Post-Mortem (+12 more)
+Cohesion: 0.14
+Nodes (26): Anti-Patterns Detected, Bear Call Spread Strategy Knowledge, DeepSeek Build Specification, Bull Put Spread Strategy Knowledge, ChromaDB Research Pattern Store, Confidence Scoring System, Daily Config Updater Agent, Daily Plan Synthesizer Agent (+18 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.27
 Nodes (17): aggregate_60min_candles(), compute_60min_emas(), compute_emas(), _csv_files(), load_day(), push_bars_to_redis(), reconstruct_spot(), redis_client() (+9 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.26
-Nodes (13): int, Path, str, build_tsym(), EnrichTradePlanTool, get_lot_size(), _get_nonblocking_conn(), get_weekly_expiry() (+5 more)
+Cohesion: 0.12
+Nodes (23): _connection(), init_db(), load_latest_daily_config(), query_execution_reports(), query_research_notes(), save_daily_config(), save_execution_report(), save_research_note() (+15 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.16
-Nodes (12): EntrySignalBroker, main(), Main broker that monitors and publishes entry signals, Check if current time is within trading hours (9:15 AM - 3:30 PM), Run broker continuously during market hours, Backtest signals on historical data for a specific date, Test mode: simulate with recent market data, Save signal to JSONL file for analysis (+4 more)
+Cohesion: 0.24
+Nodes (11): extract_task_output(), _iter_json_objects(), parse_json_output(), Agent output parsing — robustly extract a JSON dict from CrewAI outputs.  CrewAI, Yield each top-level balanced {...} substring, string-aware.      Tracks single-, Extract a JSON dict from agent raw text (markdown fences, prose, or a     single, Robustly get a dict from a CrewAI TaskOutput (or anything str-able).      Prefer, str (+3 more)
 
 ### Community 25 - "Community 25"
 Cohesion: 0.27
@@ -548,12 +562,12 @@ Cohesion: 0.24
 Nodes (11): correlate_move_with_indicators, detect_significant_moves, DuckDB Lock Contention Fix, Entry Research Agent, entry_research_agent.py, ENTRY_RESEARCH_QUICKSTART.md, ENTRY_RESEARCH_AGENT_SPEC.md, ENTRY_RESEARCH_AGENT_SUMMARY.md (+3 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.19
-Nodes (17): check_penguin(), check_redis(), check_v31(), _check_v31_via_duckdb(), _check_v31_via_redis(), check_v4(), _is_market_hours(), Check v3.1 health via DuckDB (after hours only, no lock contention). (+9 more)
+Cohesion: 0.05
+Nodes (62): Path, str, bool, check_dambuilder(), check_llm(), check_penguin(), check_porcupine(), check_redis() (+54 more)
 
 ### Community 34 - "Community 34"
-Cohesion: 0.06
-Nodes (41): correlate_move_with_indicators(), create_entry_research_agent(), detect_significant_moves(), query_1min_candles_v31(), query_1min_candles_v4(), Query ALL 1-min candles from Varaha v4 DuckDB (multitimeframe aggregator)., Detect all moves >= min_move_points in the candle data.      Args:         candl, For a given move time, find what indicators were aligned BEFORE it.      Args: (+33 more)
+Cohesion: 0.40
+Nodes (5): momentum, family, index, timeframes, timestamp
 
 ### Community 35 - "Community 35"
 Cohesion: 0.33
@@ -564,8 +578,8 @@ Cohesion: 0.42
 Nodes (8): DuckDBPyConnection, float, int, str, calculate_decay_percentage(), main(), query_option_price_at_date(), simulate_butterfly_with_shifts()
 
 ### Community 37 - "Community 37"
-Cohesion: 0.40
-Nodes (3): 2024 Backtest Results, Kaggle 2024 F&O Data, Trailing Stop Loss (TSL)
+Cohesion: 0.25
+Nodes (6): 2024 Backtest Results, Kaggle 2024 F&O Data, Position Morphing State Machine, Morpher Agent (Monitoring), Morphing, Trailing Stop Loss (TSL)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.22
@@ -580,20 +594,20 @@ Cohesion: 0.25
 Nodes (6): MorphCheckInput, MorphCheckTool, str, Monitoring Tools — MORPH detection + premium-decay shift proposals for the monit, ShiftCheckInput, ShiftCheckTool
 
 ### Community 43 - "Community 43"
-Cohesion: 0.16
-Nodes (9): Calculate target points from matched patterns' avg_move., Determine trade direction from matching patterns.          For now: patterns wit, Calculate target points based on matched patterns.         Uses backtest results, Log message with timestamp, Initialize Entry Agent and load approved patterns from ChromaDB, Convert win_rate string ('100.0%') to float (1.0), Load approved patterns from ChromaDB, int (+1 more)
+Cohesion: 0.11
+Nodes (28): assess_all(), assess_and_cache(), assess_trade(), cache_age_sec(), cache_path(), compute_position_signature(), invalidate(), load_assessment() (+20 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.40
 Nodes (5): main(), simulate_butterfly_day_by_day(), float, int, str
 
 ### Community 46 - "Community 46"
-Cohesion: 0.23
-Nodes (12): bars_to_dicts(), get_bars_by_date(), load_spot_bars(), str, Load NIFTY 50 minute bars for a date range. Returns DataFrame with     columns:, Convert DataFrame to list of dicts matching production bar format., Group bars by date string. Returns {date_str: [bar_dicts]}., bars_to_dicts() (+4 more)
+Cohesion: 0.10
+Nodes (28): bars_to_dicts(), get_bars_by_date(), load_spot_bars(), str, Load NIFTY 50 minute bars for a date range. Returns DataFrame with     columns:, Convert DataFrame to list of dicts matching production bar format., Group bars by date string. Returns {date_str: [bar_dicts]}., float (+20 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.20
-Nodes (14): Contract Agent (CrewAI), data_capture_v3.1 — 1-Min Bar Capture, data_capture_v4 Queue Aggregator, EMA Research Agent, entry_check.py — Entry Signal Generation, EntryCheckTool — Fallback Chain, entry_check_latest.json — Entry Signal Output, PCR Research Agent (+6 more)
+Cohesion: 0.24
+Nodes (9): _connect(), is_market_hours(), _MarketDataQueryInput, MarketDataQueryTool, Native SQLite market data module — reads Penguin capture_nifty.sqlite directly., _sqlite_path(), Connection, bool (+1 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.40
@@ -653,11 +667,11 @@ Nodes (38): After:, After (Context-Aware Entry Gate):, Before:, Before (Blind En
 
 ### Community 120 - "Community 120"
 Cohesion: 0.06
-Nodes (51): Run a full Unicorn debate cycle.      Args:         raw_data: Dict from unicorn_, run_unicorn_debate(), _build_raw_payload(), Strip verdicts from families and return flat 7-family raw dict.      The 7 desig, _load_fixture(), _load_yaml(), Project UNICORN — Phase 3 Tests: Agent Config & Debate Structure  Validates unic, Template resolution for NOT_UP gate creates correct Skeptic prompt. (+43 more)
+Nodes (47): _load_fixture(), _load_yaml(), Project UNICORN — Phase 3 Tests: Agent Config & Debate Structure  Validates unic, Template resolution for NOT_UP gate creates correct Skeptic prompt., Validate that the Advocate output JSON schema is correct., All evidence fields cited must be findable in raw data., Validate that the Skeptic output JSON schema is correct., Advocate points run through verifier produce scores and tags. (+39 more)
 
 ### Community 121 - "Community 121"
-Cohesion: 0.08
-Nodes (43): BaseTool, Brahmand E2E Chain — Sequential Crew: Entry → Regime → Strategy → Contract → Exe, Spawn background research subprocess. Non-blocking. Lock-guarded.     Called whe, Run Entry → Regime → Strategy as a single sequential CrewAI pipeline.     Return, run_sequential_crew(), _trigger_unicorn_research(), Creates CrewAI Task instances from tasks.yaml blueprints., TaskFactory (+35 more)
+Cohesion: 0.42
+Nodes (7): Contract Agent (CrewAI), EMA Research Agent, PCR Research Agent, SuperTrend Research Agent, varaha_data.duckdb — Market Data Database, Volatility Research Agent, Weighted Pattern System
 
 ### Community 122 - "Community 122"
 Cohesion: 0.06
@@ -670,10 +684,6 @@ Nodes (30): 11:00 PM Tomorrow (May 23), 11:00 PM Tonight (May 22), 9:15 AM - 3:3
 ### Community 124 - "Community 124"
 Cohesion: 0.06
 Nodes (30): 1. **Pattern Quality Weighting** ✅ FIXED (May 23), 1. **PCR Mean Reversion Signal** ✅ Implemented + ✅ Tested, 2. **ALL-RED Consensus + ADX Spike + VIX Elevation Pattern** ✅ Implemented + ✅ Tested, 2. **Pattern Directionality** ✅ FIXED (May 23), 3. **ChromaDB Pattern Loading** ✅ Working, 3. **ST Divergence + ADX Pattern** ✅ Implemented + ✅ Tested, 4. **Entry Gate Market Context Integration** ✅ Implemented, 4. **Entry Gate Market Context Integration** ✅ Implemented + ✅ Tested (+22 more)
-
-### Community 125 - "Community 125"
-Cohesion: 0.14
-Nodes (22): duckdb_has_data(), DuckDBMarket, get_today_str(), log(), main(), now_minutes(), float, int (+14 more)
 
 ### Community 126 - "Community 126"
 Cohesion: 0.07
@@ -728,8 +738,8 @@ Cohesion: 0.08
 Nodes (25): 1. Structured Event Logging, 2. Monitoring Cycle Structure, 3. Event Types Captured, 4. Console Log Enhancements, After (Observable Monitoring Phase):, Before (Blind Monitoring Phase):, Benefits, code:block1 ([MONITOR-CYCLE-START] TRD-001 | IRON_FLY | 5min | 09:35:00) (+17 more)
 
 ### Community 139 - "Community 139"
-Cohesion: 0.33
-Nodes (4): Reconstruct what score_trend_redis would have scored for a given candle., Approximate what the traffic light would say based on available DuckDB data., Check if the research pattern agrees with what trend/TL would have said., float
+Cohesion: 0.11
+Nodes (25): datetime, float, str, int, atm_strike(), check_exit(), close_trade(), margin_per_lot() (+17 more)
 
 ### Community 140 - "Community 140"
 Cohesion: 0.14
@@ -816,8 +826,8 @@ Cohesion: 0.11
 Nodes (18): Architecture Diagram (May 20+), Benefits of Unified Architecture, code:block1 (Entry Check (Redis)              Regime Agent (LLM + DuckDB)), code:block2 (┌───────────────────────────────────────────────────────────), code:python (def _run(index: str) -> dict:), code:block4 (┌───────────────────────────────────────────────────────────), code:block5 (v3.1 (60 sec push)), code:json ({) (+10 more)
 
 ### Community 161 - "Community 161"
-Cohesion: 0.14
-Nodes (14): EMAResearchAgent, PCRResearchAgent, # TODO: Generate date range and iterate, Query v4 trade_outcomes for actual trade P&L with entry signals.         Each ro, Base class for all research agents - uses both v3.1 and v4 databases, Analyzes SuperTrend, ADX, DI+, DI-, trend alignment patterns, Analyzes PCR, OI sentiment patterns, Analyzes EMA crossovers, RSI extremes (+6 more)
+Cohesion: 0.11
+Nodes (18): EMAResearchAgent, PCRResearchAgent, # TODO: Generate date range and iterate, Query v4 trade_outcomes for actual trade P&L with entry signals.         Each ro, Reconstruct what score_trend_redis would have scored for a given candle., Approximate what the traffic light would say based on available DuckDB data., Check if the research pattern agrees with what trend/TL would have said., Base class for all research agents - uses both v3.1 and v4 databases (+10 more)
 
 ### Community 162 - "Community 162"
 Cohesion: 0.12
@@ -840,12 +850,12 @@ Cohesion: 0.12
 Nodes (16): 1. Trade Activity Today, 2. Data Capture Failure, 3. Code Fixes Applied Today, 4. State Ready for Tomorrow (May 26), 5. Pre-market Checklist, 6. Open Gaps, 7. Root Cause: DuckDB Lock Conflict, 8. Commands to Run Tonight (+8 more)
 
 ### Community 167 - "Community 167"
-Cohesion: 0.22
-Nodes (9): _connect(), is_market_hours(), _MarketDataQueryInput, Native SQLite market data module — reads Penguin capture_nifty.sqlite directly., _sqlite_path(), Connection, bool, Path (+1 more)
+Cohesion: 0.05
+Nodes (62): get_latest_market_snapshot(), Convenience: return the most recent market_data row., _dambuilder_trace(), Brahmand E2E Chain — Sequential Crew: Entry → Regime → Strategy → Contract → Exe, Run Entry → Regime → Strategy as a single sequential CrewAI pipeline.     Return, Spawn background research subprocess. Non-blocking. Lock-guarded.     Called whe, run_sequential_crew(), _trigger_unicorn_research() (+54 more)
 
 ### Community 168 - "Community 168"
-Cohesion: 0.06
-Nodes (43): bool, Antariksh — Orchestration + Signal Generation, init_agentops_if_enabled(), AgentOps integration — opt-in, off by default.  Set AGENTOPS_API_KEY to enable s, Run full 6-agent pipeline: Entry → Regime → Strategy → Contract → Execution → Ri, run_full_chain(), _already_running(), _has_active_order() (+35 more)
+Cohesion: 0.50
+Nodes (3): MarketDataQueryInput, OptionSnapshotQueryInput, DuckDB Market Data Tool — CrewAI Tool for Post-Mortem historical queries.  Queri
 
 ### Community 169 - "Community 169"
 Cohesion: 0.12
@@ -872,8 +882,8 @@ Cohesion: 0.21
 Nodes (13): compute_emas(), load_bars(), push_to_redis(), bool, float, int, str, Full replay: push bars, write EMAs, optionally run kickoff. (+5 more)
 
 ### Community 175 - "Community 175"
-Cohesion: 0.08
-Nodes (41): now_str(), _check_sl_tp(), _classify_position(), _close_in_db(), _close_side(), _ensure_sl_tp_orders(), execute_action(), _get_atm_from_legs() (+33 more)
+Cohesion: 0.09
+Nodes (41): _check_sl_tp(), _classify_position(), _close_in_db(), _close_side(), _discretionary_actions(), _ensure_sl_tp_orders(), execute_action(), _get_atm_from_legs() (+33 more)
 
 ### Community 176 - "Community 176"
 Cohesion: 0.14
@@ -892,8 +902,8 @@ Cohesion: 0.24
 Nodes (12): calculate_decay_percentage(), main(), float, int, str, query_option_price_at_date(), Query option price for a given date., Run backtest with leg shifting. (+4 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.23
-Nodes (12): _derive_direction(), detect_market_regime(), main(), Store approved patterns in ChromaDB for Entry Agent to load, Detect market regime for yesterday (BULLISH, BEARISH, SIDEWAYS)     Used to unde, Main nightly scheduler function     Runs: Research → Backtest → Validate → Store, Send summary to Telegram, Derive predicted market direction from pattern family + trigger_conditions. (+4 more)
+Cohesion: 0.21
+Nodes (13): _derive_direction(), detect_market_regime(), main(), Store approved patterns in ChromaDB for Entry Agent to load, Detect market regime for yesterday (BULLISH, BEARISH, SIDEWAYS)     Used to unde, Main nightly scheduler function     Runs: Research → Backtest → Validate → Store, Send summary to Telegram, Derive predicted market direction from pattern family + trigger_conditions. (+5 more)
 
 ### Community 181 - "Community 181"
 Cohesion: 0.15
@@ -924,12 +934,12 @@ Cohesion: 0.17
 Nodes (11): 1. Fixed Field Names (3 files), 2. Added Missing Multi-Indicator Pattern, 3. Database Schema Confirmed, code:python (# Wrong (what code checked)), code:python (# ST_ADX_VIX_001: "ALL-RED Consensus + ADX Spike + VIX Eleva), Files Modified, Fixes Applied, Impact (+3 more)
 
 ### Community 188 - "Community 188"
-Cohesion: 0.12
-Nodes (23): _connection(), init_db(), load_latest_daily_config(), query_execution_reports(), query_research_notes(), save_daily_config(), save_execution_report(), save_research_note() (+15 more)
+Cohesion: 0.06
+Nodes (33): board_numbers, 1_return_on_capital_pct_per_month, 1b_return_on_avg_margin_pct_per_month, 2_avg_loss, 2_avg_win, 2_win_rate_pct, 3_margin_per_lot, 3_max_lots_on_capital (+25 more)
 
 ### Community 189 - "Community 189"
-Cohesion: 0.07
-Nodes (43): build_judge_prompt(), _deterministic_decision(), _enrich_decision(), judge(), _make_entry_decision(), unicorn_judge.py — Judge Scoring & Decision Logic  Weighs pre-verified Advocate, Build the entry_decision dict matching existing e2e_chain contract., Ensure LLM-produced decision has all required keys. (+35 more)
+Cohesion: 0.09
+Nodes (37): build_judge_prompt(), _enrich_decision(), judge(), Ensure LLM-produced decision has all required keys., Build the prompt for the Judge LLM.      The Judge receives PRE-VERIFIED claims., Run the full Judge pipeline.      1. Verify all claims from both sides (determin, Verify a list of claim points against raw data.      Args:         raw: dict fro, verify_points() (+29 more)
 
 ### Community 190 - "Community 190"
 Cohesion: 0.18
@@ -1076,8 +1086,8 @@ Cohesion: 0.22
 Nodes (8): code:bash (cd /home/trading_ceo/brahmand), Expected Time, Git Workflow, Quality Checklist, ✅ WAVE 1 — GREEN LIGHT, Wave 1 Implementation Order, What Success Looks Like, Your Decisions Approved ✅
 
 ### Community 226 - "Community 226"
-Cohesion: 0.12
-Nodes (25): get_latest_market_snapshot(), _is_market_hours(), MarketDataQueryInput, MarketDataQueryTool, OptionSnapshotQueryInput, DuckDB Market Data Tool — CrewAI Tool for Post-Mortem historical queries.  Queri, Convenience: return the most recent market_data row., AgentFactory (+17 more)
+Cohesion: 0.67
+Nodes (3): _ck(), main(), Regression: cached position-research (the position-manager analogue of UNICORN).
 
 ### Community 227 - "Community 227"
 Cohesion: 0.25
@@ -1441,39 +1451,39 @@ Nodes (3): code:python (# tests/unit/test_entry_agents.py), code:bash (pytest te
 
 ### Community 333 - "Community 333"
 Cohesion: 0.07
-Nodes (40): cache_age_sec(), cache_path(), invalidate_cache(), load_debate_points(), Return age of cached points in seconds, or None if no cache., Delete cached points. If gate_type is None, invalidate all., Disk path for a gate's debate points cache., Load cached debate points if still valid.      Args:         gate_type: "NOT_UP" (+32 more)
+Nodes (46): cache_age_sec(), cache_path(), compute_signature(), invalidate_cache(), load_debate_points(), unicorn_research_cache.py — LLM Research Point Cache  Stores Advocate/Skeptic de, Return age of cached points in seconds, or None if no cache., Delete cached points. If gate_type is None, invalidate all. (+38 more)
 
 ### Community 334 - "Community 334"
 Cohesion: 0.12
-Nodes (34): _ensure_logger(), log_cache(), log_debate(), log_error(), log_judge(), log_raw_query(), log_verdict(), log_verify() (+26 more)
-
-### Community 335 - "Community 335"
-Cohesion: 0.21
-Nodes (7): MarketDataFeed, Access real-time or historical market data, Get the most recent 1-min candle, Get candle at specific timestamp, Get all candles for a specific date, Get market context (VIX, PCR, ADX) and research pattern matches.         Used by, str
+Nodes (34): _deterministic_decision(), unicorn_judge.py — Judge Scoring & Decision Logic  Weighs pre-verified Advocate, Pure-Python scoring: uses raw_score (unnormalized) so more     evidence = higher, _ensure_logger(), log_anomaly(), log_cache(), log_debate(), log_error() (+26 more)
 
 ### Community 336 - "Community 336"
 Cohesion: 0.10
-Nodes (27): _ensure_imports(), _query_all(), QueryInput, UnicornRawQuery — CrewAI tool that returns raw market data across 7 families.  C, Lazy-import family query functions on first use.     Adds antariksh parent to sy, Call all 7 families + traffic_light (for candles only).     Returns raw dict wit, UnicornRawQuery, str (+19 more)
+Nodes (28): _build_raw_payload(), _ensure_imports(), _query_all(), QueryInput, UnicornRawQuery — CrewAI tool that returns raw market data across 7 families.  C, Strip verdicts from families and return flat 7-family raw dict.      The 7 desig, Lazy-import family query functions on first use.     Adds antariksh parent to sy, Call all 7 families + traffic_light (for candles only).     Returns raw dict wit (+20 more)
 
 ### Community 337 - "Community 337"
-Cohesion: 0.15
-Nodes (22): _connect(), _connect_sqlite_intraday(), Open read-only DuckDB connection with concurrent access.     Priority: Penguin S, If today's Penguin EOD warehouse exists, use it. Else legacy DuckDB., During market hours, read from live Penguin SQLite via sqlite_scanner., _resolve_db_path(), _calculate_decay(), _classify_legs() (+14 more)
+Cohesion: 0.14
+Nodes (23): _connect(), _connect_sqlite_intraday(), _is_market_hours(), Open read-only DuckDB connection with concurrent access.     Priority: Penguin S, If today's Penguin EOD warehouse exists, use it. Else legacy DuckDB., During market hours, read from live Penguin SQLite via sqlite_scanner., _resolve_db_path(), _calculate_decay() (+15 more)
 
 ### Community 338 - "Community 338"
-Cohesion: 0.17
-Nodes (12): Anti-Patterns Detected, Bear Call Spread Strategy Knowledge, Bull Put Spread Strategy Knowledge, Confidence Scoring System, Entry Signal Knowledge, Exit Signal Knowledge, Greek Knowledge, Iron Butterfly Strategy Knowledge (+4 more)
+Cohesion: 0.09
+Nodes (53): bool, float, int, str, duckdb_has_data(), DuckDBMarket, get_today_str(), log() (+45 more)
+
+### Community 339 - "Community 339"
+Cohesion: 0.04
+Nodes (56): bool, Antariksh — Orchestration + Signal Generation, init_agentops_if_enabled(), AgentOps integration — opt-in, off by default.  Set AGENTOPS_API_KEY to enable s, Run full 6-agent pipeline: Entry → Regime → Strategy → Contract → Execution → Ri, run_full_chain(), _already_running(), _has_active_order() (+48 more)
 
 ### Community 340 - "Community 340"
-Cohesion: 0.40
-Nodes (4): parse_json_output(), JSON output parser — extracts JSON from agent raw output with markdown fences., Extract JSON dict from agent raw output (may have markdown fences).      Uses a, str
+Cohesion: 0.12
+Nodes (15): 1. Why (evidence, 2026-06-10), 1b. PHASE 2 RESULT — the 3 Board numbers (2026-06-11, full-2024 run), 2. Goal & realistic calibration, 3. Phases, 4. Feasible now vs optimize later, 5. Honest risks, 6. Board calls needed, Phase 0 — Fail-loud + honest accounting (1 day, prerequisite) (+7 more)
 
 ### Community 342 - "Community 342"
-Cohesion: 0.18
-Nodes (12): BrokerManager, Flattrade, get_broker_manager(), get_current_vix(), get_nifty_spot(), place_order(), Shoonya, bool (+4 more)
+Cohesion: 0.10
+Nodes (17): _load_yaml(), Brahmand Agent, Task & Tool Factory — Dynamic CrewAI creation from YAML registri, Return available market types., Create a CrewAI Task from its YAML blueprint.          Args:             task_ke, Return available task keys., Load and parse a YAML registry file., Replace {variable} slots in template string with values from variables dict., Create a CrewAI Agent from its YAML blueprint.          Args:             role_k (+9 more)
 
 ### Community 343 - "Community 343"
-Cohesion: 0.09
-Nodes (22): _load_agent_config(), Project UNICORN — Integration Tests: Prove the switch happened.  These tests ver, Use frozen fixture to verify UNICORN path produces correct output contract     w, UNICORN output has all keys the downstream e2e_chain code reads., USE_UNICORN flag must be defined and default to True., e2e_chain module must import cleanly with USE_UNICORN=True., _trigger_unicorn_research must exist and be callable., _trigger_unicorn_research must not spawn duplicate processes. (+14 more)
+Cohesion: 0.08
+Nodes (28): _deterministic_fallback(), unicorn_debate.py — Unicorn Debate Orchestrator  Wires the full adversarial deba, Run a full Unicorn debate cycle.      Args:         raw_data: Dict from unicorn_, Shim — the deterministic gate decision lives ONLY in canonical_strategy     (SHE, run_unicorn_debate(), _load_agent_config(), str, Project UNICORN — Integration Tests: Prove the switch happened.  These tests ver (+20 more)
 
 ### Community 344 - "Community 344"
 Cohesion: 0.10
@@ -1508,8 +1518,8 @@ Cohesion: 0.08
 Nodes (25): macro, banknifty_nifty_ratio, banknifty_nifty_ratio_note, distance_to_pivot_pct, gap_pct, gift_premium, gift_premium_note, open_price (+17 more)
 
 ### Community 352 - "Community 352"
-Cohesion: 0.13
-Nodes (19): check_anomaly(), _fallback_result(), unicorn_anomaly.py — Scorecard anomaly detector + graceful fallback.  Detects co, Return a safe NONE result when debate fails., Check a debate decision for anomalies.      Returns: {anomaly: bool, flags: [str, Run debate with anomaly gating.      If the debate produces an anomalous result,, safe_debate(), log_anomaly() (+11 more)
+Cohesion: 0.14
+Nodes (17): check_anomaly(), _fallback_result(), unicorn_anomaly.py — Scorecard anomaly detector + graceful fallback.  Detects co, Return a safe NONE result when debate fails., Check a debate decision for anomalies.      Returns: {anomaly: bool, flags: [str, Run debate with anomaly gating.      If the debate produces an anomalous result,, safe_debate(), callable (+9 more)
 
 ### Community 353 - "Community 353"
 Cohesion: 0.11
@@ -1563,10 +1573,6 @@ Nodes (17): delta, gamma, theta, vega, call_oi_concentration, greeks, iv_current
 Cohesion: 0.12
 Nodes (17): delta, gamma, theta, vega, call_oi_concentration, greeks, iv_current, iv_percentile (+9 more)
 
-### Community 366 - "Community 366"
-Cohesion: 0.16
-Nodes (16): bool, Check if current candle state matches pattern trigger conditions, Brahmand E2E Chain — Provenance Verification.  Deterministic recomputation of ag, Verify agent decision numbers match deterministic gate recomputation.     Return, Deterministic regime from VIX/ADX. Same rules as entry_tools.score_regime()., Verify regime agent recommendation against deterministic recomputation.     Clam, Verify strategy agent output against deterministic parameter rules.     Validate, Recompute the deterministic gate output from agent's trend+TL signals. (+8 more)
-
 ### Community 367 - "Community 367"
 Cohesion: 0.27
 Nodes (14): attach_views(), _build_views(), capture_path(), connect_live(), connect_research(), Penguin live-data compatibility layer.  Single source of truth for reading the L, Create `market_data` + `option_snapshots` compat views over a Penguin SQLite cap, In-memory DuckDB connection exposing the live Penguin capture for `index`     th (+6 more)
@@ -1580,8 +1586,8 @@ Cohesion: 0.14
 Nodes (5): Project UNICORN Test Fixtures  Provides frozen raw_data_sample.json output from, Frozen query_all_families output — NIFTY, captured 2026-06-03., Just the families dict from frozen data., raw_data_families(), raw_data_frozen()
 
 ### Community 370 - "Community 370"
-Cohesion: 0.20
-Nodes (10): Analyst Decomposition, Antariksh, Brahmand, Debate Framework, DeepSeek API — LLM Backend, E2E Entry Chain, EMA State Files — Persistent Trend Data, Entry Agent (CrewAI) (+2 more)
+Cohesion: 0.12
+Nodes (17): Analyst Decomposition, Antariksh, Brahmand, data_capture_v3.1 — 1-Min Bar Capture, data_capture_v4 Queue Aggregator, Debate Framework, DeepSeek API — LLM Backend, E2E Entry Chain (+9 more)
 
 ### Community 371 - "Community 371"
 Cohesion: 0.15
@@ -1629,7 +1635,7 @@ Nodes (10): _parse_llm_json(), Project UNICORN — LLM Boundary Tests  Tests the
 
 ### Community 382 - "Community 382"
 Cohesion: 0.15
-Nodes (12): families, momentum, options, index, family, index, timeframes, timestamp (+4 more)
+Nodes (12): families, options, volatility, index, family, index, timestamp, timestamp (+4 more)
 
 ### Community 383 - "Community 383"
 Cohesion: 0.12
@@ -1660,8 +1666,8 @@ Cohesion: 0.22
 Nodes (9): flow, family, index, indicators, timestamp, fii_data_note, fii_fut_5d_change, pcr_change (+1 more)
 
 ### Community 390 - "Community 390"
-Cohesion: 0.32
-Nodes (7): _deterministic_fallback(), _make_fallback_decision(), unicorn_debate.py — Unicorn Debate Orchestrator  Wires the full adversarial deba, Build fallback entry_decision dict., Fallback when no advocate/skeptic points provided.     Uses SuperTrend consensus, float, str
+Cohesion: 0.13
+Nodes (14): float, Path, str, float, Path, str, ts = 'YYYY-MM-DD HH:MM:SS' — drives get_live_candles' 'today' and         _compu, Warm up all EMAs over historical 60-min closes (SMA seed, then EMA). (+6 more)
 
 ### Community 391 - "Community 391"
 Cohesion: 0.25
@@ -1715,37 +1721,97 @@ Nodes (6): body_pct, color, lower_wick_pct, range_pct, upper_wick_pct, 5m
 Cohesion: 0.33
 Nodes (6): body_pct, color, lower_wick_pct, range_pct, upper_wick_pct, 60m
 
-### Community 404 - "Community 404"
-Cohesion: 0.50
-Nodes (4): main(), int, str, _underlying()
+### Community 405 - "Community 405"
+Cohesion: 0.18
+Nodes (21): get_active_trades(), Update trade record with new state.      Args:         trade_id: Trade to update, Get all active (ACTIVE status) trades today., update_trade(), load_active_trades(), Load all ACTIVE trades from trade_execution_db (DuckDB)., acquire_lock(), check_sl_tp_triggers() (+13 more)
+
+### Community 406 - "Community 406"
+Cohesion: 0.39
+Nodes (7): Update trade metadata in duckdb (called after execution_agent completes).      A, update_trade_in_duckdb(), _ck(), main(), Regression: the stale-trade jam (trades stuck open → single-position entry guard, _reset(), _status()
 
 ### Community 408 - "Community 408"
 Cohesion: 0.40
 Nodes (5): trend, family, index, timeframes, timestamp
 
 ### Community 409 - "Community 409"
+Cohesion: 0.09
+Nodes (53): BaseModel, BaseTool, CrewAI Execution→Risk Chain — Test module for agent dependencies.  Creates Execu, Run the Execution→Risk CrewAI chain with context passing.      Execution Agent p, run_crewai_chain(), PatternAnalyzer, build_risk_crew(), detect_morph() (+45 more)
+
+### Community 410 - "Community 410"
+Cohesion: 0.67
+Nodes (3): _fresh_sandbox(), main(), int
+
+### Community 415 - "Community 415"
+Cohesion: 0.29
+Nodes (10): decide_entry(), decide_gate(), _entry_tools(), get_params(), _no_go(), Single GO/NO-GO entry decision.      Returns {go, signal NOT_UP|NOT_DOWN|NONE, d, Per-gate (NOT_UP / NOT_DOWN) decision in the unicorn fallback dict shape.      N, Strategy parameters. data/strategy_params.json overrides defaults — that     fil (+2 more)
+
+### Community 417 - "Community 417"
+Cohesion: 0.43
+Nodes (7): Circadian Rhythm Loop, daily_config.json — Learned Parameters, DuckDB Columns for Post-Mortem, flow.py, Postmortem Agent (Post-Trade), Strategy Agent (CrewAI), 3-Phase System
+
+### Community 419 - "Community 419"
+Cohesion: 0.17
+Nodes (12): any, _flatten_dict_value(), _get_tolerance(), _is_direction_field(), If a field value is itself a dict, try to find the most representative     numer, Direct lookup: raw[family][timeframes][tf][field]., Return the numeric tolerance for a given field name., Direction/classification fields are compared by string equality,     not numeric (+4 more)
+
+### Community 420 - "Community 420"
+Cohesion: 0.18
+Nodes (10): available, buffer_count, ema_value, last_bars, multiplier, period, status, tf (+2 more)
+
+### Community 421 - "Community 421"
+Cohesion: 0.18
+Nodes (10): available, buffer_count, ema_value, last_bars, multiplier, period, status, tf (+2 more)
+
+### Community 422 - "Community 422"
+Cohesion: 0.18
+Nodes (10): available, buffer_count, ema_value, last_bars, multiplier, period, status, tf (+2 more)
+
+### Community 423 - "Community 423"
+Cohesion: 0.18
+Nodes (10): available, buffer_count, ema_value, last_bars, multiplier, period, status, tf (+2 more)
+
+### Community 424 - "Community 424"
+Cohesion: 0.18
+Nodes (10): available, buffer_count, ema_value, last_bars, multiplier, period, status, tf (+2 more)
+
+### Community 425 - "Community 425"
+Cohesion: 0.38
+Nodes (10): datetime, float, str, bs_price(), _N(), next_weekly_expiry(), price_leg(), European option price; floors at intrinsic when t or iv degenerate. (+2 more)
+
+### Community 426 - "Community 426"
+Cohesion: 0.22
+Nodes (8): grid, conf, max_per_day, sl_pct, tp_pct, window, results, validated_top10
+
+### Community 427 - "Community 427"
+Cohesion: 0.42
+Nodes (8): _close_duckdb(), main(), now_iso(), bool, int, str, Force-close still-open DuckDB trades (the store the entry guard reads).     Arch, _underlying()
+
+### Community 431 - "Community 431"
+Cohesion: 0.50
+Nodes (4): Path, str, main(), trace()
+
+### Community 432 - "Community 432"
 Cohesion: 0.40
-Nodes (5): volatility, family, index, timeframes, timestamp
+Nodes (5): _make_entry_decision(), Build the entry_decision dict matching existing e2e_chain contract., bool, float, int
 
 ## Knowledge Gaps
-- **2058 isolated node(s):** `1a. `completion_by_tf` undefined ✅ DONE`, `1b. Missing CrewAI imports ✅ DONE`, `1c. Functional test`, `P2 — duckdb_tool.py option_snapshots leg not migrated ✅ DONE`, `P3 — india_vix NULL in enriched snapshot ✅ DONE` (+2053 more)
+- **2224 isolated node(s):** `float`, `int`, `float`, `results`, `validated_top` (+2219 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **45 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **46 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `varaha_data.duckdb — Market Data Database` connect `Community 47` to `Community 168`, `Community 226`, `Community 21`, `Community 175`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Why does `Path` connect `Community 6` to `Community 168`, `Community 7`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `run_sequential_crew()` connect `Community 121` to `Community 0`, `Community 226`, `Community 34`, `Community 4`, `Community 168`, `Community 12`, `Community 333`, `Community 334`, `Community 366`, `Community 336`, `Community 19`, `Community 340`, `Community 22`, `Community 120`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `run_sequential_crew()` connect `Community 167` to `Community 33`, `Community 4`, `Community 333`, `Community 47`, `Community 336`, `Community 338`, `Community 339`, `Community 19`, `Community 405`, `Community 22`, `Community 343`, `Community 24`, `Community 409`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `run_unicorn_debate()` connect `Community 343` to `Community 352`, `Community 167`, `Community 334`, `Community 120`, `Community 189`?**
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `varaha_data.duckdb — Market Data Database` connect `Community 121` to `Community 417`, `Community 168`, `Community 175`, `Community 370`, `Community 339`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `run_sequential_crew()` (e.g. with `MarketDataQueryTool` and `_log()`) actually correct?**
   _`run_sequential_crew()` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 19 inferred relationships involving `AgentFactory` (e.g. with `bool` and `float`) actually correct?**
-  _`AgentFactory` has 19 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 27 inferred relationships involving `PatternAnalyzer` (e.g. with `bool` and `int`) actually correct?**
-  _`PatternAnalyzer` has 27 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `1a. `completion_by_tf` undefined ✅ DONE`, `1b. Missing CrewAI imports ✅ DONE`, `1c. Functional test` to the rest of the system?**
-  _2513 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Are the 18 inferred relationships involving `AgentFactory` (e.g. with `bool` and `float`) actually correct?**
+  _`AgentFactory` has 18 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 26 inferred relationships involving `PatternAnalyzer` (e.g. with `int` and `str`) actually correct?**
+  _`PatternAnalyzer` has 26 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `Check v3.1 health via Redis queue (lock-free, market hours only).`, `Check v3.1 health via DuckDB (after hours only, no lock contention).`, `Check v3.1 data health. Uses Redis during market hours to avoid     DuckDB lock` to the rest of the system?**
+  _2718 weakly-connected nodes found - possible documentation gaps or missing edges._

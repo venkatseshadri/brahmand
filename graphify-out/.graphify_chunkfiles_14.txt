@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/NIFTY_AGENT_TOOLS_VALIDATION.md
+/home/trading_ceo/brahmand/docs/TOMORROW_TRADING_CONFIG.md
+/home/trading_ceo/brahmand/docs/IMPLEMENTATION_SUMMARY.md
+/home/trading_ceo/brahmand/docs/RESEARCH_AGENTS_IMPLEMENTATION_COMPLETE.md
+/home/trading_ceo/brahmand/docs/ENTRY_CHECK_FIX_SUMMARY.md
+/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_AGENT_SPEC.md
+/home/trading_ceo/brahmand/docs/RUN_BACKTEST_2024_VALIDATION.md
+/home/trading_ceo/brahmand/docs/REFACTORING_COMPLETE.md
+/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_TOOLS_REFERENCE.md
+/home/trading_ceo/brahmand/docs/LIVE_TRADING_SETUP.md
+/home/trading_ceo/brahmand/docs/ENTRY_GATE_FIX_PENDING.md
+/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_QUICK_REFERENCE.txt

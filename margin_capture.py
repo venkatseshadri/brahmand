@@ -66,8 +66,10 @@ def _get_expiry() -> str:
         db.close()
         if row:
             return str(row[0]).strip()
-    except Exception:
-        pass
+    except Exception as e:
+        logging.getLogger("brahmand.margin").debug(
+            "Live expiry lookup failed, using fallback: %s", e
+        )
 
     # Fallback: from config or manual
     if EXPIRY_FILE.exists():
@@ -89,8 +91,10 @@ def _get_atm() -> Optional[int]:
         if row:
             spot = float(row[0])
             return round(spot / STRIKE_STEP) * STRIKE_STEP
-    except Exception:
-        pass
+    except Exception as e:
+        logging.getLogger("brahmand.margin").debug(
+            "Live ATM lookup failed, using fallback: %s", e
+        )
     return None
 
 
@@ -324,18 +328,32 @@ def main():
                     result = capture_margins()
                     if "error" in result:
                         consecutive_failures += 1
-                        logger.error(f"❌ Capture error: {result['error']} (failure #{consecutive_failures})")
+                        logger.error(
+                            f"❌ Capture error: {result['error']} (failure #{consecutive_failures})"
+                        )
                         if consecutive_failures >= 3:
-                            logger.critical(f"🚨 {consecutive_failures} consecutive failures — sending alert!")
+                            logger.critical(
+                                f"🚨 {consecutive_failures} consecutive failures — sending alert!"
+                            )
                     else:
                         consecutive_failures = 0
-                        spreads_ok = sum(1 for s in result.get("spreads", []) if s.get("margin") is not None)
-                        logger.info(f"✅ Captured {spreads_ok}/10 spreads for ATM {result['atm']} (expiry: {result['expiry']})")
+                        spreads_ok = sum(
+                            1
+                            for s in result.get("spreads", [])
+                            if s.get("margin") is not None
+                        )
+                        logger.info(
+                            f"✅ Captured {spreads_ok}/10 spreads for ATM {result['atm']} (expiry: {result['expiry']})"
+                        )
                 except Exception as e:
                     consecutive_failures += 1
-                    logger.error(f"❌ Capture exception: {e} (failure #{consecutive_failures})")
+                    logger.error(
+                        f"❌ Capture exception: {e} (failure #{consecutive_failures})"
+                    )
                     if consecutive_failures >= 3:
-                        logger.critical(f"🚨 {consecutive_failures} consecutive failures — check API!")
+                        logger.critical(
+                            f"🚨 {consecutive_failures} consecutive failures — check API!"
+                        )
             else:
                 logger.info(f"✅ Market closed at {now} — exiting loop")
                 break
@@ -345,7 +363,9 @@ def main():
         if "error" in res:
             logger.error(f"❌ Error: {res['error']}")
         else:
-            spreads_ok = sum(1 for s in res.get("spreads", []) if s.get("margin") is not None)
+            spreads_ok = sum(
+                1 for s in res.get("spreads", []) if s.get("margin") is not None
+            )
             logger.info(f"✅ Captured {spreads_ok}/10 spreads")
         print(json.dumps(res, indent=2, default=str))
 

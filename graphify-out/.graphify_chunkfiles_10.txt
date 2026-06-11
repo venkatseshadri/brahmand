@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/REPLAY_GUIDE.md
+/home/trading_ceo/brahmand/docs/TEST_IMPLEMENTATION_ROADMAP.md
+/home/trading_ceo/brahmand/docs/README.md
+/home/trading_ceo/brahmand/docs/AGENT_CONFORMANCE_HARNESS_SPEC.md
+/home/trading_ceo/brahmand/docs/REPLAY_HARNESS_REVIEW.md
+/home/trading_ceo/brahmand/docs/PATTERN_INTEGRATION_FRAMEWORK.md
+/home/trading_ceo/brahmand/docs/CREWAI_KNOWLEDGE_INTEGRATION.md
+/home/trading_ceo/brahmand/docs/CONTEXT.md
+/home/trading_ceo/brahmand/docs/KNOWLEDGE_ARCHITECTURE.md
+/home/trading_ceo/brahmand/docs/SESSION_20260525_FINDINGS.md
+/home/trading_ceo/brahmand/docs/RISK_AGENT_CREW_ARCHITECTURE.md
+/home/trading_ceo/brahmand/docs/POSTMORTEM_DATA_FLOW.md

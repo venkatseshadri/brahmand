@@ -228,27 +228,31 @@ def close_trade(
         close_dt = datetime.now()
         duration_mins = int((close_dt - entry_dt).total_seconds() / 60)
 
-        # Insert into history
-        conn.execute(
-            """
-            INSERT INTO trade_history
-            (trade_id, entry_time, close_time, strategy, close_reason, entry_pnl, final_pnl, duration_mins, legs)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            [
-                trade_id,
-                entry_time,
-                close_dt.isoformat(),
-                strategy,
-                close_reason,
-                entry_pnl,
-                final_pnl,
-                duration_mins,
-                legs_json,
-            ],
-        )
+        # Idempotent: check if already archived to history (partial close edge case)
+        already = conn.execute(
+            "SELECT trade_id FROM trade_history WHERE trade_id = ?", [trade_id]
+        ).fetchone()
 
-        # Mark as closed in active
+        if not already:
+            conn.execute(
+                """
+                INSERT INTO trade_history
+                (trade_id, entry_time, close_time, strategy, close_reason, entry_pnl, final_pnl, duration_mins, legs)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                [
+                    trade_id,
+                    entry_time,
+                    close_dt.isoformat(),
+                    strategy,
+                    close_reason,
+                    entry_pnl,
+                    final_pnl,
+                    duration_mins,
+                    legs_json,
+                ],
+            )
+
         conn.execute(
             "UPDATE active_trades SET status = 'CLOSED' WHERE trade_id = ?", [trade_id]
         )
@@ -336,7 +340,9 @@ def update_active_trade(
                 jt["tp"] = tp
             jt["last_updated"] = datetime.now().isoformat()
             _save_ledger(led)
-    except Exception:
-        pass
+    except Exception as e:
+        logging.getLogger("brahmand.trade_db").warning(
+            "Order ledger sync failed for %s: %s", trade_id, e
+        )
 
     return True

@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/BRAHMAND_BUILD_SPECIFICATION.md
+/home/trading_ceo/brahmand/docs/RELEASE_NOTES_2026-05-19.md
+/home/trading_ceo/brahmand/docs/KNOWLEDGE_INDEX.md
+/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_QUICKSTART.md
+/home/trading_ceo/brahmand/docs/BACKTEST_2024_RESULTS_SUMMARY.md
+/home/trading_ceo/brahmand/docs/TEST_STRATEGY_WITH_RESEARCH_PATTERNS.md
+/home/trading_ceo/brahmand/docs/WAVE1_GO.md
+/home/trading_ceo/brahmand/docs/TSL_THRESHOLD_FIX.md
+/home/trading_ceo/brahmand/docs/ORDER_LEDGER_AND_EXECUTION_DB_ARCHITECTURE.md
+/home/trading_ceo/brahmand/docs/ORDER_AGENT_ACTIVATION.md
+/home/trading_ceo/brahmand/docs/POSTMORTEM_AGENT_DESIGN.md
+/home/trading_ceo/brahmand/docs/ARCHITECTURE.md

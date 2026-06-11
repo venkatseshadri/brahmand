@@ -1,0 +1,12 @@
+/home/trading_ceo/brahmand/docs/DEPLOYMENT_READY.md
+/home/trading_ceo/brahmand/archives/TAURIC_REUSE_PLAN.md
+/home/trading_ceo/brahmand/archives/HANDOFF.md
+/home/trading_ceo/brahmand/archives/RESEARCH_REFERENCES.md
+/home/trading_ceo/brahmand/archives/REVIEW_BEFORE_WAVE1.md
+/home/trading_ceo/brahmand/archives/BUILD_PLAN.md
+/home/trading_ceo/brahmand/archives/NEXT_STEPS.md
+/home/trading_ceo/brahmand/archives/WAVE1_GO.md
+/home/trading_ceo/brahmand/archives/DUCKDB_CONCURRENCY.md
+/home/trading_ceo/brahmand/config/tasks.yaml
+/home/trading_ceo/brahmand/config/agents_registry.yaml
+/home/trading_ceo/brahmand/config/tools_registry.yaml
