@@ -458,6 +458,45 @@ def check_porcupine() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_dambuilder() -> Tuple[bool, list]:
+    """DAMBUILDER invariant — multitf_enricher heartbeat just must be fresh.
+
+    Checks: `multitf_enricher:{NIFTY,SENSEX}:heartbeat` in Redis.  Must
+    be present and <10 min old during market hours once the shadow units
+    are deployed (T1).  Silently passes when the key is missing (pre-T1)
+    or outside market hours — WARNs only when a heartbeat WAS present
+    (proving the unit was installed) and then goes stale.
+    """
+    warnings = []
+    if not _is_market_hours():
+        return True, warnings
+    try:
+        import redis as rds
+
+        r = rds.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+        for label in ("NIFTY", "SENSEX"):
+            hb = r.get(f"multitf_enricher:{label}:heartbeat")
+            if not hb:
+                continue  # pre-T1 — unit not installed yet, not an alert
+            try:
+                age = (datetime.now() - datetime.fromisoformat(hb)).total_seconds() / 60
+                if age > 10:
+                    warnings.append(
+                        f"DAMBUILDER [{label}]: multitf_enricher heartbeat stale "
+                        f"{age:.0f}m (crash-loop or stuck?)"
+                    )
+            except (ValueError, TypeError):
+                warnings.append(
+                    f"DAMBUILDER [{label}]: multitf_enricher heartbeat "
+                    f"unparseable: {hb}"
+                )
+    except Exception as e:
+        warnings.append(f"DAMBUILDER: check failed: {e}")
+        return False, warnings
+
+    return len(warnings) == 0, warnings
+
+
 def check_llm() -> Tuple[bool, list]:
     """LLM availability — scan today's kickoff/chain logs (passive, no API cost).
 
@@ -505,6 +544,7 @@ def run_all() -> Tuple[bool, list]:
         ("LLM", check_llm),
         ("Penguin", check_penguin),
         ("PORCUPINE", check_porcupine),
+        ("DAMBUILDER", check_dambuilder),
         ("v3.1", check_v31),
         ("v4_NIFTY", lambda: check_v4("NIFTY")),
         ("v4_SENSEX", lambda: check_v4("SENSEX")),
