@@ -1,0 +1,670 @@
+{
+  "meta": {
+    "period": "2024-01-01..2024-01-12",
+    "engine": "REAL canonical_strategy.decide_entry via production I/O seams",
+    "premiums": "Black-Scholes, IV=VIX (flat smile) \u2014 Tier-B calibration pending",
+    "contract_spec": "today's regime: Tue weekly expiry, lot 65, wing/SL/TP from canonical params",
+    "capital": 200000.0
+  },
+  "decisions": {
+    "go": 49,
+    "no_go": 9,
+    "refused_pricing": 0
+  },
+  "trades": {
+    "count": 49,
+    "wins": 13,
+    "losses": 36,
+    "win_rate_pct": 26.5,
+    "total_pnl_net": -179734.51,
+    "total_costs": 9642.51,
+    "by_exit": {
+      "TP_HIT": 10,
+      "SL_HIT": 33,
+      "EOD": 6
+    }
+  },
+  "board_numbers": {
+    "1_return_on_capital_pct_per_month": -89.87,
+    "1b_return_on_avg_margin_pct_per_month": -97.59,
+    "2_avg_win": 17972.0,
+    "2_avg_loss": -11482.0,
+    "2_win_rate_pct": 26.5,
+    "3_max_lots_on_capital": 18,
+    "3_margin_per_lot": 10533.0,
+    "max_drawdown": 236010.91,
+    "months": 1
+  },
+  "equity_curve": [
+    {
+      "date": "2024-01-01",
+      "equity": 210846.49
+    },
+    {
+      "date": "2024-01-02",
+      "equity": 115462.2
+    },
+    {
+      "date": "2024-01-03",
+      "equity": 131872.42
+    },
+    {
+      "date": "2024-01-04",
+      "equity": 113418.88
+    },
+    {
+      "date": "2024-01-05",
+      "equity": 102387.77
+    },
+    {
+      "date": "2024-01-08",
+      "equity": 71352.2
+    },
+    {
+      "date": "2024-01-09",
+      "equity": 40288.72
+    },
+    {
+      "date": "2024-01-10",
+      "equity": -5193.35
+    },
+    {
+      "date": "2024-01-11",
+      "equity": -25164.42
+    },
+    {
+      "date": "2024-01-12",
+      "equity": 20265.49
+    }
+  ],
+  "trade_log": [
+    {
+      "entry": "2024-01-01 09:30:00",
+      "exit": "2024-01-01 14:00:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 18,
+      "credit": 60.58,
+      "reason": "TP_HIT",
+      "pnl": 32834.07,
+      "costs": 183.33
+    },
+    {
+      "entry": "2024-01-01 14:05:00",
+      "exit": "2024-01-01 15:10:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21800,
+      "buy_k": 21600,
+      "lots": 18,
+      "credit": 63.69,
+      "reason": "SL_HIT",
+      "pnl": -21987.58,
+      "costs": 248.98
+    },
+    {
+      "entry": "2024-01-02 09:30:00",
+      "exit": "2024-01-02 09:36:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21750,
+      "buy_k": 21550,
+      "lots": 16,
+      "credit": 42.0,
+      "reason": "SL_HIT",
+      "pnl": -11892.54,
+      "costs": 150.94
+    },
+    {
+      "entry": "2024-01-02 09:40:00",
+      "exit": "2024-01-02 09:54:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21750,
+      "buy_k": 21550,
+      "lots": 15,
+      "credit": 40.29,
+      "reason": "SL_HIT",
+      "pnl": -13093.34,
+      "costs": 145.34
+    },
+    {
+      "entry": "2024-01-02 09:55:00",
+      "exit": "2024-01-02 09:56:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 15,
+      "credit": 32.17,
+      "reason": "SL_HIT",
+      "pnl": -18243.31,
+      "costs": 137.56
+    },
+    {
+      "entry": "2024-01-02 10:00:00",
+      "exit": "2024-01-02 10:26:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 15,
+      "credit": 39.97,
+      "reason": "SL_HIT",
+      "pnl": -13502.5,
+      "costs": 145.0
+    },
+    {
+      "entry": "2024-01-02 10:30:00",
+      "exit": "2024-01-02 10:31:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 15,
+      "credit": 38.55,
+      "reason": "SL_HIT",
+      "pnl": -10270.78,
+      "costs": 140.53
+    },
+    {
+      "entry": "2024-01-02 10:35:00",
+      "exit": "2024-01-02 10:40:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 15,
+      "credit": 34.27,
+      "reason": "TP_HIT",
+      "pnl": 18810.95,
+      "costs": 113.8
+    },
+    {
+      "entry": "2024-01-02 10:45:00",
+      "exit": "2024-01-02 10:49:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 14,
+      "credit": 26.35,
+      "reason": "SL_HIT",
+      "pnl": -8209.39,
+      "costs": 119.49
+    },
+    {
+      "entry": "2024-01-02 10:50:00",
+      "exit": "2024-01-02 12:16:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 14,
+      "credit": 30.3,
+      "reason": "SL_HIT",
+      "pnl": -12321.33,
+      "costs": 127.33
+    },
+    {
+      "entry": "2024-01-02 12:20:00",
+      "exit": "2024-01-02 12:36:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 13,
+      "credit": 16.88,
+      "reason": "SL_HIT",
+      "pnl": -4158.87,
+      "costs": 102.87
+    },
+    {
+      "entry": "2024-01-02 12:40:00",
+      "exit": "2024-01-02 13:02:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 14,
+      "credit": 20.26,
+      "reason": "TP_HIT",
+      "pnl": 10056.83,
+      "costs": 98.77
+    },
+    {
+      "entry": "2024-01-02 13:05:00",
+      "exit": "2024-01-02 13:08:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 14,
+      "credit": 27.48,
+      "reason": "SL_HIT",
+      "pnl": -6899.32,
+      "costs": 119.82
+    },
+    {
+      "entry": "2024-01-02 13:10:00",
+      "exit": "2024-01-02 13:34:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 15,
+      "credit": 34.0,
+      "reason": "SL_HIT",
+      "pnl": -9795.49,
+      "costs": 133.24
+    },
+    {
+      "entry": "2024-01-02 13:35:00",
+      "exit": "2024-01-02 14:11:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 13,
+      "credit": 12.74,
+      "reason": "SL_HIT",
+      "pnl": -5270.15,
+      "costs": 98.75
+    },
+    {
+      "entry": "2024-01-02 14:15:00",
+      "exit": "2024-01-02 14:38:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 14,
+      "credit": 19.19,
+      "reason": "SL_HIT",
+      "pnl": -10595.05,
+      "costs": 111.85
+    },
+    {
+      "entry": "2024-01-03 10:15:00",
+      "exit": "2024-01-03 15:25:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 21,
+      "credit": 81.13,
+      "reason": "EOD",
+      "pnl": 16410.22,
+      "costs": 502.13
+    },
+    {
+      "entry": "2024-01-04 09:30:00",
+      "exit": "2024-01-04 15:25:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 22,
+      "credit": 85.16,
+      "reason": "EOD",
+      "pnl": -18453.54,
+      "costs": 592.84
+    },
+    {
+      "entry": "2024-01-05 09:30:00",
+      "exit": "2024-01-05 10:54:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21750,
+      "buy_k": 21550,
+      "lots": 20,
+      "credit": 74.51,
+      "reason": "SL_HIT",
+      "pnl": -22379.81,
+      "costs": 435.81
+    },
+    {
+      "entry": "2024-01-05 10:55:00",
+      "exit": "2024-01-05 15:25:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 18,
+      "credit": 65.14,
+      "reason": "EOD",
+      "pnl": 11348.7,
+      "costs": 281.1
+    },
+    {
+      "entry": "2024-01-08 09:30:00",
+      "exit": "2024-01-08 09:36:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 16,
+      "credit": 47.85,
+      "reason": "SL_HIT",
+      "pnl": -14099.42,
+      "costs": 184.22
+    },
+    {
+      "entry": "2024-01-08 09:40:00",
+      "exit": "2024-01-08 11:06:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 17,
+      "credit": 52.83,
+      "reason": "SL_HIT",
+      "pnl": -15164.13,
+      "costs": 202.43
+    },
+    {
+      "entry": "2024-01-08 11:10:00",
+      "exit": "2024-01-08 11:53:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21400,
+      "lots": 17,
+      "credit": 50.97,
+      "reason": "SL_HIT",
+      "pnl": -13797.65,
+      "costs": 195.1
+    },
+    {
+      "entry": "2024-01-08 11:55:00",
+      "exit": "2024-01-08 12:32:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21550,
+      "buy_k": 21750,
+      "lots": 18,
+      "credit": 62.07,
+      "reason": "SL_HIT",
+      "pnl": -21510.04,
+      "costs": 239.44
+    },
+    {
+      "entry": "2024-01-08 12:35:00",
+      "exit": "2024-01-08 14:34:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 18,
+      "credit": 59.09,
+      "reason": "TP_HIT",
+      "pnl": 33535.67,
+      "costs": 172.03
+    },
+    {
+      "entry": "2024-01-09 09:30:00",
+      "exit": "2024-01-09 09:41:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 15,
+      "credit": 35.92,
+      "reason": "TP_HIT",
+      "pnl": 18974.59,
+      "costs": 115.91
+    },
+    {
+      "entry": "2024-01-09 09:45:00",
+      "exit": "2024-01-09 09:50:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 15,
+      "credit": 35.41,
+      "reason": "SL_HIT",
+      "pnl": -10266.14,
+      "costs": 135.89
+    },
+    {
+      "entry": "2024-01-09 09:55:00",
+      "exit": "2024-01-09 10:00:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21800,
+      "lots": 15,
+      "credit": 39.77,
+      "reason": "SL_HIT",
+      "pnl": -11813.77,
+      "costs": 143.02
+    },
+    {
+      "entry": "2024-01-09 10:05:00",
+      "exit": "2024-01-09 10:12:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21850,
+      "lots": 14,
+      "credit": 21.62,
+      "reason": "SL_HIT",
+      "pnl": -6236.22,
+      "costs": 111.92
+    },
+    {
+      "entry": "2024-01-09 10:15:00",
+      "exit": "2024-01-09 10:41:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 14,
+      "credit": 21.57,
+      "reason": "TP_HIT",
+      "pnl": 9608.93,
+      "costs": 100.77
+    },
+    {
+      "entry": "2024-01-09 10:45:00",
+      "exit": "2024-01-09 10:46:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 21.82,
+      "reason": "SL_HIT",
+      "pnl": -5471.53,
+      "costs": 111.63
+    },
+    {
+      "entry": "2024-01-09 10:50:00",
+      "exit": "2024-01-09 10:57:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 30.2,
+      "reason": "SL_HIT",
+      "pnl": -7321.72,
+      "costs": 123.62
+    },
+    {
+      "entry": "2024-01-09 11:00:00",
+      "exit": "2024-01-09 11:48:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 15,
+      "credit": 36.34,
+      "reason": "TP_HIT",
+      "pnl": 17627.68,
+      "costs": 117.32
+    },
+    {
+      "entry": "2024-01-09 11:50:00",
+      "exit": "2024-01-09 11:54:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 21.3,
+      "reason": "SL_HIT",
+      "pnl": -5325.15,
+      "costs": 110.85
+    },
+    {
+      "entry": "2024-01-09 11:55:00",
+      "exit": "2024-01-09 12:38:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 27.02,
+      "reason": "TP_HIT",
+      "pnl": 13180.8,
+      "costs": 105.2
+    },
+    {
+      "entry": "2024-01-09 12:40:00",
+      "exit": "2024-01-09 13:51:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 13,
+      "credit": 17.28,
+      "reason": "SL_HIT",
+      "pnl": -5376.99,
+      "costs": 104.19
+    },
+    {
+      "entry": "2024-01-09 13:55:00",
+      "exit": "2024-01-09 13:57:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 21.87,
+      "reason": "SL_HIT",
+      "pnl": -6254.73,
+      "costs": 112.23
+    },
+    {
+      "entry": "2024-01-09 14:00:00",
+      "exit": "2024-01-09 14:08:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 14,
+      "credit": 28.83,
+      "reason": "SL_HIT",
+      "pnl": -7802.57,
+      "costs": 122.17
+    },
+    {
+      "entry": "2024-01-09 14:10:00",
+      "exit": "2024-01-09 14:11:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 13,
+      "credit": 6.08,
+      "reason": "SL_HIT",
+      "pnl": -2522.56,
+      "costs": 88.96
+    },
+    {
+      "entry": "2024-01-09 14:15:00",
+      "exit": "2024-01-09 14:16:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 13,
+      "credit": 10.21,
+      "reason": "SL_HIT",
+      "pnl": -3077.08,
+      "costs": 94.23
+    },
+    {
+      "entry": "2024-01-09 14:20:00",
+      "exit": "2024-01-09 14:21:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21400,
+      "lots": 13,
+      "credit": 13.58,
+      "reason": "SL_HIT",
+      "pnl": -7486.59,
+      "costs": 101.29
+    },
+    {
+      "entry": "2024-01-09 14:25:00",
+      "exit": "2024-01-09 14:27:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21600,
+      "buy_k": 21400,
+      "lots": 13,
+      "credit": 14.52,
+      "reason": "SL_HIT",
+      "pnl": -17313.48,
+      "costs": 109.28
+    },
+    {
+      "entry": "2024-01-09 14:30:00",
+      "exit": "2024-01-09 14:32:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21550,
+      "buy_k": 21350,
+      "lots": 13,
+      "credit": 7.71,
+      "reason": "TP_HIT",
+      "pnl": 5813.05,
+      "costs": 85.05
+    },
+    {
+      "entry": "2024-01-10 09:30:00",
+      "exit": "2024-01-10 10:18:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21500,
+      "buy_k": 21700,
+      "lots": 21,
+      "credit": 81.21,
+      "reason": "SL_HIT",
+      "pnl": -24226.14,
+      "costs": 597.99
+    },
+    {
+      "entry": "2024-01-10 10:20:00",
+      "exit": "2024-01-10 15:25:00",
+      "strategy": "CALL_SPREAD",
+      "sell_k": 21550,
+      "buy_k": 21750,
+      "lots": 22,
+      "credit": 86.23,
+      "reason": "EOD",
+      "pnl": -21255.93,
+      "costs": 635.33
+    },
+    {
+      "entry": "2024-01-11 09:30:00",
+      "exit": "2024-01-11 10:54:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21700,
+      "buy_k": 21500,
+      "lots": 19,
+      "credit": 70.82,
+      "reason": "SL_HIT",
+      "pnl": -19572.15,
+      "costs": 417.3
+    },
+    {
+      "entry": "2024-01-11 10:55:00",
+      "exit": "2024-01-11 15:25:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21650,
+      "buy_k": 21450,
+      "lots": 19,
+      "credit": 72.31,
+      "reason": "EOD",
+      "pnl": -398.92,
+      "costs": 374.22
+    },
+    {
+      "entry": "2024-01-12 09:30:00",
+      "exit": "2024-01-12 13:42:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21750,
+      "buy_k": 21550,
+      "lots": 19,
+      "credit": 72.75,
+      "reason": "TP_HIT",
+      "pnl": 39499.54,
+      "costs": 279.81
+    },
+    {
+      "entry": "2024-01-12 13:45:00",
+      "exit": "2024-01-12 15:25:00",
+      "strategy": "PUT_SPREAD",
+      "sell_k": 21900,
+      "buy_k": 21700,
+      "lots": 20,
+      "credit": 73.61,
+      "reason": "EOD",
+      "pnl": 5930.37,
+      "costs": 361.63
+    }
+  ]
+}

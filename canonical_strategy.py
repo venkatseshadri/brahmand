@@ -56,15 +56,22 @@ def get_params() -> dict:
     return params
 
 
+_ENTRY_TOOLS = None
+
+
 def _entry_tools():
-    """Load antariksh entry_tools by explicit path. A bare `from tools.entry_tools
-    import ...` resolves to brahmand's own `tools` package once imported, raising
-    ModuleNotFoundError (same workaround the old fallback.py carried)."""
-    path = Path(__file__).parent.parent / "antariksh" / "tools" / "entry_tools.py"
-    spec = importlib.util.spec_from_file_location("antariksh_entry_tools", path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+    """Load antariksh entry_tools by explicit path (cached — its crewai import
+    is expensive). A bare `from tools.entry_tools import ...` resolves to
+    brahmand's own `tools` package once imported, raising ModuleNotFoundError
+    (same workaround the old fallback.py carried)."""
+    global _ENTRY_TOOLS
+    if _ENTRY_TOOLS is None:
+        path = Path(__file__).parent.parent / "antariksh" / "tools" / "entry_tools.py"
+        spec = importlib.util.spec_from_file_location("antariksh_entry_tools", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _ENTRY_TOOLS = mod
+    return _ENTRY_TOOLS
 
 
 def _no_go(reason: str, extra: dict = None) -> dict:
