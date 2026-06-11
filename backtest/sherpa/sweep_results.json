@@ -1,0 +1,987 @@
+{
+ "grid": {
+  "conf": "[35, 50, 60, 70]",
+  "sl_pct": "[0.25, 0.4, 0.6]",
+  "tp_pct": "[0.3, 0.5, 0.7]",
+  "max_per_day": "[1, 2, 3]",
+  "window": "[('09:30', '11:30'), ('09:30', '14:30')]"
+ },
+ "results": [
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 51.2,
+    "net_pnl": 20804.0,
+    "expectancy": 169.0,
+    "pct_per_month_on_capital": 1.73,
+    "max_dd": 67579.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 46.4,
+    "net_pnl": -96214.0,
+    "expectancy": -770.0,
+    "pct_per_month_on_capital": -8.02,
+    "max_dd": 102548.0
+   },
+   "Y2025_val": {
+    "trades": 248,
+    "win_rate": 42.3,
+    "net_pnl": -210313.0,
+    "expectancy": -848.0,
+    "pct_per_month_on_capital": -8.76,
+    "max_dd": 218333.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 51.2,
+    "net_pnl": 20804.0,
+    "expectancy": 169.0,
+    "pct_per_month_on_capital": 1.73,
+    "max_dd": 67579.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 46.4,
+    "net_pnl": -96214.0,
+    "expectancy": -770.0,
+    "pct_per_month_on_capital": -8.02,
+    "max_dd": 102548.0
+   },
+   "Y2025_val": {
+    "trades": 249,
+    "win_rate": 42.2,
+    "net_pnl": -211400.0,
+    "expectancy": -849.0,
+    "pct_per_month_on_capital": -8.81,
+    "max_dd": 219419.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 35.6,
+    "net_pnl": 7210.0,
+    "expectancy": 61.0,
+    "pct_per_month_on_capital": 0.6,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 247,
+    "win_rate": 32.4,
+    "net_pnl": -325899.0,
+    "expectancy": -1319.0,
+    "pct_per_month_on_capital": -13.58,
+    "max_dd": 345326.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 36.6,
+    "net_pnl": 4779.0,
+    "expectancy": 39.0,
+    "pct_per_month_on_capital": 0.4,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 248,
+    "win_rate": 31.9,
+    "net_pnl": -337056.0,
+    "expectancy": -1359.0,
+    "pct_per_month_on_capital": -14.04,
+    "max_dd": 357570.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 36.6,
+    "net_pnl": 4779.0,
+    "expectancy": 39.0,
+    "pct_per_month_on_capital": 0.4,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 249,
+    "win_rate": 31.7,
+    "net_pnl": -338143.0,
+    "expectancy": -1358.0,
+    "pct_per_month_on_capital": -14.09,
+    "max_dd": 357570.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 35.7,
+    "net_pnl": 968.0,
+    "expectancy": 8.0,
+    "pct_per_month_on_capital": 0.08,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 243,
+    "win_rate": 32.1,
+    "net_pnl": -323045.0,
+    "expectancy": -1329.0,
+    "pct_per_month_on_capital": -13.46,
+    "max_dd": 343558.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 40.7,
+    "net_pnl": -2108.0,
+    "expectancy": -17.0,
+    "pct_per_month_on_capital": -0.18,
+    "max_dd": 122394.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 40.7,
+    "net_pnl": -2108.0,
+    "expectancy": -17.0,
+    "pct_per_month_on_capital": -0.18,
+    "max_dd": 122394.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 54.5,
+    "net_pnl": -2696.0,
+    "expectancy": -22.0,
+    "pct_per_month_on_capital": -0.22,
+    "max_dd": 81915.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 54.5,
+    "net_pnl": -2696.0,
+    "expectancy": -22.0,
+    "pct_per_month_on_capital": -0.22,
+    "max_dd": 81915.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.4,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 39.0,
+    "net_pnl": -29843.0,
+    "expectancy": -253.0,
+    "pct_per_month_on_capital": -2.49,
+    "max_dd": 122394.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.4,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 39.1,
+    "net_pnl": -32557.0,
+    "expectancy": -283.0,
+    "pct_per_month_on_capital": -2.71,
+    "max_dd": 122394.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 47.0,
+    "net_pnl": -36818.0,
+    "expectancy": -320.0,
+    "pct_per_month_on_capital": -3.07,
+    "max_dd": 70617.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 46.6,
+    "net_pnl": -37956.0,
+    "expectancy": -322.0,
+    "pct_per_month_on_capital": -3.16,
+    "max_dd": 71754.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 37.3,
+    "net_pnl": -43024.0,
+    "expectancy": -365.0,
+    "pct_per_month_on_capital": -3.59,
+    "max_dd": 109213.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 93,
+    "win_rate": 39.8,
+    "net_pnl": -44836.0,
+    "expectancy": -482.0,
+    "pct_per_month_on_capital": -3.74,
+    "max_dd": 93603.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 37.4,
+    "net_pnl": -46714.0,
+    "expectancy": -406.0,
+    "pct_per_month_on_capital": -3.89,
+    "max_dd": 109213.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 2,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 100,
+    "win_rate": 37.0,
+    "net_pnl": -49233.0,
+    "expectancy": -492.0,
+    "pct_per_month_on_capital": -4.1,
+    "max_dd": 86190.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 2,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 103,
+    "win_rate": 36.9,
+    "net_pnl": -49323.0,
+    "expectancy": -479.0,
+    "pct_per_month_on_capital": -4.11,
+    "max_dd": 92852.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 2,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 100,
+    "win_rate": 35.0,
+    "net_pnl": -51791.0,
+    "expectancy": -518.0,
+    "pct_per_month_on_capital": -4.32,
+    "max_dd": 104568.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 95,
+    "win_rate": 38.9,
+    "net_pnl": -51896.0,
+    "expectancy": -546.0,
+    "pct_per_month_on_capital": -4.32,
+    "max_dd": 98765.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 38.2,
+    "net_pnl": -54934.0,
+    "expectancy": -447.0,
+    "pct_per_month_on_capital": -4.58,
+    "max_dd": 114100.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 38.2,
+    "net_pnl": -54934.0,
+    "expectancy": -447.0,
+    "pct_per_month_on_capital": -4.58,
+    "max_dd": 114100.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 3,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 107,
+    "win_rate": 37.4,
+    "net_pnl": -56401.0,
+    "expectancy": -527.0,
+    "pct_per_month_on_capital": -4.7,
+    "max_dd": 90150.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 3,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 110,
+    "win_rate": 37.3,
+    "net_pnl": -56491.0,
+    "expectancy": -514.0,
+    "pct_per_month_on_capital": -4.71,
+    "max_dd": 96812.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 3,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 156,
+    "win_rate": 38.5,
+    "net_pnl": -58907.0,
+    "expectancy": -378.0,
+    "pct_per_month_on_capital": -4.91,
+    "max_dd": 92785.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.4,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 51.3,
+    "net_pnl": -59484.0,
+    "expectancy": -517.0,
+    "pct_per_month_on_capital": -4.96,
+    "max_dd": 81915.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 3,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 162,
+    "win_rate": 40.1,
+    "net_pnl": -59926.0,
+    "expectancy": -370.0,
+    "pct_per_month_on_capital": -4.99,
+    "max_dd": 115440.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 93,
+    "win_rate": 45.2,
+    "net_pnl": -60513.0,
+    "expectancy": -651.0,
+    "pct_per_month_on_capital": -5.04,
+    "max_dd": 83062.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 2,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 134,
+    "win_rate": 38.1,
+    "net_pnl": -60878.0,
+    "expectancy": -454.0,
+    "pct_per_month_on_capital": -5.07,
+    "max_dd": 111024.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 95,
+    "win_rate": 45.3,
+    "net_pnl": -62070.0,
+    "expectancy": -653.0,
+    "pct_per_month_on_capital": -5.17,
+    "max_dd": 82464.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.4,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 50.8,
+    "net_pnl": -64150.0,
+    "expectancy": -544.0,
+    "pct_per_month_on_capital": -5.35,
+    "max_dd": 81915.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.5,
+    "per_day": 2,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 137,
+    "win_rate": 39.4,
+    "net_pnl": -65574.0,
+    "expectancy": -479.0,
+    "pct_per_month_on_capital": -5.46,
+    "max_dd": 127544.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 93,
+    "win_rate": 37.6,
+    "net_pnl": -65622.0,
+    "expectancy": -706.0,
+    "pct_per_month_on_capital": -5.47,
+    "max_dd": 123572.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 2,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 103,
+    "win_rate": 34.0,
+    "net_pnl": -66173.0,
+    "expectancy": -642.0,
+    "pct_per_month_on_capital": -5.51,
+    "max_dd": 111230.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 70,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 3,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 107,
+    "win_rate": 34.6,
+    "net_pnl": -66201.0,
+    "expectancy": -619.0,
+    "pct_per_month_on_capital": -5.52,
+    "max_dd": 106512.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 95,
+    "win_rate": 36.8,
+    "net_pnl": -68698.0,
+    "expectancy": -723.0,
+    "pct_per_month_on_capital": -5.72,
+    "max_dd": 126648.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 60,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 3,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 159,
+    "win_rate": 37.7,
+    "net_pnl": -69358.0,
+    "expectancy": -436.0,
+    "pct_per_month_on_capital": -5.78,
+    "max_dd": 102539.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 42.3,
+    "net_pnl": -69989.0,
+    "expectancy": -569.0,
+    "pct_per_month_on_capital": -5.83,
+    "max_dd": 131746.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.4,
+    "tp": 0.5,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 42.3,
+    "net_pnl": -69989.0,
+    "expectancy": -569.0,
+    "pct_per_month_on_capital": -5.83,
+    "max_dd": 131746.0
+   }
+  }
+ ],
+ "validated_top10": [
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 51.2,
+    "net_pnl": 20804.0,
+    "expectancy": 169.0,
+    "pct_per_month_on_capital": 1.73,
+    "max_dd": 67579.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 46.4,
+    "net_pnl": -96214.0,
+    "expectancy": -770.0,
+    "pct_per_month_on_capital": -8.02,
+    "max_dd": 102548.0
+   },
+   "Y2025_val": {
+    "trades": 248,
+    "win_rate": 42.3,
+    "net_pnl": -210313.0,
+    "expectancy": -848.0,
+    "pct_per_month_on_capital": -8.76,
+    "max_dd": 218333.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.3,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 51.2,
+    "net_pnl": 20804.0,
+    "expectancy": 169.0,
+    "pct_per_month_on_capital": 1.73,
+    "max_dd": 67579.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 46.4,
+    "net_pnl": -96214.0,
+    "expectancy": -770.0,
+    "pct_per_month_on_capital": -8.02,
+    "max_dd": 102548.0
+   },
+   "Y2025_val": {
+    "trades": 249,
+    "win_rate": 42.2,
+    "net_pnl": -211400.0,
+    "expectancy": -849.0,
+    "pct_per_month_on_capital": -8.81,
+    "max_dd": 219419.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 118,
+    "win_rate": 35.6,
+    "net_pnl": 7210.0,
+    "expectancy": 61.0,
+    "pct_per_month_on_capital": 0.6,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 247,
+    "win_rate": 32.4,
+    "net_pnl": -325899.0,
+    "expectancy": -1319.0,
+    "pct_per_month_on_capital": -13.58,
+    "max_dd": 345326.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 36.6,
+    "net_pnl": 4779.0,
+    "expectancy": 39.0,
+    "pct_per_month_on_capital": 0.4,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 248,
+    "win_rate": 31.9,
+    "net_pnl": -337056.0,
+    "expectancy": -1359.0,
+    "pct_per_month_on_capital": -14.04,
+    "max_dd": 357570.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 35,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-14:30"
+   },
+   "H1_train": {
+    "trades": 123,
+    "win_rate": 36.6,
+    "net_pnl": 4779.0,
+    "expectancy": 39.0,
+    "pct_per_month_on_capital": 0.4,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 249,
+    "win_rate": 31.7,
+    "net_pnl": -338143.0,
+    "expectancy": -1358.0,
+    "pct_per_month_on_capital": -14.09,
+    "max_dd": 357570.0
+   }
+  },
+  {
+   "cfg": {
+    "conf": 50,
+    "sl": 0.25,
+    "tp": 0.7,
+    "per_day": 1,
+    "window": "09:30-11:30"
+   },
+   "H1_train": {
+    "trades": 115,
+    "win_rate": 35.7,
+    "net_pnl": 968.0,
+    "expectancy": 8.0,
+    "pct_per_month_on_capital": 0.08,
+    "max_dd": 97728.0
+   },
+   "H2_val": {
+    "trades": 125,
+    "win_rate": 38.4,
+    "net_pnl": -80161.0,
+    "expectancy": -641.0,
+    "pct_per_month_on_capital": -6.68,
+    "max_dd": 128168.0
+   },
+   "Y2025_val": {
+    "trades": 243,
+    "win_rate": 32.1,
+    "net_pnl": -323045.0,
+    "expectancy": -1329.0,
+    "pct_per_month_on_capital": -13.46,
+    "max_dd": 343558.0
+   }
+  }
+ ]
+}
