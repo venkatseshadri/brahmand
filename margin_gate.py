@@ -20,9 +20,29 @@ log = logging.getLogger("brahmand.margin_gate")
 IST = timezone(timedelta(hours=5, minutes=30))
 MARGIN_STALE_MINUTES = 5
 
-_ANTARIKSH_ROOT = Path(__file__).resolve().parent.parent.parent / "antariksh"
+_ANTARIKSH_ROOT = Path(__file__).resolve().parent.parent / "antariksh"
 _LIMITS_FILE = _ANTARIKSH_ROOT / "data" / "broker_limits.json"
 _MATRIX_FILE = Path(__file__).resolve().parent / "data" / "margin_matrix.json"
+
+
+def _parse_ts(ts_str: str) -> Optional[datetime]:
+    try:
+        dt = datetime.fromisoformat(ts_str)
+    except (ValueError, TypeError):
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=IST)
+    return dt
+
+
+def _limits_age_minutes(limits: dict) -> Optional[float]:
+    try:
+        limit_dt = _parse_ts(limits.get("timestamp", ""))
+        if limit_dt is None:
+            return None
+        return (datetime.now(IST) - limit_dt).total_seconds() / 60
+    except Exception:
+        return None
 
 
 def _load_broker_limits() -> Optional[dict]:
@@ -74,23 +94,29 @@ def check_entry_margin(
     legs: list,
     leg_margin: Optional[float] = None,
 ) -> Tuple[bool, str]:
-    """Pre-entry margin gate. Returns (ok, reason). FAIL-CLOSED on stale/missing data."""
+    """Pre-entry margin gate. Returns (ok, reason). FAIL-CLOSED: blocks on missing data."""
     limits = _load_broker_limits()
     if not limits:
         return False, "MARGIN_DATA_MISSING: broker_limits.json not found"
 
-    ts = limits.get("timestamp", "")
-    try:
-        limit_dt = datetime.fromisoformat(ts)
-        age = (datetime.now(IST) - limit_dt).total_seconds() / 60
-    except (ValueError, TypeError):
+    age = _limits_age_minutes(limits)
+    if age is None:
         return False, "MARGIN_DATA_STALE: unparseable timestamp"
 
     if age > MARGIN_STALE_MINUTES:
-        return (
-            False,
-            f"MARGIN_DATA_STALE: {age:.0f}m old (limit {MARGIN_STALE_MINUTES}m)",
-        )
+        log.info(f"Margin cache stale ({age:.0f}m) — attempting live refresh")
+        fresh = refresh_margin_after_fill()
+        if fresh:
+            limits = _load_broker_limits()
+            if limits:
+                age = _limits_age_minutes(limits)
+                if age is not None and age <= MARGIN_STALE_MINUTES:
+                    log.info(f"Margin live-refreshed OK (age {age:.0f}m)")
+        if not limits or age is None or age > MARGIN_STALE_MINUTES:
+            return False, (
+                f"MARGIN_DATA_STALE: {age:.0f}m old "
+                f"(limit {MARGIN_STALE_MINUTES}m, live refresh failed)"
+            )
 
     free_margin = limits.get("free_margin", 0)
     if not free_margin or free_margin <= 0:
