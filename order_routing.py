@@ -164,6 +164,16 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
             "price", 0
         )  # Capture execution price for P&L calc
 
+    # ── T17: Post-fill margin refresh (broker is source of truth) ──────
+    try:
+        from margin_gate import refresh_margin_after_fill
+
+        refresh_margin_after_fill()
+    except Exception as e:
+        import logging
+
+        logging.getLogger(__name__).warning(f"Post-fill margin refresh failed: {e}")
+
     # STEP 2: Build SL/TP dicts for duckdb
     sl = {}
     tp = {}
@@ -609,8 +619,10 @@ def update_trade_in_duckdb(
         # close was flipping archived trades back to SL_TP_PLACED, leaving them in
         # trade_history AND active (status != CLOSED) forever — jamming the
         # single-position entry guard every session. The guard makes that impossible.
-        query = (f"UPDATE active_trades SET {', '.join(updates)} "
-                 f"WHERE trade_id = ? AND status != 'CLOSED'")
+        query = (
+            f"UPDATE active_trades SET {', '.join(updates)} "
+            f"WHERE trade_id = ? AND status != 'CLOSED'"
+        )
         with _connect() as con:
             con.execute(query, params)
             con.commit()  # don't rely on autocommit (close_trade commits explicitly)

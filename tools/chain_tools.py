@@ -336,6 +336,16 @@ class BuildAndExecuteTradeTool(BaseTool):
             "status": "OPEN",
         }
 
+        # ── T17: Pre-entry margin gate (fail-closed: stale/missing = NO entry) ─
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from margin_gate import check_entry_margin
+
+        opt_type = "CE" if "CALL" in strategy_type else "PE"
+        margin_ok, margin_reason = check_entry_margin("NIFTY", opt_type, legs)
+        if not margin_ok:
+            return json.dumps({"error": f"margin gate: {margin_reason}"})
+        log.info(f"Margin gate: {margin_reason}")
+
         for leg in legs:
             if leg["action"] == "SELL":
                 save_execution_report(

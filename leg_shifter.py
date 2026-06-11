@@ -295,14 +295,15 @@ def evaluate_sell_shift(trade: dict, available_margin: float) -> Optional[Dict]:
         con.close()
 
 
-def run_leg_shifter(trade: dict, available_margin: float) -> Dict:
+def run_leg_shifter(trade: dict, available_margin: float = 0) -> Dict:
     """
     Main entry point: Evaluate both shifters sequentially.
     Run HEDGE_SHIFTER first (always safe), then SELL_SHIFTER (needs margin check).
 
     Args:
         trade: Active trade dict
-        available_margin: Available margin from broker get_limits() API
+        available_margin: Available margin from broker get_limits() API.
+                          If 0, auto-loads from cached broker_limits.json.
 
     Returns:
         {
@@ -311,6 +312,20 @@ def run_leg_shifter(trade: dict, available_margin: float) -> Dict:
             "timestamp": iso_timestamp
         }
     """
+    if available_margin <= 0:
+        try:
+            limits = json.loads(
+                Path("/home/trading_ceo/antariksh/data/broker_limits.json").read_text()
+            )
+            available_margin = limits.get("free_margin", 0)
+            logging.getLogger(__name__).info(
+                f"Leg-shifter margin auto-loaded from cache: {available_margin:,.0f}"
+            )
+        except Exception as e:
+            logging.getLogger(__name__).warning(
+                f"Leg-shifter margin load failed: {e} — sell shifts blocked"
+            )
+
     hedge_shift = evaluate_hedge_shift(trade)
     sell_shift = evaluate_sell_shift(trade, available_margin)
 
