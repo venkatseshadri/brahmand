@@ -303,23 +303,22 @@ def check_mcx() -> Tuple[bool, list]:
 
     # Expiry sentinel: WARN if any futures contract expires ≤ 3 days (T16)
     try:
-        from feed import _INSTRUMENT_EXPIRIES
-
-        for name, expiry in _INSTRUMENT_EXPIRIES.items():
-            if isinstance(expiry, date):
+        resolved_path = Path("/home/trading_ceo/antariksh/data/resolved_contracts.json")
+        if resolved_path.exists():
+            contracts = json.loads(resolved_path.read_text())
+            for name, info in contracts.items():
+                expiry_str = info.get("expiry", "")
+                try:
+                    expiry = datetime.strptime(expiry_str, "%Y-%m-%d").date()
+                except ValueError:
+                    continue
                 days = (expiry - datetime.now().date()).days
-            else:
-                days = (
-                    (expiry - datetime.now().date()).days
-                    if isinstance(expiry, date)
-                    else 999
-                )
-            if days <= 3:
-                warnings.append(
-                    f"EXPIRY [{name}]: contract expires {expiry} ({days}d) — "
-                    f"needs successor resolvable in master file"
-                )
-    except ImportError:
+                if days <= 3:
+                    warnings.append(
+                        f"EXPIRY [{name}]: contract {info.get('tsym', '?')} "
+                        f"expires {expiry_str} ({days}d) — successor needed"
+                    )
+    except (OSError, ValueError, json.JSONDecodeError):
         pass
 
     return len(warnings) == 0, warnings
