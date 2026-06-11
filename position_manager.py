@@ -23,6 +23,10 @@ from dotenv import load_dotenv
 
 load_dotenv(str(Path(__file__).parent / ".env"))
 
+from logger import get_logger, log_exception
+
+_pm_log = get_logger("position_manager")
+
 # ── Defaults (tune from observed data over days) ──
 DECAY_PCT = 0.375  # 37.5% theta decay → roll trigger
 HEDGE_GAP = 150  # pts from sold strike → tighten hedge
@@ -121,8 +125,8 @@ def _pattern_risk_adjust(trade: dict) -> None:
         trade["tsl_lock_ratio"] = new_tsl
         trade["pattern_confidence"] = conf
 
-    except Exception:
-        pass  # Never block position manager for pattern errors
+    except Exception as e:
+        _pm_log.debug("Pattern risk adjust skipped: %s", e)
 
 
 def run(trade: dict, entry_scores: dict = None) -> list[dict]:
@@ -455,8 +459,10 @@ def _square_off(legs: list, trade_id: str, reason: str) -> float:
                     trade_id=trade_id,
                     reason=reason,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                _pm_log.warning(
+                    "Order placement failed for %s: %s", leg.get("tsym", "?"), e
+                )
     return pnl
 
 
@@ -477,10 +483,7 @@ def _close_in_db(trade_id: str, reason: str, trade: dict):
             final_pnl=trade.get("cumulative_pnl"),
         )
     except Exception as e:
-        # Do NOT swallow silently: a failed DuckDB close while the JSON close
-        # below still runs recreates the JSON<->DuckDB split-brain this function
-        # exists to prevent. Surface it in the position-manager log.
-        print(f"[{now_str()}] PM: ⚠️ DuckDB close_trade failed for {trade_id}: {e}")
+        log_exception(_pm_log, e, f"DuckDB close_trade failed for {trade_id}")
 
     # Write-through to order_ledger.json — the store entry_setup's guard reads.
     try:
@@ -494,9 +497,36 @@ def _close_in_db(trade_id: str, reason: str, trade: dict):
             jt["exit_reason"] = code
             jt["exit_time"] = datetime.now().isoformat()
             _save_ledger(led)
+
+            # DAMBUILDER T5 — persist outcome for research
+            try:
+                from antariksh.research.outcome_tables import (
+                    write_trade_outcome as _wto,
+                )
+
+                _wto(
+                    os.environ.get(
+                        "CAPTURE_SQLITE",
+                        "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite",
+                    ),
+                    {
+                        "trade_id": trade_id,
+                        "entry_time": jt.get("entry_time"),
+                        "exit_time": jt.get("exit_time"),
+                        "strategy": jt.get("strategy"),
+                        "wing_width": jt.get("wing_width", trade.get("wing_width")),
+                        "entry_pnl": jt.get("entry_pnl"),
+                        "final_pnl": trade.get("cumulative_pnl"),
+                        "duration_mins": jt.get("duration_mins"),
+                        "close_reason": code,
+                        "legs": jt.get("legs", []),
+                    },
+                )
+            except Exception:
+                _pm_log.debug("trade_outcomes write failed for %s", trade_id)
     except Exception as e:
-        print(
-            f"[{now_str()}] PM: ⚠️ JSON ledger close write-through failed for {trade_id}: {e}"
+        log_exception(
+            _pm_log, e, f"JSON ledger close write-through failed for {trade_id}"
         )
 
 
@@ -530,6 +560,12 @@ def execute_action(action: dict, trade: dict) -> dict:
         return trade
 
     if action["type"] == CLOSE_ALL:
+        # Mark every leg to its live LTP first: _square_off books P&L from
+        # leg['ltp'] (else the entry fill). EOD/floor CLOSE_ALL reaches here
+        # straight from run_bridge with unmarked legs, so without this it booked
+        # a phantom ₹0 on a deep-underwater position (the SL/TP path already
+        # marks via _close_side).
+        _mark_legs_to_ltp(trade.get("legs", []))
         trade["cumulative_pnl"] += _square_off(
             trade.get("legs", []), trade_id, action.get("reason", "CLOSE_ALL")
         )
@@ -793,9 +829,11 @@ def _ensure_sl_tp_orders(trade: dict, trade_id: str):
             legs_for_orders.append(leg2)
         res = place_sl_tp_orders(trade_id, legs_for_orders)
         if res.get("total_orders"):
-            print(f"  🛟 Fallback SL/TP placed (LLM down): {res['total_orders']}")
+            _pm_log.info(
+                "Fallback SL/TP placed (LLM down): %s orders", res["total_orders"]
+            )
     except Exception as e:
-        print(f"  ⚠️  Fallback SL/TP placement failed: {e}")
+        _pm_log.error("Fallback SL/TP placement failed: %s", e)
 
 
 def _check_sl_tp(trade: dict) -> dict:
@@ -918,11 +956,17 @@ def _discretionary_actions(trade: dict, trade_id: str, mtm: float) -> list:
         assessment = load_assessment(trade_id, signature=sig)
         if assessment is not None:
             age = cache_age_sec(trade_id) or 0
-            print(f"  🧠 Research cache HIT ({age:.0f}s): "
-                  f"{assessment.get('recommendation', '?')} "
-                  f"— {str(assessment.get('reason', ''))[:80]}")
+            _pm_log.info(
+                "Research cache HIT (%ds): %s — %s",
+                int(age),
+                assessment.get("recommendation", "?"),
+                str(assessment.get("reason", ""))[:80],
+            )
             return assessment.get("actions", []) or []
-        print("  Research cache MISS/stale → live deterministic P1-P7")
+        _pm_log.info("Research cache MISS/stale → live deterministic P1-P7")
+        return run(trade)
+    except Exception as e:
+        _pm_log.warning("Research path failed: %s → live deterministic P1-P7", e)
         return run(trade)
     except Exception as e:
         print(f"  ⚠️  Research path failed: {e} → live deterministic P1-P7")
@@ -949,7 +993,7 @@ def run_bridge():
 
         trades = ledger_get_active()
     except Exception as e:
-        print(f"[{now_str()}] POSITION MANAGER: Ledger read failed → {e}")
+        _pm_log.error("Ledger read failed: %s", e)
         return
 
     if not trades:
@@ -957,9 +1001,7 @@ def run_bridge():
 
     for trade in trades:
         trade_id = trade.get("trade_id", "?")
-        print(
-            f"[{now_str()}] PM: Evaluating trade {trade_id} ({trade.get('strategy', '?')})"
-        )
+        _pm_log.info("Evaluating trade %s (%s)", trade_id, trade.get("strategy", "?"))
 
         # ── Deterministic EOD square-off (hard rule, NOT LLM discretion) ──
         # Index positions must be flat by the cash close. This is the operational
@@ -969,7 +1011,7 @@ def run_bridge():
         # minute). MARKET_CLOSE=15:30 is correct for the only traded indices
         # (NIFTY/SENSEX); make it per-index if MCX trading is ever added.
         if now_str() >= MARKET_CLOSE:
-            print(f"  🕒 EOD {MARKET_CLOSE} → square-off CLOSE_ALL")
+            _pm_log.warning("EOD %s → square-off CLOSE_ALL", MARKET_CLOSE)
             execute_action(
                 {"type": CLOSE_ALL, "reason": f"Market close ({MARKET_CLOSE})"}, trade
             )
@@ -980,9 +1022,12 @@ def run_bridge():
         trade["last_mtm"] = sl_result.get("mtm", 0)
         if sl_result["action"] in ("SL_HIT", "TP_HIT"):
             leg = sl_result["leg"]
-            print(
-                f"  🔴 {sl_result['action']}: {leg['tsym']} "
-                f"ltp={sl_result['ltp']:.2f} mtm={sl_result['mtm']:.2f}"
+            _pm_log.warning(
+                "%s: %s ltp=%.2f mtm=%.2f",
+                sl_result["action"],
+                leg["tsym"],
+                sl_result["ltp"],
+                sl_result["mtm"],
             )
             if sl_result["action"] == "SL_HIT":
                 execute_action(
@@ -996,7 +1041,7 @@ def run_bridge():
                 _close_side(trade, leg["type"])
             continue  # Skip LLM — SL/TP is arithmetic
 
-        print(f"  📊 MTM = {sl_result['mtm']:.2f}  (ACTIVE)")
+        _pm_log.info("MTM = %.2f (ACTIVE)", sl_result["mtm"])
 
         # ── PROTECTIVE: cumulative P&L floor (P6), live every cycle, NEVER cached ──
         # SL/TP (P4/P5) and EOD (P7) are already handled above; the floor is the
@@ -1004,9 +1049,14 @@ def run_bridge():
         # discretionary action — same formula as run()'s P6 (realized + unrealized).
         cumulative = trade.get("cumulative_pnl", 0) + sl_result["mtm"]
         if cumulative <= FLOOR:
-            print(f"  🔴 P&L floor: cumulative ₹{cumulative:.0f} ≤ ₹{FLOOR} → CLOSE ALL")
+            _pm_log.warning(
+                "P&L floor hit: cumulative ₹%.0f ≤ ₹%d → CLOSE ALL", cumulative, FLOOR
+            )
             execute_action(
-                {"type": CLOSE_ALL, "reason": f"Cumulative P&L ₹{cumulative:.0f} ≤ floor ₹{FLOOR}"},
+                {
+                    "type": CLOSE_ALL,
+                    "reason": f"Cumulative P&L ₹{cumulative:.0f} ≤ floor ₹{FLOOR}",
+                },
                 trade,
             )
             continue
@@ -1036,11 +1086,11 @@ def run_bridge():
                     action_taken=action.get("type", "monitor"),
                     note=json.dumps(action, default=str)[:500],
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                _pm_log.debug("log_monitor_action failed for %s: %s", trade_id, e)
 
         if actions:
-            print(f"  🔄 {len(actions)} actions executed")
+            _pm_log.info("%d actions executed", len(actions))
             # Persist modified trade (legs, SL/TP) to DuckDB
             try:
                 update_active_trade(
@@ -1050,7 +1100,7 @@ def run_bridge():
                     tp=trade.get("tp"),
                 )
             except Exception as e:
-                print(f"  ⚠️  Failed to persist trade: {e}")
+                _pm_log.error("Failed to persist trade %s: %s", trade_id, e)
 
 
 if __name__ == "__main__":
@@ -1080,10 +1130,10 @@ if __name__ == "__main__":
         t = state.get("active_trade")
         if t:
             actions = run(t)
-            print(f"\nPosition Manager ({len(actions)} actions):")
+            _pm_log.info("Position Manager (%d actions):", len(actions))
             for a in actions:
-                print(f"  P{a['priority']}: {a['type']:12s} — {a['reason']}")
+                _pm_log.info("  P%d: %-12s — %s", a["priority"], a["type"], a["reason"])
         else:
-            print("No active trade")
+            _pm_log.info("No active trade")
     else:
         run_bridge()  # Default: bridge mode

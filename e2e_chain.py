@@ -38,6 +38,40 @@ from verification import (
 # ── UNICORN Integration ───────────────────────────────────────────────
 # USE_UNICORN=True  → Entry gate runs adversarial debate pipeline
 # USE_UNICORN=False → Entry gate runs legacy CrewAI deterministic tools
+
+
+def _dambuilder_trace(
+    gate: str, entry_decision: dict, regime: dict, outcome: str, spot: float
+):
+    try:
+        from datetime import datetime, timezone, timedelta
+
+        ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+        db_path = os.environ.get(
+            "CAPTURE_SQLITE",
+            "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite",
+        )
+        row = {
+            "timestamp": ist.isoformat(),
+            "index_name": "NIFTY",
+            "decision_id": f"{ist.strftime('%Y%m%dT%H%M%S')}",
+            "gate_type": gate,
+            "decision_source": entry_decision.get("source", "unknown"),
+            "signal": entry_decision.get("signal"),
+            "go": entry_decision.get("go", False),
+            "confidence": entry_decision.get("confidence"),
+            "regime": regime.get("regime"),
+            "regime_recommendation": regime.get("recommendation"),
+            "vix": regime.get("vix"),
+            "spot": spot,
+        }
+        from antariksh.research.outcome_tables import write_decision_trace
+
+        write_decision_trace(db_path, row)
+    except Exception:
+        pass
+
+
 USE_UNICORN = True
 _UNICORN_RESEARCH_LOCK = Path(__file__).parent / "data" / ".unicorn_research.lock"
 
@@ -566,14 +600,20 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                     parsed_outputs[i] = parsed
                     agent_log(_agent, f"{name}_Agent", parsed)
                     if not parsed:
-                        _err(f"{name} Agent extracted empty: "
-                             f"{str(result.tasks_output[i])[:200]}")
+                        _err(
+                            f"{name} Agent extracted empty: "
+                            f"{str(result.tasks_output[i])[:200]}"
+                        )
                 except Exception as e:
-                    _err(f"{name} Agent parse failed: {e} :: "
-                         f"{str(result.tasks_output[i])[:200]}")
+                    _err(
+                        f"{name} Agent parse failed: {e} :: "
+                        f"{str(result.tasks_output[i])[:200]}"
+                    )
     else:
-        _err(f"Strategy crew returned no tasks_output: type={type(result).__name__} "
-             f"repr={repr(result)[:300]}")
+        _err(
+            f"Strategy crew returned no tasks_output: type={type(result).__name__} "
+            f"repr={repr(result)[:300]}"
+        )
 
     strategy = parsed_outputs[0]
     contracts_data = parsed_outputs[1]
@@ -651,6 +691,23 @@ def run_full_chain(
                 regime_recommendation=rg.get("recommendation"),
                 vix=rg.get("vix"),
                 **extra,
+            )
+
+            # DAMBUILDER T5 — persist decision trace to capture SQLite
+            _dambuilder_trace(
+                gate="NOT_UP",
+                entry_decision=ed,
+                regime=rg,
+                outcome=outcome,
+                spot=spot,
+            )
+            not_down_ed = (crew_result or {}).get("not_down_decision", {})
+            _dambuilder_trace(
+                gate="NOT_DOWN",
+                entry_decision=not_down_ed if isinstance(not_down_ed, dict) else {},
+                regime=rg,
+                outcome=outcome,
+                spot=spot,
             )
         except Exception:
             pass
