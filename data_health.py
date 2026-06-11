@@ -152,7 +152,8 @@ def check_dambuilder() -> Tuple[bool, list]:
 
 def check_data_freshness() -> Tuple[bool, list]:
     """Check MAX(timestamp) of market_data + market_data_enriched per index.
-    WARN if > 5 min old during market hours (heartbeat files can lie)."""
+    WARN if > 5 min old during market hours (heartbeat files can lie).
+    WARN if table is empty during market hours (capture stopped entirely)."""
     warnings = []
     if not _is_market_hours():
         return True, warnings
@@ -173,16 +174,20 @@ def check_data_freshness() -> Tuple[bool, list]:
                     f"SELECT MAX(timestamp) FROM {tbl} WHERE instrument=?",
                     (inst,),
                 ).fetchone()
-                if row and row[0]:
-                    try:
-                        ts = datetime.fromisoformat(row[0])
-                        age = (datetime.now() - ts).total_seconds() / 60
-                        if age > 5:
-                            warnings.append(
-                                f"DATA [{inst}]: {label} stale — last bar {age:.0f} min ago"
-                            )
-                    except (ValueError, OSError):
-                        pass
+                if not row or not row[0]:
+                    warnings.append(
+                        f"DATA [{inst}]: {label} table EMPTY — capture may have stopped"
+                    )
+                    continue
+                try:
+                    ts = datetime.fromisoformat(row[0])
+                    age = (datetime.now() - ts).total_seconds() / 60
+                    if age > 5:
+                        warnings.append(
+                            f"DATA [{inst}]: {label} stale — last bar {age:.0f} min ago"
+                        )
+                except (ValueError, OSError):
+                    pass
             conn.close()
         except Exception:
             pass
