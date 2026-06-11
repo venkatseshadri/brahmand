@@ -12,7 +12,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Tuple
 
@@ -300,6 +300,27 @@ def check_mcx() -> Tuple[bool, list]:
         conn.close()
     except Exception as e:
         warnings.append(f"MCX SQLite check failed: {e}")
+
+    # Expiry sentinel: WARN if any futures contract expires ≤ 3 days (T16)
+    try:
+        from feed import _INSTRUMENT_EXPIRIES
+
+        for name, expiry in _INSTRUMENT_EXPIRIES.items():
+            if isinstance(expiry, date):
+                days = (expiry - datetime.now().date()).days
+            else:
+                days = (
+                    (expiry - datetime.now().date()).days
+                    if isinstance(expiry, date)
+                    else 999
+                )
+            if days <= 3:
+                warnings.append(
+                    f"EXPIRY [{name}]: contract expires {expiry} ({days}d) — "
+                    f"needs successor resolvable in master file"
+                )
+    except ImportError:
+        pass
 
     return len(warnings) == 0, warnings
 
