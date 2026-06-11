@@ -39,6 +39,8 @@ def _heartbeat_age(prefix: str, instrument: str) -> float | None:
         ts_str = path.read_text().strip()
         if not ts_str:
             return None
+        # Strip timezone offset if present (feed heartbeats may have +05:30)
+        ts_str = ts_str.replace("+05:30", "").rstrip("Z")
         dt = datetime.fromisoformat(ts_str)
         return (datetime.now() - dt).total_seconds() / 60
     except (OSError, ValueError):
@@ -148,6 +150,45 @@ def check_dambuilder() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_data_freshness() -> Tuple[bool, list]:
+    """Check MAX(timestamp) of market_data + market_data_enriched per index.
+    WARN if > 5 min old during market hours (heartbeat files can lie)."""
+    warnings = []
+    if not _is_market_hours():
+        return True, warnings
+    import sqlite3
+    from datetime import datetime
+
+    for inst in ("NIFTY", "SENSEX"):
+        db = (
+            f"/home/trading_ceo/python-trader/varaha/data/capture_{inst.lower()}.sqlite"
+        )
+        try:
+            conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+            for tbl, label in [
+                ("market_data", "feed"),
+                ("market_data_enriched", "enricher"),
+            ]:
+                row = conn.execute(
+                    f"SELECT MAX(timestamp) FROM {tbl} WHERE instrument=?",
+                    (inst,),
+                ).fetchone()
+                if row and row[0]:
+                    try:
+                        ts = datetime.fromisoformat(row[0])
+                        age = (datetime.now() - ts).total_seconds() / 60
+                        if age > 5:
+                            warnings.append(
+                                f"DATA [{inst}]: {label} stale — last bar {age:.0f} min ago"
+                            )
+                    except (ValueError, OSError):
+                        pass
+            conn.close()
+        except Exception:
+            pass
+    return len(warnings) == 0, warnings
+
+
 def check_llm() -> Tuple[bool, list]:
     """LLM availability — scan today's kickoff/chain logs."""
     warnings = []
@@ -190,6 +231,7 @@ def run_all() -> Tuple[bool, list]:
         ("Penguin", check_penguin),
         ("PORCUPINE", check_porcupine),
         ("DAMBUILDER", check_dambuilder),
+        ("DATA_FRESH", check_data_freshness),
         ("Redis", check_redis),
     ]:
         ok, warnings = fn()
