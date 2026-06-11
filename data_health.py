@@ -303,7 +303,9 @@ def check_mcx() -> Tuple[bool, list]:
 
     # Expiry sentinel: WARN if any futures contract expires ≤ 3 days (T16)
     try:
-        resolved_path = Path("/home/trading_ceo/antariksh/data/resolved_contracts.json")
+        resolved_path = Path(
+            "/home/trading_ceo/antariksh/data/live/resolved_contracts.json"
+        )
         if resolved_path.exists():
             contracts = json.loads(resolved_path.read_text())
             for name, info in contracts.items():
