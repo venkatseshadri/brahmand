@@ -8,7 +8,8 @@
 |---|---|---|
 | 2026-06-11 | Phase 0 — fail-loud + honest fills | ✅ DONE commit `1c377b9`: `notify.py` Telegram channel (verified live); `data_health.check_llm` (402 scan + fallback-ratio counter, Telegram-alerted, throttled 1/hr); `place_entry_orders` marks ₹0 legs to live LTP or REJECTs (regression `tests/test_honest_entry_fills.py` 3/3). DeepSeek topped up + verified live 2026-06-11 00:48. |
 | 2026-06-11 | Phase 1 — canonical consolidation | ✅ CORE DONE commit `c23f40b`: `canonical_strategy.py` (entry_tools decision core; fixes live wrong-side bug — old fallback sent BULLISH→CALL_SPREAD; VIX-null fails closed; params via `data/strategy_params.json` = future LLM seam); `fallback.py` + `unicorn_debate._deterministic_fallback` now shims; golden tests 10/10. PORCUPINE `llm_down` scenario PASS 4/4 (antariksh `8413418`, driver `a906948`). **PHASE 1 COMPLETE.** |
-| 2026-06-11 | Phase 2 — validate edge (backtest canonical, 3 Board numbers) | 🔨 IN PROGRESS. Data inventory: Kaggle NIFTY-50 minute bars 2015→2026-05 + INDIA VIX minute (Tier A); real options only 13 days Oct-Nov 2024 (Tier B anchor). **Bonus live fix `bb8c9ef` (antariksh):** traffic-light scorer ignored get_live_candles' string shape → TL family was permanently NEUTRAL 0% (half the entry signal dead); fixed + 3/3 regression; verify TL non-zero in chain logs at next market open. NEXT: replay engine (write EMA-state + Redis keys per historical bar, drive REAL canonical_strategy.decide_entry; PORCUPINE philosophy — inject at I/O seams only). Known seam issues to handle: get_live_candles/_compute_completion_by_tf use datetime.now() (bug-#3a class). |
+| 2026-06-11 | Phase 2 — validate edge (backtest canonical, 3 Board numbers) | 🔨 IN PROGRESS. Data inventory: Kaggle NIFTY-50 minute bars 2015→2026-05 + INDIA VIX minute (Tier A); real options only 13 days Oct-Nov 2024 (Tier B anchor). **Bonus live fix `bb8c9ef` (antariksh):** traffic-light scorer ignored get_live_candles' string shape → TL family was permanently NEUTRAL 0% (half the entry signal dead); fixed + 3/3 regression; verify TL non-zero in chain logs at next market open. Replay engine BUILT (backtest/sherpa/: data_loader, replay_io, bs_pricer, trade_sim, run_backtest). Full-2024 run COMPLETE → **3 Board numbers delivered, verdict NEGATIVE expectancy (see §1b)**. Phase 2 deliverables DONE; gate fired → harness recalibration before any paper trade. |
+| 2026-06-11 | Phase 2b — parameter recalibration (sweep in harness, H1 train / H2 validate) | ⏳ NEXT |
 **Decision:** The deterministic logic IS the trading system. The LLM is an overlay that optimizes parameters — it can never be required for the system to trade, and its absence can never silently change behavior.
 
 ---
@@ -22,6 +23,34 @@
 - Root cause of disagreement: different data sources (enriched-snapshot `trend.timeframes` vs Redis-direct scoring) + different thresholds.
 - Result: zero trades, and the day's "NO-GO" log is false evidence about the strategy.
 - Separate finding: 06-05 paper trade entry orders FILLED at `execution_price: 0.0` — paper P&L is fiction until fills are marked to live LTP.
+
+## 1b. PHASE 2 RESULT — the 3 Board numbers (2026-06-11, full-2024 run)
+
+Engine: REAL `canonical_strategy.decide_entry` driven over Kaggle NIFTY+VIX minute
+bars via the production I/O seams (zero strategy reimplementation). Premiums =
+Black-Scholes @ IV=VIX (flat smile — Tier-B calibration vs 13 real option days
+pending). Today's contract spec (Tue weekly, lot 65), honest costs, NSE margin
+floor ₹30K/lot, MAX 3 trades/day (live re-entry discipline).
+
+| Board number | Value |
+|---|---|
+| 1. Return on capital | **−13.0% / month** (−₹312,954 over 12 months on ₹2L — capital ruined ~1.5×; max DD ₹324K) |
+| 2. Avg win / avg loss / win rate | +₹7,514 / −₹5,869 / 39.5% → **expectancy ≈ −₹580/trade** |
+| 3. Max hedged lots on ₹2L | **6** (margin ≈ ₹30K/lot NSE floor) |
+
+Detail: 539 trades (86% of decision points said GO — the gate barely filters);
+exits = 289 SL / 126 TP / 124 EOD; costs ₹85,880 (~₹160/trade friction);
+2 positive months out of 12 (Jun +34K, Aug +43K).
+
+**VERDICT (per §Phase 2 gate): NEGATIVE expectancy — do NOT paper-trade these
+params. Recalibrate in the harness, not live.** Dominant failure modes:
+(a) entry gate too permissive (conf ≥35 passes nearly everything),
+(b) SL 25% on a near-expiry ATM sold leg is hair-trigger (54% of exits),
+(c) churn: 2.2 trades/day × costs.
+Next: parameter sweep in the harness — confidence threshold, SL/TP, trades/day,
+entry window — trained on 2024-H1, validated out-of-sample on 2024-H2 (and
+2025 data exists for further validation). Caveat: synthetic premiums put error
+bars on magnitude, not on sign.
 
 ## 2. Goal & realistic calibration
 
