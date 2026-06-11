@@ -30,6 +30,15 @@ def _is_market_hours() -> bool:
     return 9 * 60 + 15 <= tm <= 15 * 60 + 30
 
 
+def _is_mcx_hours() -> bool:
+    now = datetime.now()
+    hour, minute = now.hour, now.minute
+    if now.weekday() >= 5:
+        return False
+    tm = hour * 60 + minute
+    return 9 * 60 + 15 <= tm <= 23 * 60 + 30
+
+
 def _heartbeat_age(prefix: str, instrument: str) -> float | None:
     """Read heartbeat file, return age in minutes or None if missing."""
     path = HEARTBEAT_DIR / f"{prefix}_{instrument}.heartbeat"
@@ -227,6 +236,74 @@ def check_redis() -> Tuple[bool, list]:
     return True, []
 
 
+def check_mcx() -> Tuple[bool, list]:
+    """MCX commodities — feed heartbeat + log freshness + SQLite per commodity (T15)."""
+    warnings = []
+    if not _is_mcx_hours():
+        return True, warnings
+
+    # Feed heartbeat
+    age = _heartbeat_age("feed", "MCX")
+    if age is None:
+        warnings.append("FATAL [MCX]: feed heartbeat MISSING")
+    elif age > 5:
+        warnings.append(f"FEED [MCX]: heartbeat stale {age:.0f}m")
+
+    # Enricher heartbeat
+    age = _heartbeat_age("enricher", "MCX")
+    if age is not None and age > 10:
+        warnings.append(f"ENRICHER [MCX]: heartbeat stale {age:.0f}m")
+
+    # Bar freshness from MCX_1min.log
+    bar = _last_log_line("MCX_1min.log")
+    if bar:
+        try:
+            t = datetime.fromisoformat(bar["timestamp"])
+            age_m = (datetime.now() - t).total_seconds() / 60
+            if age_m > 5:
+                warnings.append(f"BARS [MCX]: stale — last bar {age_m:.0f} min ago")
+        except (ValueError, OSError):
+            pass
+
+    # SQLite per-commodity freshness
+    import sqlite3
+
+    DB = "/home/trading_ceo/python-trader/varaha/data/capture_mcx.sqlite"
+    MCX_COMMODITIES = [
+        "ALUMINI",
+        "CRUDEOILM",
+        "NATGASMINI",
+        "SILVERMIC",
+        "ZINCMINI",
+        "LEADMINI",
+        "GOLD",
+    ]
+    try:
+        conn = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+        for inst in MCX_COMMODITIES:
+            row = conn.execute(
+                "SELECT MAX(timestamp) FROM market_data WHERE instrument=?",
+                (inst,),
+            ).fetchone()
+            if not row or not row[0]:
+                warnings.append(f"DATA [MCX:{inst}]: market_data EMPTY")
+                continue
+            try:
+                ts = datetime.fromisoformat(row[0])
+                sql_age = (datetime.now() - ts).total_seconds() / 60
+                if sql_age > 10:
+                    warnings.append(
+                        f"DATA [MCX:{inst}]: stale — last bar {sql_age:.0f} min ago"
+                    )
+            except (ValueError, OSError):
+                pass
+        conn.close()
+    except Exception as e:
+        warnings.append(f"MCX SQLite check failed: {e}")
+
+    return len(warnings) == 0, warnings
+
+
 def run_all() -> Tuple[bool, list]:
     results = []
     all_warnings = []
@@ -237,6 +314,7 @@ def run_all() -> Tuple[bool, list]:
         ("PORCUPINE", check_porcupine),
         ("DAMBUILDER", check_dambuilder),
         ("DATA_FRESH", check_data_freshness),
+        ("MCX", check_mcx),
         ("Redis", check_redis),
     ]:
         ok, warnings = fn()
