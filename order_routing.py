@@ -95,9 +95,7 @@ def _live_ltp(tsym: str) -> float:
             return 0.0
         conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         try:
-            row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)
-            ).fetchone()
+            row = conn.execute("SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)).fetchone()
             return float(row[0]) if row and row[0] else 0.0
         finally:
             conn.close()
@@ -136,10 +134,7 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
                     "total_orders": 0,
                     "mode": "LIVE" if LIVE_MODE else "PAPER",
                     "status": "REJECTED",
-                    "error": (
-                        f"no live LTP for {leg.get('tsym', '?')} — "
-                        "refusing 0-price fill"
-                    ),
+                    "error": (f"no live LTP for {leg.get('tsym', '?')} — refusing 0-price fill"),
                 }
             leg["fill_price"] = ltp
 
@@ -160,9 +155,7 @@ def place_entry_orders(legs: List[Dict]) -> Dict:
             reason=f"{leg.get('type')} {leg.get('action')} @ {leg.get('strike')}",
         )
         entry_orders.append(result["order_id"])
-        leg["fill_price"] = result.get(
-            "price", 0
-        )  # Capture execution price for P&L calc
+        leg["fill_price"] = result.get("price", 0)  # Capture execution price for P&L calc
 
     # ── T17: Post-fill margin refresh (broker is source of truth) ──────
     try:
@@ -244,6 +237,14 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
     sl_orders = []
     tp_orders = []
 
+    # Position qty from entry orders (overrides LLM hallucinated lot size)
+    entry_quantity = 65
+    entry_orders = get_trade_orders(trade_id)
+    for eo in entry_orders:
+        if eo.get("order_type") == "ENTRY":
+            entry_quantity = eo.get("quantity", 65)
+            break
+
     for leg in legs:
         if leg.get("action") != "SELL":
             continue
@@ -253,7 +254,7 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
             sl_result = place_order(
                 symbol=leg.get("tsym", ""),
                 action_type="BUY",  # Buy to close the short
-                quantity=leg.get("quantity", 65),
+                quantity=entry_quantity,
                 price=leg.get("sl"),
                 order_type="SL",
                 component="risk_agent",
@@ -267,7 +268,7 @@ def place_sl_tp_orders(trade_id: str, legs: List[Dict]) -> Dict:
             tp_result = place_order(
                 symbol=leg.get("tsym", ""),
                 action_type="BUY",  # Buy to close the short
-                quantity=leg.get("quantity", 65),
+                quantity=entry_quantity,
                 price=leg.get("tp"),
                 order_type="TP",
                 component="risk_agent",
@@ -481,11 +482,7 @@ def get_order(order_id: str) -> Optional[Dict]:
 def get_trade_orders(trade_id: str) -> List[Dict]:
     """Get all orders for a specific trade."""
     ledger = _load_ledger()
-    return [
-        order
-        for order in ledger["orders"].values()
-        if order.get("trade_id") == trade_id
-    ]
+    return [order for order in ledger["orders"].values() if order.get("trade_id") == trade_id]
 
 
 def clear_ledger():
@@ -670,8 +667,7 @@ def get_active_trades() -> List[Dict]:
     return [
         trade
         for trade in ledger.get("_trades", {}).values()
-        if trade.get("status") == "ACTIVE"
-        and trade.get("entry_time", "").startswith(today)
+        if trade.get("status") == "ACTIVE" and trade.get("entry_time", "").startswith(today)
     ]
 
 
@@ -681,8 +677,7 @@ def get_trades_by_strategy(strategy_type: str) -> List[Dict]:
     return [
         trade
         for trade in ledger.get("_trades", {}).values()
-        if trade.get("status") == "ACTIVE"
-        and trade.get("strategy_type") == strategy_type
+        if trade.get("status") == "ACTIVE" and trade.get("strategy_type") == strategy_type
     ]
 
 
