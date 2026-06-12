@@ -65,11 +65,14 @@ def _dambuilder_trace(
             "vix": regime.get("vix"),
             "spot": spot,
         }
+        home = str(Path(__file__).resolve().parent.parent)
+        if home not in sys.path:
+            sys.path.insert(0, home)
         from antariksh.research.outcome_tables import write_decision_trace
 
         write_decision_trace(db_path, row)
-    except Exception:
-        pass
+    except Exception as e:
+        get_logger("chain").warning(f"decision_trace write failed: {e}")
 
 
 USE_UNICORN = True
