@@ -344,7 +344,9 @@ class BuildAndExecuteTradeTool(BaseTool):
         margin_ok, margin_reason = check_entry_margin("NIFTY", opt_type, legs)
         if not margin_ok:
             return json.dumps({"error": f"margin gate: {margin_reason}"})
-        log.info(f"Margin gate: {margin_reason}")
+        from logger import get_logger
+
+        get_logger("chain").info(f"Margin gate: {margin_reason}")
 
         for leg in legs:
             if leg["action"] == "SELL":
