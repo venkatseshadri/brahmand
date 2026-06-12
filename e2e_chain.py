@@ -475,12 +475,12 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "not_down_decision": not_down_decision,
             "entry_decision": {
                 "source": not_up_decision.get("source", "canonical"),
-                "signal": "NOT_UP",
+                "signal": not_up_decision.get("signal"),
                 "go": False,
                 "confidence": not_up_decision.get("confidence"),
             },
             "regime": {
-                "regime": regime.get("regime"),
+                "regime": regime.get("regime") or snap.get("regime"),
                 "recommendation": regime.get("recommendation"),
                 "vix": vix,
             },
@@ -496,11 +496,15 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "not_down_decision": not_down_decision,
             "entry_decision": {
                 "source": not_up_decision.get("source", "canonical"),
-                "signal": "REGIME_SKIP",
+                "signal": not_up_decision.get("signal"),
                 "go": False,
                 "confidence": not_up_decision.get("confidence"),
             },
-            "regime": regime,
+            "regime": {
+                "regime": regime.get("regime") or snap.get("regime"),
+                "recommendation": regime.get("recommendation"),
+                "vix": vix,
+            },
             "spot": spot,
         }
 

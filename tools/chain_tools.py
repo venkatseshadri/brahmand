@@ -17,12 +17,16 @@ from pydantic import BaseModel, Field
 
 
 def _weekly_expiry() -> str:
-    """Compute next Tuesday expiry as fallback default (NIFTY weekly expiry)."""
-    now = datetime.now()
-    days = (1 - now.weekday()) % 7  # Monday=0, Tuesday=1
-    if days == 0:
-        days = 7
-    return (now + timedelta(days=days)).strftime("%d-%b-%Y").upper()
+    """Compute NIFTY weekly expiry via single oracle (0DTE-aware)."""
+    import sys
+    from pathlib import Path as _P
+
+    _antariksh = _P(__file__).resolve().parent.parent.parent / "antariksh"
+    if str(_antariksh) not in sys.path:
+        sys.path.insert(0, str(_antariksh))
+    from config.token_resolver import resolve_weekly_expiry
+
+    return resolve_weekly_expiry("NIFTY").strftime("%d-%b-%Y").upper()
 
 
 class ResolveContractsInput(BaseModel):
@@ -32,9 +36,7 @@ class ResolveContractsInput(BaseModel):
     )
     atm: int = Field(default=0, description="At-the-money strike price")
     wing_width: int = Field(default=200, description="Wing width from ATM")
-    expiry: str = Field(
-        default_factory=_weekly_expiry, description="Expiry date, e.g. 26-MAY-2026"
-    )
+    expiry: str = Field(default_factory=_weekly_expiry, description="Expiry date, e.g. 26-MAY-2026")
 
 
 # ── Contract Agent Tool ──────────────────────────────────────────────────
