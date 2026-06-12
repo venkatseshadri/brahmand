@@ -15,6 +15,7 @@ Margin check only for SELL_SHIFTER (hedge shift always reduces margin).
 
 import json
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, Tuple
@@ -60,9 +61,7 @@ def _lookup_margin_from_matrix(
 def _get_current_atm(trade: dict) -> int:
     """Get ATM from trade setup."""
     return (
-        trade.get("setup", {}).get("atm_strike", 0)
-        if isinstance(trade.get("setup"), dict)
-        else 0
+        trade.get("setup", {}).get("atm_strike", 0) if isinstance(trade.get("setup"), dict) else 0
     )
 
 
@@ -244,16 +243,12 @@ def evaluate_sell_shift(trade: dict, available_margin: float) -> Optional[Dict]:
         matrix = _load_margin_matrix()
 
         # Look up old margin
-        old_margin = _lookup_margin_from_matrix(
-            old_sell_strike, hedge_strike, option_type, matrix
-        )
+        old_margin = _lookup_margin_from_matrix(old_sell_strike, hedge_strike, option_type, matrix)
         if not old_margin:
             return None  # Can't find old margin in matrix
 
         # Look up new margin (or will need to call SPAN API if not in matrix)
-        new_margin = _lookup_margin_from_matrix(
-            new_sell_strike, hedge_strike, option_type, matrix
-        )
+        new_margin = _lookup_margin_from_matrix(new_sell_strike, hedge_strike, option_type, matrix)
 
         if not new_margin:
             # Not in matrix — would need SPAN API call (defer for now, mark as TBD)
@@ -365,7 +360,9 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
             return {"status": "FAILED", "reason": "NO_LTP_DATA"}
 
         # Step 1: Place BUY order for new hedge (OPEN)
-        new_hedge_tsym = f"NIFTY{trade.get('expiry', '').replace('-', '')}{option_type}{new_hedge_strike}"
+        new_hedge_tsym = (
+            f"NIFTY{trade.get('expiry', '').replace('-', '')}{option_type}{new_hedge_strike}"
+        )
         open_order = place_order(
             symbol=new_hedge_tsym,
             action_type="BUY",
@@ -378,7 +375,9 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
         )
 
         # Step 2: Place SELL order for old hedge (CLOSE)
-        old_hedge_tsym = f"NIFTY{trade.get('expiry', '').replace('-', '')}{option_type}{old_hedge_strike}"
+        old_hedge_tsym = (
+            f"NIFTY{trade.get('expiry', '').replace('-', '')}{option_type}{old_hedge_strike}"
+        )
         old_hedge_leg = next(
             (
                 l
@@ -396,17 +395,13 @@ def execute_hedge_shift(trade: dict, proposal: Dict) -> Dict:
                 "ORDER BY timestamp DESC LIMIT 1",
                 (expiry, old_hedge_strike, option_type),
             ).fetchone()
-            old_hedge_ltp = (
-                float(row_old[0]) if row_old else old_hedge_leg.get("fill_price", 0)
-            )
+            old_hedge_ltp = float(row_old[0]) if row_old else old_hedge_leg.get("fill_price", 0)
 
         close_order = place_order(
             symbol=old_hedge_tsym,
             action_type="SELL",
             quantity=65,
-            price=old_hedge_ltp or old_hedge_leg.get("fill_price", 0)
-            if old_hedge_leg
-            else 0,
+            price=old_hedge_ltp or old_hedge_leg.get("fill_price", 0) if old_hedge_leg else 0,
             order_type="SHIFT_CLOSE",
             component="leg_shifter",
             trade_id=trade.get("trade_id"),
@@ -514,9 +509,7 @@ def execute_sell_shift(trade: dict, proposal: Dict) -> Dict:
             )  # 65 = NIFTY lot size
 
             # Place BUY order to close old SELL (buy back)
-            old_sell_tsym = (
-                f"NIFTY{expiry.replace('-', '')}{option_type}{old_sell_strike}"
-            )
+            old_sell_tsym = f"NIFTY{expiry.replace('-', '')}{option_type}{old_sell_strike}"
             close_order = place_order(
                 symbol=old_sell_tsym,
                 action_type="BUY",
