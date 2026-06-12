@@ -40,6 +40,25 @@ from verification import (
 # USE_UNICORN=False → Entry gate runs legacy CrewAI deterministic tools
 
 
+def _snapshot_regime(adx: float, snap: dict) -> str:
+    """Derive a basic regime label from ADX + Supertrend when CrewAI agent output is empty."""
+    if not adx or not snap:
+        return "unknown"
+    if adx > 25:
+        st = (snap.get("supertrend_direction") or "").lower()
+        if "up" in st:
+            return "bullish"
+        if "down" in st:
+            return "bearish"
+    st15 = (snap.get("st_15min_direction") or "").lower()
+    if adx > 20:
+        if "up" in st15:
+            return "bullish"
+        if "down" in st15:
+            return "bearish"
+    return "sideways"
+
+
 def _dambuilder_trace(gate: str, entry_decision: dict, regime: dict, outcome: str, spot: float):
     try:
         from datetime import datetime, timezone, timedelta
@@ -480,7 +499,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 "confidence": not_up_decision.get("confidence"),
             },
             "regime": {
-                "regime": regime.get("regime") or snap.get("regime"),
+                "regime": regime.get("regime") or _snapshot_regime(adx, snap),
                 "recommendation": regime.get("recommendation"),
                 "vix": vix,
             },
@@ -501,7 +520,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 "confidence": not_up_decision.get("confidence"),
             },
             "regime": {
-                "regime": regime.get("regime") or snap.get("regime"),
+                "regime": regime.get("regime") or _snapshot_regime(adx, snap),
                 "recommendation": regime.get("recommendation"),
                 "vix": vix,
             },

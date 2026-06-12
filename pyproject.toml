@@ -6,7 +6,12 @@ requires-python = ">=3.12"
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["__pycache__/", "*.pyc", ".git/", "graphify-out/", "cache/", "data/", "varaha_system.log"]
 
 [tool.ruff.lint]
 select = ["F821"]  # undefined-name
 ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"backtest/*" = ["F821"]
+"pattern_analyzer.py" = ["F821"]
