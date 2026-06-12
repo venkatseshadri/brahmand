@@ -747,12 +747,30 @@ def run_full_chain(
         _log("  Regime gate: SKIP — aborting")
         return regime
 
+    # Entry window gate: refuse entries after 15:00 IST (post-close tail)
+    now_ist = datetime.now()
+    if now_ist.hour > 15 or (now_ist.hour == 15 and now_ist.minute >= 5):
+        _log("  Entry window: POST-CLOSE — refusing entry")
+        return None
+
     # Extract trade from Execution Agent's output
     trade = crew_result.get("trade", {})
     if not trade:
-        _audit_entry_check("no_trade_returned")
-        _log("  Execution: no trade returned — aborting")
-        return None
+        # Split-brain guard: CrewAI lost the crew output but orders may be live.
+        # Reconcile from the cache written atomically by BuildAndExecuteTradeTool.
+        from tools.chain_tools import get_last_built_trade
+
+        recovered = get_last_built_trade(max_age_sec=60.0)
+        if recovered:
+            _log(
+                "  ⚠ Execution: crew output lost — RECOVERED from trade cache "
+                f"(id={recovered.get('trade_id')})"
+            )
+            trade = recovered
+        else:
+            _audit_entry_check("no_trade_returned")
+            _log("  Execution: no trade returned — aborting")
+            return None
 
     entry_decision = crew_result.get("entry_decision", {})
     _audit_entry_check("go")

@@ -8,12 +8,31 @@ Order routing via order_routing module functions.
 
 import json
 import sys
+import os
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Type
+from typing import Type, List, Dict, Any, Optional
 
-from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
+from crewai.tools import BaseTool
+
+
+# Split-brain guard: when CrewAI loses the strategy crew's output, the chain
+# reconciles from this cache (set by BuildAndExecuteTradeTool._run, read by
+# e2e_chain.run_full_chain via get_last_built_trade).
+_LAST_BUILT_TRADE: dict = {}
+_LAST_BUILT_TIME: float = 0.0
+
+
+def get_last_built_trade(max_age_sec: float = 60.0) -> Optional[dict]:
+    """Return the last cached trade dict if < max_age_sec old. Used for split-brain recovery."""
+    if not _LAST_BUILT_TRADE or not _LAST_BUILT_TRADE.get("trade_id"):
+        return None
+    age = time.time() - _LAST_BUILT_TIME
+    if age > max_age_sec:
+        return None
+    return dict(_LAST_BUILT_TRADE)
 
 
 def _weekly_expiry() -> str:
@@ -378,6 +397,10 @@ class BuildAndExecuteTradeTool(BaseTool):
             return json.dumps({"error": f"Failed to import order_routing: {e}"})
         except Exception as e:
             return json.dumps({"error": f"place_entry_orders failed: {str(e)[:200]}"})
+
+        global _LAST_BUILT_TRADE, _LAST_BUILT_TIME
+        _LAST_BUILT_TRADE = dict(trade)
+        _LAST_BUILT_TIME = time.time()
 
         return json.dumps(trade, indent=2, default=str)
 
