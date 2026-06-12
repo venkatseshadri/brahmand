@@ -773,6 +773,13 @@ def run_full_chain(
             return None
 
     entry_decision = crew_result.get("entry_decision", {})
+
+    # Ensure regime has fallback for GO-path audit (not just rejection paths)
+    if regime and not regime.get("regime"):
+        regime["regime"] = _snapshot_regime(
+            crew_result.get("adx", 0), crew_result.get("spot_snapshot", {})
+        )
+
     _audit_entry_check("go")
 
     # Attach ALL agent outputs for postmortem analysis
