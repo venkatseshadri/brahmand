@@ -119,9 +119,7 @@ def check_penguin() -> Tuple[bool, list]:
                 t = datetime.fromisoformat(bar["timestamp"])
                 age_m = (datetime.now() - t).total_seconds() / 60
                 if age_m > 5:
-                    warnings.append(
-                        f"BARS [{inst}]: stale — last bar {age_m:.0f} min ago"
-                    )
+                    warnings.append(f"BARS [{inst}]: stale — last bar {age_m:.0f} min ago")
             except (ValueError, OSError):
                 pass
     return len(warnings) == 0, warnings
@@ -153,9 +151,7 @@ def check_dambuilder() -> Tuple[bool, list]:
         if age is None:
             continue  # pre-T1
         if age > 10:
-            warnings.append(
-                f"DAMBUILDER [{label}]: multitf_enricher heartbeat stale {age:.0f}m"
-            )
+            warnings.append(f"DAMBUILDER [{label}]: multitf_enricher heartbeat stale {age:.0f}m")
     return len(warnings) == 0, warnings
 
 
@@ -170,9 +166,7 @@ def check_data_freshness() -> Tuple[bool, list]:
     from datetime import datetime
 
     for inst in ("NIFTY", "SENSEX"):
-        db = (
-            f"/home/trading_ceo/python-trader/varaha/data/capture_{inst.lower()}.sqlite"
-        )
+        db = f"/home/trading_ceo/python-trader/varaha/data/capture_{inst.lower()}.sqlite"
         try:
             conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
             for tbl, label in [
@@ -215,9 +209,7 @@ def check_llm() -> Tuple[bool, list]:
         if kickoff.exists():
             n402 = kickoff.read_text(errors="replace").count("Error code: 402")
             if n402:
-                warnings.append(
-                    f"LLM 402 Insufficient Balance — {n402} failed calls today"
-                )
+                warnings.append(f"LLM 402 Insufficient Balance — {n402} failed calls today")
         chain = log_dir / f"chain_{day}.log"
         if chain.exists():
             ctext = chain.read_text(errors="replace")
@@ -292,9 +284,7 @@ def check_mcx() -> Tuple[bool, list]:
                 ts = datetime.fromisoformat(row[0])
                 sql_age = (datetime.now() - ts).total_seconds() / 60
                 if sql_age > 10:
-                    warnings.append(
-                        f"DATA [MCX:{inst}]: stale — last bar {sql_age:.0f} min ago"
-                    )
+                    warnings.append(f"DATA [MCX:{inst}]: stale — last bar {sql_age:.0f} min ago")
             except (ValueError, OSError):
                 pass
         conn.close()
@@ -303,9 +293,7 @@ def check_mcx() -> Tuple[bool, list]:
 
     # Expiry sentinel: WARN if any futures contract expires ≤ 3 days (T16)
     try:
-        resolved_path = Path(
-            "/home/trading_ceo/antariksh/data/live/resolved_contracts.json"
-        )
+        resolved_path = Path("/home/trading_ceo/antariksh/data/live/resolved_contracts.json")
         if resolved_path.exists():
             contracts = json.loads(resolved_path.read_text())
             for name, info in contracts.items():
@@ -326,12 +314,36 @@ def check_mcx() -> Tuple[bool, list]:
     return len(warnings) == 0, warnings
 
 
+def check_feed_callbacks() -> Tuple[bool, list]:
+    """WARN if feed.log has 'error from callback' lines during market hours.
+    Silence during off-hours. Catches NameError/undefined-name bugs that
+    the WS callback handler silently swallows (T16-B1, V12, 06-01 class)."""
+    warnings = []
+    if not _is_market_hours():
+        return True, warnings
+    log_path = Path("/home/trading_ceo/antariksh/logs/feed.log")
+    if not log_path.exists():
+        return True, warnings
+    try:
+        text = log_path.read_text(errors="replace")
+        count = text.count("error from callback")
+        if count > 0:
+            warnings.append(
+                f"FEED [callbacks]: {count} 'error from callback' in feed.log "
+                f"— likely swallowed NameError (undefined-name class)"
+            )
+    except (OSError, ValueError):
+        pass
+    return len(warnings) == 0, warnings
+
+
 def run_all() -> Tuple[bool, list]:
     results = []
     all_warnings = []
     for name, fn in [
         ("LLM", check_llm),
         ("FEED", check_feed),
+        ("FEED_CB", check_feed_callbacks),
         ("Penguin", check_penguin),
         ("PORCUPINE", check_porcupine),
         ("DAMBUILDER", check_dambuilder),

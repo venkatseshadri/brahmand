@@ -27,9 +27,7 @@ from typing import Optional
 
 sys.path.insert(0, str(Path("/home/trading_ceo/python-trader/Shoonya_oAuthAPI-py")))
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s")
 logger = logging.getLogger("MarginCapture")
 
 # ── Config ──
@@ -71,11 +69,20 @@ def _get_expiry() -> str:
             "Live expiry lookup failed, using fallback: %s", e
         )
 
-    # Fallback: from config or manual
-    if EXPIRY_FILE.exists():
-        data = json.loads(EXPIRY_FILE.read_text())
-        return data.get("weekly", "22-MAY-2026")
-    return "22-MAY-2026"
+    # Fallback: single expiry oracle (broker scrip_master → weekday calc)
+    try:
+        import sys
+        from pathlib import Path as _P
+
+        _antariksh = _P(__file__).resolve().parent.parent / "antariksh"
+        if str(_antariksh) not in sys.path:
+            sys.path.insert(0, str(_antariksh))
+        from config.token_resolver import resolve_weekly_expiry
+
+        return resolve_weekly_expiry("NIFTY").strftime("%d-%b-%Y").upper()
+    except Exception as e:
+        logging.getLogger("brahmand.margin").warning("Expiry oracle unavailable: %s", e)
+        return "27-MAY-2026"  # will be stale but not permanently wrong
 
 
 def _get_atm() -> Optional[int]:
@@ -92,9 +99,7 @@ def _get_atm() -> Optional[int]:
             spot = float(row[0])
             return round(spot / STRIKE_STEP) * STRIKE_STEP
     except Exception as e:
-        logging.getLogger("brahmand.margin").debug(
-            "Live ATM lookup failed, using fallback: %s", e
-        )
+        logging.getLogger("brahmand.margin").debug("Live ATM lookup failed, using fallback: %s", e)
     return None
 
 
@@ -309,12 +314,8 @@ def _parse_margin(resp) -> Optional[float]:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Margin Capture — Shoonya Span Calculator"
-    )
-    parser.add_argument(
-        "--loop", action="store_true", help="Run every 5 min during market hours"
-    )
+    parser = argparse.ArgumentParser(description="Margin Capture — Shoonya Span Calculator")
+    parser.add_argument("--loop", action="store_true", help="Run every 5 min during market hours")
     parser.add_argument("--once", action="store_true", help="Single capture and exit")
     args = parser.parse_args()
 
@@ -338,18 +339,14 @@ def main():
                     else:
                         consecutive_failures = 0
                         spreads_ok = sum(
-                            1
-                            for s in result.get("spreads", [])
-                            if s.get("margin") is not None
+                            1 for s in result.get("spreads", []) if s.get("margin") is not None
                         )
                         logger.info(
                             f"✅ Captured {spreads_ok}/10 spreads for ATM {result['atm']} (expiry: {result['expiry']})"
                         )
                 except Exception as e:
                     consecutive_failures += 1
-                    logger.error(
-                        f"❌ Capture exception: {e} (failure #{consecutive_failures})"
-                    )
+                    logger.error(f"❌ Capture exception: {e} (failure #{consecutive_failures})")
                     if consecutive_failures >= 3:
                         logger.critical(
                             f"🚨 {consecutive_failures} consecutive failures — check API!"
@@ -363,9 +360,7 @@ def main():
         if "error" in res:
             logger.error(f"❌ Error: {res['error']}")
         else:
-            spreads_ok = sum(
-                1 for s in res.get("spreads", []) if s.get("margin") is not None
-            )
+            spreads_ok = sum(1 for s in res.get("spreads", []) if s.get("margin") is not None)
             logger.info(f"✅ Captured {spreads_ok}/10 spreads")
         print(json.dumps(res, indent=2, default=str))
 

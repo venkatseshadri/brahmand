@@ -40,9 +40,7 @@ from verification import (
 # USE_UNICORN=False → Entry gate runs legacy CrewAI deterministic tools
 
 
-def _dambuilder_trace(
-    gate: str, entry_decision: dict, regime: dict, outcome: str, spot: float
-):
+def _dambuilder_trace(gate: str, entry_decision: dict, regime: dict, outcome: str, spot: float):
     try:
         from datetime import datetime, timezone, timedelta
 
@@ -81,9 +79,7 @@ _UNICORN_RESEARCH_LOCK = Path(__file__).parent / "data" / ".unicorn_research.loc
 _log = get_logger("chain").info
 _agent = get_logger("chain")
 _err = lambda msg, exc=None: (
-    log_exception(get_logger("chain"), exc, msg)
-    if exc
-    else get_logger("chain").error(msg)
+    log_exception(get_logger("chain"), exc, msg) if exc else get_logger("chain").error(msg)
 )
 
 
@@ -295,9 +291,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     not_up_entry_task = tf.create_task("not_up_entry_task", agent=not_up_entry_agent)
 
     # ── Task 1b: NOT_DOWN Entry Agent (PUT_SPREAD gate) ────────────────
-    not_down_entry_task = tf.create_task(
-        "not_down_entry_task", agent=not_down_entry_agent
-    )
+    not_down_entry_task = tf.create_task("not_down_entry_task", agent=not_down_entry_agent)
 
     # ── Task 2: Regime Agent ───────────────────────────────────────────
     regime_task = tf.create_task("regime_task", agent=regime_agent)
@@ -380,9 +374,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 else:
                     age = cache_age_sec(gate)
                     reason = f"expired ({age:.0f}s)" if age is not None else "empty"
-                    _log(
-                        f"    {label}: Cache MISS ({reason}) → deterministic + async research"
-                    )
+                    _log(f"    {label}: Cache MISS ({reason}) → deterministic + async research")
                     _trigger_unicorn_research(gate)
                     result = run_unicorn_debate(raw, gate)
                     _log(
@@ -443,9 +435,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         regime = {}
         if hasattr(entry_result, "tasks_output"):
             try:
-                not_up_decision = extract_task_output(
-                    entry_result.tasks_output[0]
-                )  # NOT_UP agent
+                not_up_decision = extract_task_output(entry_result.tasks_output[0])  # NOT_UP agent
                 not_down_decision = extract_task_output(
                     entry_result.tasks_output[1]
                 )  # NOT_DOWN agent
@@ -456,12 +446,8 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                 )  # Regime
 
                 # Provenance guard: clamp hallucinated numbers to deterministic tool values
-                verify_provenance(
-                    not_up_decision, "NOT_UP"
-                ) if not_up_decision else None
-                verify_provenance(
-                    not_down_decision, "NOT_DOWN"
-                ) if not_down_decision else None
+                verify_provenance(not_up_decision, "NOT_UP") if not_up_decision else None
+                verify_provenance(not_down_decision, "NOT_DOWN") if not_down_decision else None
                 verify_regime_provenance(regime, vix, adx) if regime else None
 
             except Exception as e:
@@ -487,24 +473,39 @@ def run_sequential_crew(entry_time: str) -> dict | None:
             "recommendation": "no_go",
             "not_up_decision": not_up_decision,
             "not_down_decision": not_down_decision,
+            "entry_decision": {
+                "source": not_up_decision.get("source", "canonical"),
+                "signal": "NOT_UP",
+                "go": False,
+                "confidence": not_up_decision.get("confidence"),
+            },
+            "regime": {
+                "regime": regime.get("regime"),
+                "recommendation": regime.get("recommendation"),
+                "vix": vix,
+            },
+            "spot": spot,
         }
 
     # Regime gate
     if regime.get("recommendation") == "skip":
-        _log(
-            f"  Regime: SKIP — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}"
-        )
+        _log(f"  Regime: SKIP — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}")
         return {
             "recommendation": "regime_skip",
             "not_up_decision": not_up_decision,
             "not_down_decision": not_down_decision,
+            "entry_decision": {
+                "source": not_up_decision.get("source", "canonical"),
+                "signal": "REGIME_SKIP",
+                "go": False,
+                "confidence": not_up_decision.get("confidence"),
+            },
             "regime": regime,
+            "spot": spot,
         }
 
     if regime.get("recommendation") == "caution":
-        _log(
-            f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}"
-        )
+        _log(f"  Regime: CAUTION — VIX={regime.get('vix', '?')} | {regime.get('reason', '?')}")
         # Allow entry on caution but limit position size (Strategy agent handles this)
 
     _log(
@@ -526,9 +527,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
         "regime": regime.get("regime"),
         "vix": regime.get("vix", 0),
         "strategy_to_execute": (
-            "CALL_SPREAD"
-            if go_call_spread
-            else ("PUT_SPREAD" if go_put_spread else "NONE")
+            "CALL_SPREAD" if go_call_spread else ("PUT_SPREAD" if go_put_spread else "NONE")
         ),
     }
 
@@ -603,15 +602,9 @@ def run_sequential_crew(entry_time: str) -> dict | None:
                     parsed_outputs[i] = parsed
                     agent_log(_agent, f"{name}_Agent", parsed)
                     if not parsed:
-                        _err(
-                            f"{name} Agent extracted empty: "
-                            f"{str(result.tasks_output[i])[:200]}"
-                        )
+                        _err(f"{name} Agent extracted empty: {str(result.tasks_output[i])[:200]}")
                 except Exception as e:
-                    _err(
-                        f"{name} Agent parse failed: {e} :: "
-                        f"{str(result.tasks_output[i])[:200]}"
-                    )
+                    _err(f"{name} Agent parse failed: {e} :: {str(result.tasks_output[i])[:200]}")
     else:
         _err(
             f"Strategy crew returned no tasks_output: type={type(result).__name__} "
@@ -628,9 +621,7 @@ def run_sequential_crew(entry_time: str) -> dict | None:
     sl_p = strategy.get("sl_pct", 0.25)
     tp_p = strategy.get("tp_pct", 0.50)
     stype = strategy.get("strategy_type", "NONE")
-    regime_entry_signal = regime.get("entry_signal") or entry_decision.get(
-        "signal", "NOT_UP"
-    )
+    regime_entry_signal = regime.get("entry_signal") or entry_decision.get("signal", "NOT_UP")
 
     strat_clean = verify_strategy_provenance(strategy)
     ww = strategy.get("wing_width", 200)

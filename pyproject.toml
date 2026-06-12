@@ -1,0 +1,12 @@
+[project]
+name = "brahmand"
+version = "0.1.0"
+description = "Brahmand — E2E Chain execution layer"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["F821"]  # undefined-name
+ignore = []
