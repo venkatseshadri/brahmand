@@ -197,17 +197,13 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
             if ld["action"] != "BUY":
                 continue
             nearest_sold = (
-                min(sold_strikes, key=lambda s: abs(s - ld["strike"]))
-                if sold_strikes
-                else None
+                min(sold_strikes, key=lambda s: abs(s - ld["strike"])) if sold_strikes else None
             )
             if nearest_sold and abs(ld["strike"] - nearest_sold) > HEDGE_GAP:
                 # Tighten: close old hedge, open new at NEAREST_SOLD ± WING_SPREAD
                 otype = ld["type"]
                 new_strike = (
-                    nearest_sold - WING_SPREAD
-                    if otype == "PE"
-                    else nearest_sold + WING_SPREAD
+                    nearest_sold - WING_SPREAD if otype == "PE" else nearest_sold + WING_SPREAD
                 )
                 actions.append(
                     {
@@ -335,9 +331,7 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
         # ── P6: Cumulative floor (realized + live mark-to-market) ──
         realized = trade.get("cumulative_pnl", 0)
         unrealized = sum(
-            (ld["fill"] - ld["ltp"])
-            if ld["action"] == "SELL"
-            else (ld["ltp"] - ld["fill"])
+            (ld["fill"] - ld["ltp"]) if ld["action"] == "SELL" else (ld["ltp"] - ld["fill"])
             for ld in legs_data
             if ld["ltp"] > 0
         )
@@ -383,12 +377,8 @@ def run(trade: dict, entry_scores: dict = None) -> list[dict]:
 
 def _classify_position(trade: dict) -> str:
     """Classify current position: BULLISH (put spread only), BEARISH (call spread only), NEUTRAL (both)."""
-    has_pe = any(
-        l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", [])
-    )
-    has_ce = any(
-        l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", [])
-    )
+    has_pe = any(l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", []))
+    has_ce = any(l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", []))
     if has_pe and has_ce:
         return "NEUTRAL"
     if has_pe:
@@ -400,16 +390,12 @@ def _classify_position(trade: dict) -> str:
 
 def _has_put_spread(trade: dict) -> bool:
     """Check if PUT_SPREAD (PE SELL leg) exists."""
-    return any(
-        l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", [])
-    )
+    return any(l["type"] == "PE" and l["action"] == "SELL" for l in trade.get("legs", []))
 
 
 def _has_call_spread(trade: dict) -> bool:
     """Check if CALL_SPREAD (CE SELL leg) exists."""
-    return any(
-        l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", [])
-    )
+    return any(l["type"] == "CE" and l["action"] == "SELL" for l in trade.get("legs", []))
 
 
 def _norm_close_reason(reason: str) -> str:
@@ -424,6 +410,23 @@ def _norm_close_reason(reason: str) -> str:
     if "MARKET CLOSE" in r:
         return "MARKET_CLOSE"
     return "MANUAL"
+
+
+def _read_live_ltp(tsym: str) -> float:
+    """Read live LTP from SQLite option_prices table. Returns 0.0 if missing."""
+    try:
+        import sqlite3
+        from antariksh.config.sqlite_schema import get_sqlite_capture_path
+
+        db = get_sqlite_capture_path("NIFTY")
+        if not db.exists():
+            return 0.0
+        conn = sqlite3.connect(str(db))
+        row = conn.execute("SELECT ltp FROM option_prices WHERE tsym=?", (tsym,)).fetchone()
+        conn.close()
+        return float(row[0]) if row and row[0] else 0.0
+    except Exception:
+        return 0.0
 
 
 def _square_off(legs: list, trade_id: str, reason: str) -> float:
@@ -441,6 +444,14 @@ def _square_off(legs: list, trade_id: str, reason: str) -> float:
     for leg in legs:
         fill = leg.get("fill_price", leg.get("fill", 0)) or 0
         ltp = leg.get("ltp", fill) or 0
+        # T23(f): stale fill guard — refuse phantom ₹0 when LTP is 0 or equals entry
+        if ltp <= 0 or abs(ltp - fill) < 0.05:
+            live = _read_live_ltp(leg.get("tsym", ""))
+            if live > 0:
+                ltp = live
+            elif ltp <= 0:
+                _pm_log.warning("Exit aborted: no live LTP for %s", leg.get("tsym"))
+                return 0.0
         if leg.get("action") == "SELL":
             pnl += fill - ltp
             close_action = "BUY"
@@ -460,9 +471,7 @@ def _square_off(legs: list, trade_id: str, reason: str) -> float:
                     reason=reason,
                 )
             except Exception as e:
-                _pm_log.warning(
-                    "Order placement failed for %s: %s", leg.get("tsym", "?"), e
-                )
+                _pm_log.warning("Order placement failed for %s: %s", leg.get("tsym", "?"), e)
     return pnl
 
 
@@ -525,9 +534,7 @@ def _close_in_db(trade_id: str, reason: str, trade: dict):
             except Exception:
                 _pm_log.debug("trade_outcomes write failed for %s", trade_id)
     except Exception as e:
-        log_exception(
-            _pm_log, e, f"JSON ledger close write-through failed for {trade_id}"
-        )
+        log_exception(_pm_log, e, f"JSON ledger close write-through failed for {trade_id}")
 
 
 def execute_action(action: dict, trade: dict) -> dict:
@@ -544,9 +551,7 @@ def execute_action(action: dict, trade: dict) -> dict:
 
     if action["type"] == CLOSE_SIDE:
         side = action.get("side", "")
-        side_legs = action.get(
-            "legs", [l for l in trade.get("legs", []) if l.get("type") == side]
-        )
+        side_legs = action.get("legs", [l for l in trade.get("legs", []) if l.get("type") == side])
         trade["cumulative_pnl"] += _square_off(
             side_legs, trade_id, action.get("reason", "CLOSE_SIDE")
         )
@@ -578,11 +583,7 @@ def execute_action(action: dict, trade: dict) -> dict:
     if action["type"] in (ROLL, TIGHTEN):
         leg = action["leg"]
         # Book P&L on closing leg
-        pnl = (
-            leg["fill"] - leg["ltp"]
-            if leg["action"] == "SELL"
-            else leg["ltp"] - leg["fill"]
-        )
+        pnl = leg["fill"] - leg["ltp"] if leg["action"] == "SELL" else leg["ltp"] - leg["fill"]
         trade["cumulative_pnl"] += pnl
         # Remove old leg
         trade["legs"] = [
@@ -829,9 +830,7 @@ def _ensure_sl_tp_orders(trade: dict, trade_id: str):
             legs_for_orders.append(leg2)
         res = place_sl_tp_orders(trade_id, legs_for_orders)
         if res.get("total_orders"):
-            _pm_log.info(
-                "Fallback SL/TP placed (LLM down): %s orders", res["total_orders"]
-            )
+            _pm_log.info("Fallback SL/TP placed (LLM down): %s orders", res["total_orders"])
     except Exception as e:
         _pm_log.error("Fallback SL/TP placement failed: %s", e)
 
@@ -863,9 +862,7 @@ def _check_sl_tp(trade: dict) -> dict:
             sl = leg.get("sl")
             tp = leg.get("tp")
 
-            row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)
-            ).fetchone()
+            row = conn.execute("SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)).fetchone()
             current_ltp = row["ltp"] if row else fill_price
 
             if action == "SELL":
@@ -1012,9 +1009,7 @@ def run_bridge():
         # (NIFTY/SENSEX); make it per-index if MCX trading is ever added.
         if now_str() >= MARKET_CLOSE:
             _pm_log.warning("EOD %s → square-off CLOSE_ALL", MARKET_CLOSE)
-            execute_action(
-                {"type": CLOSE_ALL, "reason": f"Market close ({MARKET_CLOSE})"}, trade
-            )
+            execute_action({"type": CLOSE_ALL, "reason": f"Market close ({MARKET_CLOSE})"}, trade)
             continue
 
         # ── DETERMINISTIC SL/TP CHECK (reads SQLite option_prices) ─────────
@@ -1030,14 +1025,10 @@ def run_bridge():
                 sl_result["mtm"],
             )
             if sl_result["action"] == "SL_HIT":
-                execute_action(
-                    {"type": "SL_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade
-                )
+                execute_action({"type": "SL_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade)
                 _close_side(trade, leg["type"])
             else:
-                execute_action(
-                    {"type": "TP_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade
-                )
+                execute_action({"type": "TP_HIT", "leg": leg, "pnl": sl_result["mtm"]}, trade)
                 _close_side(trade, leg["type"])
             continue  # Skip LLM — SL/TP is arithmetic
 
@@ -1049,9 +1040,7 @@ def run_bridge():
         # discretionary action — same formula as run()'s P6 (realized + unrealized).
         cumulative = trade.get("cumulative_pnl", 0) + sl_result["mtm"]
         if cumulative <= FLOOR:
-            _pm_log.warning(
-                "P&L floor hit: cumulative ₹%.0f ≤ ₹%d → CLOSE ALL", cumulative, FLOOR
-            )
+            _pm_log.warning("P&L floor hit: cumulative ₹%.0f ≤ ₹%d → CLOSE ALL", cumulative, FLOOR)
             execute_action(
                 {
                     "type": CLOSE_ALL,
