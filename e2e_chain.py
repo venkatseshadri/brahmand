@@ -697,6 +697,7 @@ def run_full_chain(
             )
 
             # DAMBUILDER T5 — persist decision trace to capture SQLite
+            spot = (crew_result or {}).get("spot")
             _dambuilder_trace(
                 gate="NOT_UP",
                 entry_decision=ed,
@@ -712,8 +713,8 @@ def run_full_chain(
                 outcome=outcome,
                 spot=spot,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            get_logger("chain").warning(f"entry-check audit failed: {e}")
 
     if crew_result is None:
         _audit_entry_check("crew_none")
