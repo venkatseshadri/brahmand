@@ -81,10 +81,13 @@ def _generate_order_id() -> str:
     return f"ORD-{datetime.now().strftime('%Y%m%d')}-{order_counter:04d}"
 
 
-def _live_ltp(tsym: str) -> float:
-    """Latest captured LTP for an option symbol (same option_prices source the
-    exit path marks against). 0.0 when unavailable."""
+def _live_ltp(tsym: str, max_age_sec: float = 180.0) -> float:
+    """Latest captured LTP for an option symbol.
+    Refuses stale rows: if newest row > max_age_sec old, returns 0.0 (fail-closed).
+    All option_prices readers in position_manager + order_routing share this.
+    """
     import sqlite3
+    from datetime import datetime, timezone, timedelta
 
     try:
         from antariksh.config.sqlite_schema import get_sqlite_capture_path
@@ -96,10 +99,23 @@ def _live_ltp(tsym: str) -> float:
         conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         try:
             row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
+                "SELECT ltp, timestamp FROM option_prices WHERE tsym = ? "
+                "ORDER BY timestamp DESC LIMIT 1",
                 (tsym,),
             ).fetchone()
-            return float(row[0]) if row and row[0] else 0.0
+            if not row or not row[0]:
+                return 0.0
+            ltp = float(row[0])
+            if max_age_sec > 0:
+                row_time = datetime.strptime(row[1][:19], "%Y-%m-%dT%H:%M:%S").replace(
+                    tzinfo=timezone(timedelta(hours=5, minutes=30))
+                )
+                age = (
+                    datetime.now(timezone(timedelta(hours=5, minutes=30))) - row_time
+                ).total_seconds()
+                if age > max_age_sec:
+                    return 0.0
+            return ltp
         finally:
             conn.close()
     except Exception:

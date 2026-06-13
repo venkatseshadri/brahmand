@@ -413,23 +413,10 @@ def _norm_close_reason(reason: str) -> str:
 
 
 def _read_live_ltp(tsym: str) -> float:
-    """Read live LTP from SQLite option_prices table. Returns 0.0 if missing."""
-    try:
-        import sqlite3
-        from antariksh.config.sqlite_schema import get_sqlite_capture_path
+    """T23(f): read live LTP via shared staleness-guarded reader. 0.0 if stale/missing."""
+    from order_routing import _live_ltp
 
-        db = get_sqlite_capture_path("NIFTY")
-        if not db.exists():
-            return 0.0
-        conn = sqlite3.connect(str(db))
-        row = conn.execute(
-            "SELECT ltp FROM option_prices WHERE tsym=? ORDER BY timestamp DESC LIMIT 1",
-            (tsym,),
-        ).fetchone()
-        conn.close()
-        return float(row[0]) if row and row[0] else 0.0
-    except Exception:
-        return 0.0
+    return _live_ltp(tsym, max_age_sec=180.0)
 
 
 def _square_off(legs: list, trade_id: str, reason: str) -> float:
@@ -841,35 +828,24 @@ def _ensure_sl_tp_orders(trade: dict, trade_id: str):
 def _check_sl_tp(trade: dict) -> dict:
     """Deterministic SL/TP check before LLM dispatch.
 
-    Reads live LTPs from SQLite option_prices (populated by penguin consumer).
+    Reads live LTPs from shared staleness-guarded reader (T23(f)).
     Returns action dict: {"action": "SL_HIT"|"TP_HIT", "leg": {...}, "mtm": X}
     or {"action": "ACTIVE", "mtm": X}
     """
-    import sqlite3
-    from antariksh.config.sqlite_schema import get_sqlite_capture_path
+    from order_routing import _live_ltp
 
-    db_path = get_sqlite_capture_path("NIFTY")
-    if not db_path.exists():
-        return {"action": "ACTIVE", "mtm": 0.0}
-
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
     mtm = 0.0
+    for leg in trade.get("legs", []):
+        tsym = leg.get("tsym", "")
+        fill_price = leg.get("fill_price", leg.get("fill", 0)) or 0
+        action = leg.get("action", "")
+        qty = leg.get("quantity", 65)
+        sl = leg.get("sl")
+        tp = leg.get("tp")
 
-    try:
-        for leg in trade.get("legs", []):
-            tsym = leg.get("tsym", "")
-            fill_price = leg.get("fill_price", leg.get("fill", 0)) or 0
-            action = leg.get("action", "")
-            qty = leg.get("quantity", 65)
-            sl = leg.get("sl")
-            tp = leg.get("tp")
-
-            row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
-                (tsym,),
-            ).fetchone()
-            current_ltp = row["ltp"] if row else fill_price
+        current_ltp = _live_ltp(tsym)
+        if current_ltp <= 0:
+            current_ltp = fill_price
 
             if action == "SELL":
                 mtm += (fill_price - current_ltp) * qty
@@ -893,36 +869,20 @@ def _check_sl_tp(trade: dict) -> dict:
                         "tp": tp,
                         "mtm": round(mtm, 2),
                     }
-    finally:
-        conn.close()
 
     return {"action": "ACTIVE", "mtm": round(mtm, 2)}
 
 
 def _mark_legs_to_ltp(legs: list) -> None:
-    """Set each leg's live 'ltp' from SQLite option_prices (same source as
-    _check_sl_tp), so square-off books real P&L instead of the entry fill."""
-    import sqlite3
+    """Set each leg's live 'ltp' from shared staleness-guarded reader (T23(f)).
+    A stale/missing LTP leaves the leg unchanged — fail-safe."""
+    from order_routing import _live_ltp
 
-    try:
-        from antariksh.config.sqlite_schema import get_sqlite_capture_path
-
-        db_path = get_sqlite_capture_path("NIFTY")
-    except Exception:
-        return
-    if not db_path.exists():
-        return
-    conn = sqlite3.connect(str(db_path))
-    try:
-        for leg in legs:
-            row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
-                (leg.get("tsym", ""),),
-            ).fetchone()
-            if row and row[0] is not None:
-                leg["ltp"] = float(row[0])
-    finally:
-        conn.close()
+    for leg in legs:
+        tsym = leg.get("tsym", "")
+        ltp = _live_ltp(tsym)
+        if ltp > 0:
+            leg["ltp"] = ltp
 
 
 def _close_side(trade: dict, side: str) -> dict:
