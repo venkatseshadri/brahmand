@@ -422,7 +422,10 @@ def _read_live_ltp(tsym: str) -> float:
         if not db.exists():
             return 0.0
         conn = sqlite3.connect(str(db))
-        row = conn.execute("SELECT ltp FROM option_prices WHERE tsym=?", (tsym,)).fetchone()
+        row = conn.execute(
+            "SELECT ltp FROM option_prices WHERE tsym=? ORDER BY timestamp DESC LIMIT 1",
+            (tsym,),
+        ).fetchone()
         conn.close()
         return float(row[0]) if row and row[0] else 0.0
     except Exception:
@@ -910,7 +913,8 @@ def _mark_legs_to_ltp(legs: list) -> None:
     try:
         for leg in legs:
             row = conn.execute(
-                "SELECT ltp FROM option_prices WHERE tsym = ?", (leg.get("tsym", ""),)
+                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
+                (leg.get("tsym", ""),),
             ).fetchone()
             if row and row[0] is not None:
                 leg["ltp"] = float(row[0])

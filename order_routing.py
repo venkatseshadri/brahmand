@@ -95,7 +95,10 @@ def _live_ltp(tsym: str) -> float:
             return 0.0
         conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
         try:
-            row = conn.execute("SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)).fetchone()
+            row = conn.execute(
+                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
+                (tsym,),
+            ).fetchone()
             return float(row[0]) if row and row[0] else 0.0
         finally:
             conn.close()
