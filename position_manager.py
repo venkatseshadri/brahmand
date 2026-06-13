@@ -865,7 +865,10 @@ def _check_sl_tp(trade: dict) -> dict:
             sl = leg.get("sl")
             tp = leg.get("tp")
 
-            row = conn.execute("SELECT ltp FROM option_prices WHERE tsym = ?", (tsym,)).fetchone()
+            row = conn.execute(
+                "SELECT ltp FROM option_prices WHERE tsym = ? ORDER BY timestamp DESC LIMIT 1",
+                (tsym,),
+            ).fetchone()
             current_ltp = row["ltp"] if row else fill_price
 
             if action == "SELL":
