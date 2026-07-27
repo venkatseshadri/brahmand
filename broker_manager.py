@@ -83,7 +83,7 @@ class Flattrade:
         try:
             with open(Flattrade.TOKEN_PATH, 'r') as f:
                 data = json.load(f)
-                return data.get("token")
+                return data.get("access_token")
         except Exception as e:
             logger.error(f"Flattrade token load failed: {e}")
             return None
