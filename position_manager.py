@@ -71,7 +71,7 @@ def _get_spot(con, index: str = "NIFTY") -> float:
 
 def _load_entry_signal() -> dict:
     """Read latest entry gate decision from file."""
-    p = Path("/home/trading_ceo/antariksh/logs/entry_check_latest.json")
+    p = Path("/home/trading_ceo/projects/antariksh/logs/entry_check_latest.json")
     if p.exists():
         return json.loads(p.read_text())
     return {"signal": "NEUTRAL", "confidence": 0, "score": 0}
@@ -506,7 +506,7 @@ def _close_in_db(trade_id: str, reason: str, trade: dict):
                 _wto(
                     os.environ.get(
                         "CAPTURE_SQLITE",
-                        "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite",
+                        "/home/trading_ceo/projects/varaha/data/capture_nifty.sqlite",
                     ),
                     {
                         "trade_id": trade_id,

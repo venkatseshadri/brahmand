@@ -3,7 +3,7 @@
 # Cron triggers this every 1 min. Uses flock for atomic locking — no duplicates.
 #
 # Usage (cron):
-#   */1 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_risk_monitor.sh
+#   */1 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_risk_monitor.sh
 
 set -e
 

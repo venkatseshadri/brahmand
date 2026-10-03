@@ -30,7 +30,7 @@ logger = logging.getLogger("PatternAnalyzer")
 
 def _v4_db_path(index: str = "NIFTY") -> Path:
     return Path(
-        f"/home/trading_ceo/python-trader/varaha/data/market_data_multitf_{index.lower()}.duckdb"
+        f"/home/trading_ceo/projects/varaha/data/market_data_multitf_{index.lower()}.duckdb"
     )
 
 

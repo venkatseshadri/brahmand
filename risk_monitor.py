@@ -1,3 +1,4 @@
+import logging
 #!/usr/bin/env python3
 """
 DEPRECATED — superseded by position_manager.py (run via run_position_manager.sh).
@@ -13,7 +14,7 @@ Only executes when there are active positions.
 Checks: SL/TP triggers, MORPH detection, leg shifts.
 Closes trades and cleans up when SL/TP hit.
 
-Audit log: /home/trading_ceo/brahmand/logs/risk_monitor_YYYYMMDD.log
+Audit log: /home/trading_ceo/projects/brahmand/logs/risk_monitor_YYYYMMDD.log
 """
 
 import json
@@ -27,7 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from duckdb_tool import _connect
 
-LOG_DIR = Path("/home/trading_ceo/brahmand/logs")
+LOG_DIR = Path("/home/trading_ceo/projects/brahmand/logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 LOCK_FILE = Path(__file__).parent / "data" / "risk_monitor.lock"

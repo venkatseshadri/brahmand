@@ -348,7 +348,7 @@ def main():
         print(f"{r['scenario'][:40]:<40} ₹{r['path_a']['pnl']:>15,.0f} ₹{r['path_b']['pnl']:>15,.0f} ₹{saved:>15,.0f}")
 
     # Save results
-    output_path = Path("/home/trading_ceo/brahmand/data/loss_scenario_analysis.json")
+    output_path = Path("/home/trading_ceo/projects/brahmand/data/loss_scenario_analysis.json")
     output_path.write_text(json.dumps({
         'timestamp': datetime.now().isoformat(),
         'scenarios': [

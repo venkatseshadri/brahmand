@@ -17,7 +17,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Optional
 
-DB_PATH = "/home/trading_ceo/brahmand/data/nifty_options_2024.duckdb"
+DB_PATH = "/home/trading_ceo/projects/brahmand/data/nifty_options_2024.duckdb"
 
 def query_option_price_at_date(conn: duckdb.DuckDBPyConnection, symbol: str, date: str) -> Optional[float]:
     """Query option price for a given date."""
@@ -295,7 +295,7 @@ def main():
         print(f"Shift win rate: {len([r for r in results if r['shift_impact'] > 0])}/{len(results)}")
 
         # Save results
-        output_path = Path("/home/trading_ceo/brahmand/data/backtest_2024_leg_shift_results.json")
+        output_path = Path("/home/trading_ceo/projects/brahmand/data/backtest_2024_leg_shift_results.json")
         output_path.write_text(json.dumps({
             'timestamp': datetime.now().isoformat(),
             'sample_size': len(results),

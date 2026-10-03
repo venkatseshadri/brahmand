@@ -30,7 +30,7 @@ On May 19 during live trading (09:23-10:20), four trades were entered but the `e
 
 ```bash
 # New cron entry:
-*/5 9-15 * * 1-5 /home/trading_ceo/antariksh/run_entry_check.sh
+*/5 9-15 * * 1-5 /home/trading_ceo/projects/antariksh/run_entry_check.sh
 ```
 
 **Why Better:**
@@ -107,17 +107,17 @@ On May 19 during live trading (09:23-10:20), four trades were entered but the `e
 
 ## Files Modified
 
-1. **`/home/trading_ceo/brahmand/kickoff.py`**
+1. **`/home/trading_ceo/projects/brahmand/kickoff.py`**
    - `enter_trade()`: Fresh entry gate logging, normalized strategy_type
    - `monitor_trade()`: Minute-by-minute cycle logging, SL/TP with timestamps
 
-2. **`/home/trading_ceo/antariksh/run_entry_check.sh`** (NEW)
+2. **`/home/trading_ceo/projects/antariksh/run_entry_check.sh`** (NEW)
    - Simple wrapper to run entry_check every 5 min via cron
    - Replaces daemon approach
 
 3. **Cron jobs** (UPDATED)
    - Removed: `entry_check_daemon_start.sh` (09:15)
-   - Added: `/home/trading_ceo/antariksh/run_entry_check.sh` (*/5 09-15)
+   - Added: `/home/trading_ceo/projects/antariksh/run_entry_check.sh` (*/5 09-15)
 
 ## Impact on May 19 Session Analysis
 
@@ -142,4 +142,4 @@ The fixes don't change May 19's historical data, but they explain the confusion:
 ---
 **Author:** Claude Code  
 **Status:** Ready for May 20 market session  
-**Testing:** Run `/home/trading_ceo/antariksh/run_entry_check.sh` manually to verify
+**Testing:** Run `/home/trading_ceo/projects/antariksh/run_entry_check.sh` manually to verify

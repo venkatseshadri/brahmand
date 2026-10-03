@@ -518,7 +518,7 @@ def run_replay(run_e2e_chain: bool = False):
     print(f"  Entries:    {n_entries}")
 
     # Save
-    output = _Path("/home/trading_ceo/brahmand/data/REPLAY_KAGGLE_TO_REDIS_LOG.json")
+    output = _Path("/home/trading_ceo/projects/brahmand/data/REPLAY_KAGGLE_TO_REDIS_LOG.json")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(
@@ -545,7 +545,7 @@ def run_replay(run_e2e_chain: bool = False):
     try:
         tool_log = json.loads(
             _Path(
-                "/home/trading_ceo/brahmand/data/NIFTY_BACKTEST_AGENT_TOOLS_LOG.json"
+                "/home/trading_ceo/projects/brahmand/data/NIFTY_BACKTEST_AGENT_TOOLS_LOG.json"
             ).read_text()
         )
         tool_daily = {d["date"]: d for d in tool_log["daily_log"]}

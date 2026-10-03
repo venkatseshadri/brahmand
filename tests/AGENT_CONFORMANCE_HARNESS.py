@@ -655,7 +655,7 @@ def run_harness(max_days=100, n_runs=N_REPEAT_RUNS):
         "states": report_states,
     }
 
-    output_path = _Path("/home/trading_ceo/brahmand/data/conformance_report.json")
+    output_path = _Path("/home/trading_ceo/projects/brahmand/data/conformance_report.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, default=str))
 

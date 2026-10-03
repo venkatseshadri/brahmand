@@ -314,7 +314,7 @@ Pattern discovery → Storage → Entry Agent loading is functional. Real-time m
 
 ```bash
 # Run full test suite
-cd /home/trading_ceo/brahmand && python3 -m pytest tests/ -v
+cd /home/trading_ceo/projects/brahmand && python3 -m pytest tests/ -v
 # → 99 passed in 0.13s
 
 # Run research-specific tests only

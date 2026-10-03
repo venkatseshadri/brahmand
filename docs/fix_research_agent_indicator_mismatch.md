@@ -94,8 +94,8 @@ Verified all required fields exist in market_data table:
 4. Confirm multi-indicator pattern ST_ADX_VIX_001 triggers when all conditions met
 
 ## Files Modified
-- `/home/trading_ceo/brahmand/research_agents.py`
-- `/home/trading_ceo/brahmand/research_agents_full_db.py`
-- `/home/trading_ceo/brahmand/entry_agent.py`
+- `/home/trading_ceo/projects/brahmand/research_agents.py`
+- `/home/trading_ceo/projects/brahmand/research_agents_full_db.py`
+- `/home/trading_ceo/projects/brahmand/entry_agent.py`
 
 **Why this matters**: The entire research→backtest→entry pipeline was broken at the discovery stage. Research agents were successfully identifying patterns in data but storing them with invalid field references, making them unusable for live trading. This fix closes the gap between research insights and execution.

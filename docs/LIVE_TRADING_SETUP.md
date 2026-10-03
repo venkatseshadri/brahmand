@@ -39,7 +39,7 @@
 ## File Structure
 
 ```
-/home/trading_ceo/brahmand/
+/home/trading_ceo/projects/brahmand/
 ├─ research_agents.py                    # 4 research agent classes
 ├─ research_backtest_framework.py         # Backtest engine
 ├─ nightly_research_scheduler.py          # 11 PM autonomous run
@@ -79,7 +79,7 @@ EOF
 crontab -e
 
 # Add this line:
-0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
+0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
 ```
 
 **Verify it's working:**
@@ -100,7 +100,7 @@ tail -50 /tmp/research_scheduler.log
 
 ```bash
 # Start the broker (will run 9:15 AM - 3:30 PM automatically)
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python3 entry_signal_broker.py --live
 
 # In another terminal, monitor logs:
@@ -111,19 +111,19 @@ tail -f /tmp/entry_signal_broker.log
 
 ```bash
 # Create wrapper script
-cat > /home/trading_ceo/brahmand/start_broker.sh << 'EOF'
+cat > /home/trading_ceo/projects/brahmand/start_broker.sh << 'EOF'
 #!/bin/bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python3 entry_signal_broker.py --live >> /tmp/entry_signal_broker.log 2>&1
 EOF
 
-chmod +x /home/trading_ceo/brahmand/start_broker.sh
+chmod +x /home/trading_ceo/projects/brahmand/start_broker.sh
 
 # Add to crontab (starts at 9:10 AM, before market open)
 crontab -e
 
 # Add:
-10 9 * * 1-5 /home/trading_ceo/brahmand/start_broker.sh
+10 9 * * 1-5 /home/trading_ceo/projects/brahmand/start_broker.sh
 ```
 
 ### 4. **Testing & Validation**

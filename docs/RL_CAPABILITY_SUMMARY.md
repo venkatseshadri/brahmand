@@ -446,4 +446,4 @@ self.knowledge.publish_sl_pattern(
 
 **Status: Ready for Phase 1 implementation 🚀**
 
-**Next:** `/home/trading_ceo/brahmand/KNOWLEDGE_ARCHITECTURE.md` + `CREWAI_KNOWLEDGE_INTEGRATION.md`
+**Next:** `/home/trading_ceo/projects/brahmand/KNOWLEDGE_ARCHITECTURE.md` + `CREWAI_KNOWLEDGE_INTEGRATION.md`

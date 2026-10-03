@@ -9,7 +9,7 @@ Tests:
   4. Entry and Risk agents have correct tools
 
 Run:
-    cd /home/trading_ceo/brahmand
+    cd /home/trading_ceo/projects/brahmand
     python3 test_order_agent_routing.py
 """
 

@@ -40,20 +40,11 @@ class ResearchAgentBase:
 
     def __init__(
         self,
-        db_path_v31: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-        db_path_v4: str = "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb",
+        db_path_v31: str = "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb",
+        db_path_v4: str = "/home/trading_ceo/projects/varaha/data/market_data_multitf_nifty.duckdb",
     ):
-        # Project Penguin — prefer EOD warehouse if available
-        from pathlib import Path
-        from datetime import date
-
-        today = date.today()
-        warehouse = Path(f"/home/trading_ceo/research/{today.isoformat()}/nifty.duckdb")
-        if warehouse.exists():
-            db_path_v31 = str(warehouse)
         self.db_path_v31 = db_path_v31
         self.db_path_v4 = db_path_v4
-        self.db_v31 = duckdb.connect(db_path_v31, read_only=True)
         try:
             self.db_v4 = duckdb.connect(db_path_v4, read_only=True)
         except:
@@ -62,19 +53,35 @@ class ResearchAgentBase:
         self.weight = 0.5
 
     def get_candles_for_date(self, date: str) -> List[Dict]:
-        """Get all 1-min candles from v3.1 database for a specific date"""
-        result = self.db_v31.execute(f"""
-            SELECT * FROM market_data
-            WHERE date = '{date}' AND index_name = 'NIFTY'
-            ORDER BY timestamp ASC
-        """).fetchall()
+        """Get all 1-min candles from Penguin/warehouse data for a specific date"""
+        import sys
+        from pathlib import Path
+        brahmand_dir = str(Path(__file__).parent)
+        if brahmand_dir not in sys.path:
+            sys.path.append(brahmand_dir)
+        from penguin_compat import connect_research
 
-        columns = [desc[0] for desc in self.db_v31.description]
-        candles = []
-        for row in result:
-            candle = dict(zip(columns, row))
-            candles.append(candle)
-        return candles
+        try:
+            con = connect_research("NIFTY", date)
+        except Exception:
+            return []
+
+        try:
+            result = con.execute(f"""
+                SELECT * FROM market_data
+                WHERE date = '{date}' AND index_name = 'NIFTY'
+                ORDER BY timestamp ASC
+            """).fetchall()
+
+            columns = [desc[0] for desc in con.description]
+            candles = []
+            for row in result:
+                candle = dict(zip(columns, row))
+                candles.append(candle)
+            return candles
+        finally:
+            con.close()
+
 
     def get_v4_candles_for_date(self, date: str, timeframe_min: int = 1) -> List[Dict]:
         """Get multi-timeframe candles from v4 database for cross-validation"""

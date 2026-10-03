@@ -9,7 +9,7 @@
 ## What's Been Implemented
 
 ### 1. **4 Specialized Research Agent Classes** ✅
-📁 `/home/trading_ceo/brahmand/research_agents.py` (420 lines)
+📁 `/home/trading_ceo/projects/brahmand/research_agents.py` (420 lines)
 
 **SuperTrendResearchAgent** (weight: 0.87)
 - Analyzes: ST5, ST15, ADX indicators
@@ -95,7 +95,7 @@ Approval Criteria (meet any):
 
 ## 4. **Nightly Autonomous Scheduler** ✅
 
-📁 `/home/trading_ceo/brahmand/nightly_research_scheduler.py`
+📁 `/home/trading_ceo/projects/brahmand/nightly_research_scheduler.py`
 
 **Workflow (every night 11:00 PM):**
 
@@ -125,7 +125,7 @@ Total execution time: ~30 seconds
 
 **Cron Setup:**
 ```bash
-0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
+0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
 ```
 
 **Log Output:**
@@ -243,7 +243,7 @@ python3 nightly_research_scheduler.py
 ### 4. **Setup Cron** (Runs every night at 11 PM)
 ```bash
 crontab -e
-# Add: 0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py
+# Add: 0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py
 ```
 
 ### 5. **Monitor Logs**

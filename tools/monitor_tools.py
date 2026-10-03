@@ -47,7 +47,7 @@ class MorphCheckTool(BaseTool):
             return json.dumps({"error": "invalid trade_json", "actions": []})
 
         # Read current entry signal
-        ec_path = Path("/home/trading_ceo/antariksh/logs/entry_check_latest.json")
+        ec_path = Path("/home/trading_ceo/projects/antariksh/logs/entry_check_latest.json")
         current_signal = "NEUTRAL"
         if ec_path.exists():
             try:

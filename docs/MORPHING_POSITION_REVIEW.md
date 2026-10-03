@@ -429,4 +429,4 @@ Before deploying fixed code:
 - Need immediate fix before production use
 
 EOF
-cat /home/trading_ceo/brahmand/MORPHING_POSITION_REVIEW.md
+cat /home/trading_ceo/projects/brahmand/MORPHING_POSITION_REVIEW.md

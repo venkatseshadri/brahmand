@@ -10,7 +10,7 @@
 
 ### TOOL 1: `query_1min_candles_v31` — Varaha v3.1 Complete Database
 
-**Database Path:** `/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb`
+**Database Path:** `/home/trading_ceo/projects/varaha/data/varaha_data.duckdb`
 
 **Table:** `market_data` (primary trading data)
 
@@ -109,7 +109,7 @@ query_1min_candles_v31(
 
 ### TOOL 2: `query_1min_candles_v4` — Varaha v4 Multitimeframe Database
 
-**Database Path:** `/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb`
+**Database Path:** `/home/trading_ceo/projects/varaha/data/market_data_multitf.duckdb`
 
 **Tables:** `market_data_multitf` or `market_data` (depending on setup)
 

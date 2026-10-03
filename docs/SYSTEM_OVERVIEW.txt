@@ -146,7 +146,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 DATABASE: Varaha v3.1
-├─ Path: /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb
+├─ Path: /home/trading_ceo/projects/varaha/data/varaha_data.duckdb
 ├─ Size: 41 MB
 ├─ Table: market_data
 ├─ Index: NIFTY
@@ -233,14 +233,14 @@ DOCUMENTATION:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. TEST BACKTEST ENGINE (Verify it works):
-   $ python3 /home/trading_ceo/brahmand/research_backtest_framework.py
+   $ python3 /home/trading_ceo/projects/brahmand/research_backtest_framework.py
 
 2. RUN FULL NIGHTLY PIPELINE (Manual test):
-   $ python3 /home/trading_ceo/brahmand/nightly_research_scheduler.py
+   $ python3 /home/trading_ceo/projects/brahmand/nightly_research_scheduler.py
 
 3. SETUP AUTOMATED EXECUTION (Cron job):
    $ crontab -e
-   # Add: 0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py
+   # Add: 0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py
 
 4. MONITOR EXECUTION:
    $ tail -f /tmp/research_scheduler.log

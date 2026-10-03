@@ -1,7 +1,7 @@
 #!/bin/bash
 # Thin wrapper — all preflight logic lives in entry_setup.py.
 # Cron:
-#   1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_kickoff.sh
+#   1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_kickoff.sh
 
 set -e
 
@@ -12,7 +12,7 @@ mkdir -p "$PROJECT_DIR/logs"
 
 # Source env
 set -a
-[ -f /home/trading_ceo/antariksh/.env ] && . /home/trading_ceo/antariksh/.env
+[ -f /home/trading_ceo/projects/antariksh/.env ] && . /home/trading_ceo/projects/antariksh/.env
 [ -f "$PROJECT_DIR/.env" ] && . "$PROJECT_DIR/.env"
 set +a
 

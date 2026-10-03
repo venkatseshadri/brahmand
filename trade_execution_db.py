@@ -1,3 +1,4 @@
+import logging
 #!/usr/bin/env python3
 """
 Trade Execution DB — Separate DuckDB for order ledger and trade state.
@@ -7,7 +8,7 @@ Stores:
   - trade_history: closed positions (written by Risk Monitor)
   - monitoring_log: minute-by-minute audit trail (written by Risk Monitor)
 
-Location: /home/trading_ceo/brahmand/data/trade_execution.duckdb
+Location: /home/trading_ceo/projects/brahmand/data/trade_execution.duckdb
 """
 
 import duckdb
@@ -24,7 +25,7 @@ _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 DB_PATH = (
     Path(_SANDBOX) / "state" / "trade_execution.duckdb"
     if _SANDBOX
-    else Path("/home/trading_ceo/brahmand/data/trade_execution.duckdb")
+    else Path("/home/trading_ceo/projects/brahmand/data/trade_execution.duckdb")
 )
 _LOCK_PATH = Path(str(DB_PATH) + ".lock")
 _LOCK_TIMEOUT_S = 15.0  # max wait for the cross-process lock

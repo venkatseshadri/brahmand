@@ -26,7 +26,7 @@ trade_execution.duckdb (DuckDB)
 
 ## 1. order_ledger.json Structure
 
-**Location:** `/home/trading_ceo/brahmand/data/order_ledger.json`
+**Location:** `/home/trading_ceo/projects/brahmand/data/order_ledger.json`
 
 **Purpose:** Track all orders and trades at the ledger level (PAPER mode execution)
 
@@ -117,7 +117,7 @@ trade_execution.duckdb (DuckDB)
 
 ## 2. trade_execution.duckdb Schema
 
-**Location:** `/home/trading_ceo/brahmand/data/trade_execution.duckdb`
+**Location:** `/home/trading_ceo/projects/brahmand/data/trade_execution.duckdb`
 
 **Purpose:** Permanent audit trail for risk monitor and analysis
 

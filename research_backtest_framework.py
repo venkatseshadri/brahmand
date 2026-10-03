@@ -84,41 +84,88 @@ class PatternBacktestSummary:
 class BacktestEngine:
     """Backtests discovered patterns against historical NIFTY data"""
 
-    def __init__(self, db_path: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"):
+    def __init__(self, db_path: str = "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb"):
         self.db_path = db_path
-        self.db = None
-        self.connect()
-
-    def connect(self):
-        """Connect to Varaha database"""
-        self.db = duckdb.connect(self.db_path, read_only=True)
 
     def get_historical_dates(self) -> List[str]:
         """Get all available trading dates"""
-        result = self.db.execute("""
-            SELECT DISTINCT date FROM market_data
-            WHERE index_name = 'NIFTY'
-            ORDER BY date ASC
-        """).fetchall()
-        return [row[0] for row in result]
+        import os
+        from pathlib import Path
+        dates = set()
+        
+        # Add dates from research warehouse
+        research_dir = Path("/home/trading_ceo/projects/research")
+        if research_dir.exists():
+            for wh in research_dir.glob("????-??-??/nifty.duckdb"):
+                dates.add(wh.parent.name)
+                
+        # Also check old varaha db natively strictly if file exists and has tables
+        if Path(self.db_path).exists():
+            try:
+                import duckdb
+                con = duckdb.connect(self.db_path, read_only=True)
+                tables = con.execute("SHOW TABLES").fetchall()
+                if ('market_data',) in tables:
+                    result = con.execute("SELECT DISTINCT date FROM market_data WHERE index_name = 'NIFTY'").fetchall()
+                    dates.update([row[0] for row in result])
+                con.close()
+            except Exception:
+                pass
+                
+        # Also check current live penguin capture
+        live_cap = Path("/home/trading_ceo/projects/varaha/data/capture_nifty.sqlite")
+        if live_cap.exists():
+            try:
+                from penguin_compat import connect_live
+                con = connect_live("NIFTY")
+                result = con.execute("SELECT DISTINCT date FROM market_data WHERE index_name = 'NIFTY'").fetchall()
+                dates.update([row[0] for row in result])
+                con.close()
+            except Exception:
+                pass
+
+        return sorted(list(dates))
 
     def get_candles_for_date(self, date: str) -> List[Dict]:
         """Get all 1-min candles for a specific date"""
-        result = self.db.execute(f"""
-            SELECT * FROM market_data
-            WHERE date = '{date}' AND index_name = 'NIFTY'
-            ORDER BY timestamp ASC
-        """).fetchall()
+        import sys
+        from pathlib import Path
+        brahmand_dir = str(Path(__file__).parent)
+        if brahmand_dir not in sys.path:
+            sys.path.append(brahmand_dir)
+        from penguin_compat import connect_research
+        
+        try:
+            con = connect_research("NIFTY", date)
+        except Exception:
+            # Fallback to varaha if no penguin capture
+            import duckdb
+            try:
+                con = duckdb.connect(self.db_path, read_only=True)
+            except:
+                return []
+        
+        try:
+            result = con.execute(f"""
+                SELECT * FROM market_data
+                WHERE date = '{date}' AND index_name = 'NIFTY'
+                ORDER BY timestamp ASC
+            """).fetchall()
 
-        # Get column names
-        columns = [desc[0] for desc in self.db.description]
+            # Get column names
+            columns = [desc[0] for desc in con.description]
 
-        candles = []
-        for row in result:
-            candle = dict(zip(columns, row))
-            candles.append(candle)
+            candles = []
+            for row in result:
+                candle = dict(zip(columns, row))
+                candles.append(candle)
 
-        return candles
+            return candles
+        except Exception:
+            return []
+        finally:
+            con.close()
+
 
     def backtest_pattern(self, pattern: Dict, date: str) -> BacktestResult:
         """

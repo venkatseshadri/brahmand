@@ -11,7 +11,7 @@ metadata:
 
 **Date:** May 23, 2026  
 **Status:** 🟢 **IMPLEMENTED**  
-**Files Modified:** `/home/trading_ceo/brahmand/kickoff.py`
+**Files Modified:** `/home/trading_ceo/projects/brahmand/kickoff.py`
 
 ---
 
@@ -192,10 +192,10 @@ Run a live cycle and check outputs:
 
 ```bash
 # Real-time monitoring
-tail -f /home/trading_ceo/brahmand/logs/kickoff_$(date +%Y%m%d).log | grep MONITOR
+tail -f /home/trading_ceo/projects/brahmand/logs/kickoff_$(date +%Y%m%d).log | grep MONITOR
 
 # Structured events
-jq '.' /home/trading_ceo/brahmand/logs/monitoring_events_$(date +%Y%m%d).jsonl | head -50
+jq '.' /home/trading_ceo/projects/brahmand/logs/monitoring_events_$(date +%Y%m%d).jsonl | head -50
 ```
 
 On next market open (May 27 if holiday), you'll see:

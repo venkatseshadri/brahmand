@@ -20,7 +20,7 @@ from typing import Optional
 import duckdb
 import numpy as np
 
-DUCKDB_PATH = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
+DUCKDB_PATH = "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb"
 EMA_STATE_DIR = Path("/tmp/replay_ema_state")
 INDEX = "NIFTY"
 REDIS_KEY = f"v3_ohlcv_queue_{INDEX}"

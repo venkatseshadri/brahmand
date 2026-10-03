@@ -188,7 +188,7 @@ def main():
     print(f"   Shifts DON'T help when: price moves against position")
 
     # Save results
-    output_path = Path("/home/trading_ceo/brahmand/data/leg_shift_mechanics_simulation.json")
+    output_path = Path("/home/trading_ceo/projects/brahmand/data/leg_shift_mechanics_simulation.json")
     output_path.write_text(json.dumps({
         'timestamp': datetime.now().isoformat(),
         'scenarios': results,

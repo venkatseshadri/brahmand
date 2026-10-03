@@ -10,7 +10,7 @@
 ## What's Built
 
 ### 1. **Research Backtest Framework** ✅
-📁 `/home/trading_ceo/brahmand/research_backtest_framework.py`
+📁 `/home/trading_ceo/projects/brahmand/research_backtest_framework.py`
 
 **Capabilities:**
 - ✅ Connect to Varaha v3.1 DuckDB (41 MB database)
@@ -31,7 +31,7 @@ Pattern: ADX > 20
 ```
 
 ### 2. **Nightly Autonomous Scheduler** ✅
-📁 `/home/trading_ceo/brahmand/nightly_research_scheduler.py`
+📁 `/home/trading_ceo/projects/brahmand/nightly_research_scheduler.py`
 
 **Workflow (11:00 PM - 12:00 AM):**
 1. Run 4 research agents on yesterday's data
@@ -47,7 +47,7 @@ Pattern: ADX > 20
 - ChromaDB integration for pattern storage
 
 ### 3. **Pattern Integration Framework** ✅
-📁 `/home/trading_ceo/brahmand/PATTERN_INTEGRATION_FRAMEWORK.md`
+📁 `/home/trading_ceo/projects/brahmand/PATTERN_INTEGRATION_FRAMEWORK.md`
 
 **Architecture:**
 - Multi-agent research (SuperTrend, PCR, EMA, Volatility families)
@@ -57,7 +57,7 @@ Pattern: ADX > 20
 - Pattern expiration (7 days)
 
 ### 4. **Autonomous Workflow Documentation** ✅
-📁 `/home/trading_ceo/brahmand/AUTONOMOUS_RESEARCH_WORKFLOW.md`
+📁 `/home/trading_ceo/projects/brahmand/AUTONOMOUS_RESEARCH_WORKFLOW.md`
 
 **Complete workflow:**
 - Nightly research → backtest → validation → storage
@@ -156,7 +156,7 @@ Pattern: ADX > 20
 
 ### Historical Data Available
 ```
-Varaha v3.1 Database: /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb
+Varaha v3.1 Database: /home/trading_ceo/projects/varaha/data/varaha_data.duckdb
 
 NIFTY Data:
 ├─ Date range: 2026-05-04 to 2026-05-21 (13 trading days)
@@ -220,7 +220,7 @@ Metrics calculated:
 
 ### 1. Test Backtest Engine
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python3 research_backtest_framework.py --run-backtest-only
 ```
 
@@ -233,7 +233,7 @@ python3 nightly_research_scheduler.py
 ### 3. Setup Cron (Automatic Every Night)
 ```bash
 crontab -e
-# Add: 0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py
+# Add: 0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py
 ```
 
 ### 4. Monitor Cron Execution

@@ -28,7 +28,7 @@ sys.path.insert(0, str(REPO))
 sys.path.insert(0, "/home/trading_ceo")  # so `antariksh.config...` imports
 
 import sqlite3
-CAP = "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite"
+CAP = "/home/trading_ceo/projects/varaha/data/capture_nifty.sqlite"
 _c = sqlite3.connect(CAP)
 _c.row_factory = sqlite3.Row
 ce = _c.execute(

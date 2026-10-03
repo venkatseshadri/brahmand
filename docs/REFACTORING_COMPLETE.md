@@ -138,7 +138,7 @@ TEST 6: Checking agent registry...
 
 Run the test suite:
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python3 test_order_agent_routing.py
 ```
 

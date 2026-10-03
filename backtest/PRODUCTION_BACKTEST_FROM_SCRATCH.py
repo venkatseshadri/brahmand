@@ -27,7 +27,7 @@ class ProductionBacktest:
     Uses actual agent decision logic, not made-up scenarios.
     """
 
-    def __init__(self, data_path: str = "/home/trading_ceo/brahmand/data"):
+    def __init__(self, data_path: str = "/home/trading_ceo/projects/brahmand/data"):
         self.data_path = Path(data_path)
         self.trades = []
         self.signals = []

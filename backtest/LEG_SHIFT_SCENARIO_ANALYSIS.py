@@ -215,6 +215,6 @@ results = {
     "recommendation": "Morphing (not leg shifting) is what saves these trades. Leg shifting adds complexity without benefit.",
 }
 
-Path("/home/trading_ceo/brahmand/data/leg_shift_max_loss_scenario.json").write_text(json.dumps(results, indent=2, default=str))
+Path("/home/trading_ceo/projects/brahmand/data/leg_shift_max_loss_scenario.json").write_text(json.dumps(results, indent=2, default=str))
 
 print("✅ Scenario saved: data/leg_shift_max_loss_scenario.json\n")

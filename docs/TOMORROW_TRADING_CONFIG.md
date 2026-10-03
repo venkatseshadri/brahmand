@@ -253,7 +253,7 @@ Win rate on live trades         80%+            End of day
 ## Files to Update
 
 ```
-/home/trading_ceo/brahmand/entry_agent.py
+/home/trading_ceo/projects/brahmand/entry_agent.py
   Line ~45: Update self.family_weights
   Line ~140: Update entry threshold (0.75)
 

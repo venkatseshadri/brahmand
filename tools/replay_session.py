@@ -239,11 +239,11 @@ class ReplaySession:
         # Indicator buffer for capture simulation
         self.buf = _IndicatorBuffer()
         if (
-            Path("/home/trading_ceo/brahmand/logs") / f"v3_ohlcv_{self.index}.log"
+            Path("/home/trading_ceo/projects/brahmand/logs") / f"v3_ohlcv_{self.index}.log"
         ).exists():
             self.buf.warmup_from_log(
                 str(
-                    Path("/home/trading_ceo/brahmand/logs")
+                    Path("/home/trading_ceo/projects/brahmand/logs")
                     / f"v3_ohlcv_{self.index}.log"
                 ),
                 max_bars=200,

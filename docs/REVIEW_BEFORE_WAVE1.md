@@ -33,7 +33,7 @@
 
 **Option A (Flat):**
 ```
-/home/trading_ceo/brahmand/
+/home/trading_ceo/projects/brahmand/
 ├── schemas.py          ← Top level
 ├── config/
 ├── agents/
@@ -42,7 +42,7 @@
 
 **Option B (Nested):**
 ```
-/home/trading_ceo/brahmand/
+/home/trading_ceo/projects/brahmand/
 ├── brahmand/
 │   ├── __init__.py
 │   ├── schemas.py      ← Inside package
@@ -64,14 +64,14 @@
 **Action:** Before coding persistence.py (Wave 1, step 4), verify:
 
 ```bash
-ls -la /home/trading_ceo/antariksh/config/antariksh_rules.yaml
+ls -la /home/trading_ceo/projects/antariksh/config/antariksh_rules.yaml
 ```
 
 **If file does NOT exist:**
 - Option A: Create it in brahmand/config/ as `risk_limits.yaml` (self-contained)
 - Option B: Inline RiskLimits defaults directly in schemas.py with hardcoded values
 
-**Recommendation:** **Option A** — Create `/home/trading_ceo/brahmand/config/risk_limits.yaml` with reasonable defaults:
+**Recommendation:** **Option A** — Create `/home/trading_ceo/projects/brahmand/config/risk_limits.yaml` with reasonable defaults:
 ```yaml
 risk_limits:
   max_drawdown: 4500.0        # Daily loss limit in ₹
@@ -123,7 +123,7 @@ risk_limits:
 
 Before implementing Wave 1 files (steps 1-5), confirm:
 
-- [ ] schemas.py location chosen (recommend: flat at /home/trading_ceo/brahmand/schemas.py)
+- [ ] schemas.py location chosen (recommend: flat at /home/trading_ceo/projects/brahmand/schemas.py)
 - [ ] RiskLimits YAML ready (either antariksh/config/antariksh_rules.yaml OR brahmand/config/risk_limits.yaml)
 - [ ] Persistence strategy decided (recommend: Custom state.db only, not CrewAI @persist)
 - [ ] All 5 schemas from SCHEMAS.md implemented in schemas.py with docstrings
@@ -173,7 +173,7 @@ Once Wave 1 is complete and tested:
 ## 📬 Response (2026-05-13)
 
 ### Q1: schemas.py location
-**Decision:** Flat — `/home/trading_ceo/brahmand/schemas.py`. No nested package.
+**Decision:** Flat — `/home/trading_ceo/projects/brahmand/schemas.py`. No nested package.
 
 ### Q2: RiskLimits source
 **Decision:** Self-contained `brahmand/config/risk_limits.yaml` seeded from `antariksh/config/antariksh_rules.yaml` values. Brahmand is a sister project — can inspire from antariksh but stays self-contained.

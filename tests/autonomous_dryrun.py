@@ -16,7 +16,7 @@ Usage:
     python autonomous_dryrun.py [--start HH:MM] [--end HH:MM] [--trades N]
 
 Cron (runs Mon-Wed-Fri):
-    0 11 * * 1,3,5 cd /home/trading_ceo/brahmand && python autonomous_dryrun.py >> logs/dryrun_$(date +%Y%m%d).log 2>&1
+    0 11 * * 1,3,5 cd /home/trading_ceo/projects/brahmand && python autonomous_dryrun.py >> logs/dryrun_$(date +%Y%m%d).log 2>&1
 """
 
 import json
@@ -45,7 +45,7 @@ from persistence import (
 from schemas import ExecutionReport
 
 DUCKDB_VARAH_DATA = Path(
-    "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
+    "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb"
 )
 LOG_DIR = Path(__file__).parent / "logs"
 

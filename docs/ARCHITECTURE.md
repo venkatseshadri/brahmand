@@ -335,14 +335,14 @@ DuckDB (varaha_data.duckdb)
     └── expiry, ltp, volume, oi
 
 EMA State Files (Persistent)
-└── /home/trading_ceo/antariksh/ema_state/
+└── /home/trading_ceo/projects/antariksh/ema_state/
     ├── NIFTY_1.pkl (1-min EMA)
     ├── NIFTY_5.pkl (5-min EMA)
     ├── NIFTY_15.pkl (15-min EMA)
     └── NIFTY_60.pkl (60-min EMA)
 
 Entry Signals (from entry_check.py)
-└── /home/trading_ceo/antariksh/entry_signals/
+└── /home/trading_ceo/projects/antariksh/entry_signals/
     └── entry_check_latest.json
         {
           "signal": "GO" | "NO-GO",
@@ -480,7 +480,7 @@ ps aux | grep data_capture
 python3 -c "from duckdb_tool import get_latest_market_snapshot; print(get_latest_market_snapshot())"
 
 # 3. Check EMA state
-ls -la /home/trading_ceo/antariksh/ema_state/
+ls -la /home/trading_ceo/projects/antariksh/ema_state/
 
 # 4. Verify kickoff cron
 crontab -l | grep kickoff
@@ -616,7 +616,7 @@ python3 kickoff.py --dry-run
 
 ## 9. DEPLOYMENT CHECKLIST
 
-- [x] All files in `/home/trading_ceo/brahmand/`
+- [x] All files in `/home/trading_ceo/projects/brahmand/`
 - [x] Crontab entries for kickoff + risk monitor
 - [x] DuckDB attached (read-only)
 - [x] EMA state directory accessible
@@ -631,7 +631,7 @@ python3 kickoff.py --dry-run
 ## 10. QUICK START
 
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 
 # 1. Check system status
 python3 -c "from duckdb_tool import get_latest_market_snapshot; import json; print(json.dumps(get_latest_market_snapshot(), indent=2))"

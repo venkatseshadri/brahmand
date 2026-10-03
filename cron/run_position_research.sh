@@ -8,7 +8,7 @@
 # where an LLM will later optimise shift/morph timing and SL/TP levels.
 #
 # Usage (crontab):
-#   0,15,30,45 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_position_research.sh
+#   0,15,30,45 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_position_research.sh
 
 set -e
 
@@ -28,7 +28,7 @@ fi
 cd "$PROJECT_DIR"
 
 # Load environment (DeepSeek API key from antariksh/.env) — for the future LLM seam.
-for env in "$PROJECT_DIR/.env" "/home/trading_ceo/antariksh/.env"; do
+for env in "$PROJECT_DIR/.env" "/home/trading_ceo/projects/antariksh/.env"; do
     if [ -f "$env" ]; then
         set -a; source "$env"; set +a
     fi

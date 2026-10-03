@@ -135,10 +135,10 @@ def enter_trade(state: dict):
 ## Cron Jobs (Updated)
 
 **REMOVED:**
-- ❌ `*/5 9-15 * * 1-5 /home/trading_ceo/antariksh/run_entry_check.sh`
+- ❌ `*/5 9-15 * * 1-5 /home/trading_ceo/projects/antariksh/run_entry_check.sh`
 
 **EXISTING (unchanged):**
-- ✅ `14 9 * * 1-5 /home/trading_ceo/python-trader/varaha/run_data_capture_with_v4.sh` — starts v3+v4
+- ✅ `14 9 * * 1-5 /home/trading_ceo/projects/varaha/run_data_capture_with_v4.sh` — starts v3+v4
 
 ## May 19 Session: Final Understanding
 

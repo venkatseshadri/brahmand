@@ -66,7 +66,7 @@ def _dambuilder_trace(gate: str, entry_decision: dict, regime: dict, outcome: st
         ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
         db_path = os.environ.get(
             "CAPTURE_SQLITE",
-            "/home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite",
+            "/home/trading_ceo/projects/varaha/data/capture_nifty.sqlite",
         )
         row = {
             "timestamp": ist.isoformat(),

@@ -1,1 +1,1 @@
-{"tf": "60min", "period": 200, "ema_value": 24155.519280619625, "available": true, "status": "ready", "last_bars": [23647.75], "buffer_count": 1684, "multiplier": 0.009950248756218905, "threshold_crossed_at": "2026-06-11T07:46:14.175620", "timestamp": "2026-06-11T07:46:14.175621"}
+{"tf": "60min", "period": 200, "ema_value": 24155.519280619625, "available": true, "status": "ready", "last_bars": [23647.75], "buffer_count": 1684, "multiplier": 0.009950248756218905, "threshold_crossed_at": "2026-07-15T14:16:50.615339", "timestamp": "2026-07-15T14:16:50.615342"}

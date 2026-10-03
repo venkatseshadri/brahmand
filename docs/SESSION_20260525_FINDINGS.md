@@ -155,7 +155,7 @@ pkill -9 -f "data_capture_v3.1_duckdb"
 pkill -9 -f "data_capture_v4_queue_aggregator"
 fuser -k varaha_data.duckdb
 fuser -k market_data_multitf.duckdb
-rm -f /home/trading_ceo/antariksh/locks/*.lock
+rm -f /home/trading_ceo/projects/antariksh/locks/*.lock
 ```
 
 This prevents zombie accumulation across days. Tomorrow's 09:14 startup will run clean.
@@ -172,8 +172,8 @@ kill $(ps aux | grep "data_capture_v3\|aggregator" | grep -v grep | awk '{print 
 find /home/trading_ceo -name "*.lock" -path "*/locks/*" -delete 2>/dev/null
 
 # Verify DuckDB healthy
-python3 -c "import duckdb; duckdb.connect('/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb').close(); print('DuckDB OK')"
+python3 -c "import duckdb; duckdb.connect('/home/trading_ceo/projects/varaha/data/varaha_data.duckdb').close(); print('DuckDB OK')"
 
 # Re-run pattern enrichment for EOD forward returns
-python3 /home/trading_ceo/brahmand/pattern_enricher.py --force --all
+python3 /home/trading_ceo/projects/brahmand/pattern_enricher.py --force --all
 ```

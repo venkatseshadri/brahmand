@@ -187,7 +187,7 @@ def test_edge_cases():
     logger.info("=" * 70)
 
     # Load margin matrix to inspect
-    margin_file = Path("/home/trading_ceo/brahmand/data/margin_matrix.json")
+    margin_file = Path("/home/trading_ceo/projects/brahmand/data/margin_matrix.json")
     if not margin_file.exists():
         logger.error("❌ margin_matrix.json not found")
         return False
@@ -233,7 +233,7 @@ def test_duckdb_connectivity():
         import duckdb
 
         db = duckdb.connect(
-            "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
+            "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb",
             read_only=True,
         )
 

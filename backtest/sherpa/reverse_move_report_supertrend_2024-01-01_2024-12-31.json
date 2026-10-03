@@ -1,0 +1,62 @@
+[
+  {
+    "indicator": "SuperTrend(15m)",
+    "horizon_min": 5,
+    "n": 89000,
+    "base_rate_up_ge50": 0.0095,
+    "base_rate_down_ge50": 0.0103,
+    "n_bullish_states": 48648,
+    "n_bearish_states": 40352,
+    "precision_up_given_bullish": 0.0063,
+    "precision_down_given_bearish": 0.013,
+    "wrong_direction_given_bullish": 0.008,
+    "wrong_direction_given_bearish": 0.0133,
+    "lift_up": 0.67,
+    "lift_down": 1.27
+  },
+  {
+    "indicator": "SuperTrend(15m)",
+    "horizon_min": 15,
+    "n": 88994,
+    "base_rate_up_ge50": 0.0429,
+    "base_rate_down_ge50": 0.0448,
+    "n_bullish_states": 48648,
+    "n_bearish_states": 40346,
+    "precision_up_given_bullish": 0.0338,
+    "precision_down_given_bearish": 0.0542,
+    "wrong_direction_given_bullish": 0.0369,
+    "wrong_direction_given_bearish": 0.0538,
+    "lift_up": 0.79,
+    "lift_down": 1.21
+  },
+  {
+    "indicator": "SuperTrend(15m)",
+    "horizon_min": 30,
+    "n": 88979,
+    "base_rate_up_ge50": 0.0901,
+    "base_rate_down_ge50": 0.0906,
+    "n_bullish_states": 48648,
+    "n_bearish_states": 40331,
+    "precision_up_given_bullish": 0.0767,
+    "precision_down_given_bearish": 0.1054,
+    "wrong_direction_given_bullish": 0.0783,
+    "wrong_direction_given_bearish": 0.1062,
+    "lift_up": 0.85,
+    "lift_down": 1.16
+  },
+  {
+    "indicator": "SuperTrend(15m)",
+    "horizon_min": 60,
+    "n": 88949,
+    "base_rate_up_ge50": 0.1646,
+    "base_rate_down_ge50": 0.1521,
+    "n_bullish_states": 48648,
+    "n_bearish_states": 40301,
+    "precision_up_given_bullish": 0.1478,
+    "precision_down_given_bearish": 0.1748,
+    "wrong_direction_given_bullish": 0.1333,
+    "wrong_direction_given_bearish": 0.1849,
+    "lift_up": 0.9,
+    "lift_down": 1.15
+  }
+]

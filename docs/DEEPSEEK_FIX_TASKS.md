@@ -31,7 +31,7 @@
 ---
 
 ## P3 — india_vix NULL in enriched snapshot ✅ DONE
-- **Root cause:** `varaha_auth.VarahaConnect` import failed — sys.path missing `/home/trading_ceo/python-trader/varaha/`.
+- **Root cause:** `varaha_auth.VarahaConnect` import failed — sys.path missing `/home/trading_ceo/projects/varaha/`.
 - **Fix:** Added `sys.path.insert(0, str(PROJECT_ROOT.parent / "python-trader" / "varaha"))` in both `Enricher._warmup()` and `BrokerSession._connect()` in `instrument_enricher.py`.
 - **Validated:** Shoonya broker connected, `get_quotes("NSE", "26017")` returns INDIA VIX = 15.89. MCX enricher restarted with fix.
 - **Also fixed:** `prev_day_data` lazy-init in `enrich_bar()` — handles startup race where warmup query misses data before consumer has written to SQLite. One DB query on first bar, cached for session.

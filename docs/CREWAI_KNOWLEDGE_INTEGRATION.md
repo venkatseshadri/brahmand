@@ -433,7 +433,7 @@ class BrahmandKnowledge:
 
 ## PART C: Post-Mortem Agent Implementation
 
-### Current Code Location: `/home/trading_ceo/brahmand/config/agents_registry.yaml` (postmortem_agent)
+### Current Code Location: `/home/trading_ceo/projects/brahmand/config/agents_registry.yaml` (postmortem_agent)
 
 ### Enhanced Implementation with Knowledge Publishing
 

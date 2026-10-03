@@ -3,7 +3,7 @@
 Brahmand Entry Setup — preflight guard for kickoff.
 
 Called directly by cron every 5 min during market hours:
-  1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /usr/bin/python3 /home/trading_ceo/brahmand/entry_setup.py
+  1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 /usr/bin/python3 /home/trading_ceo/projects/brahmand/entry_setup.py
 
 Handles ALL preparatory work:
   1. Process guard (pgrep self — skip if already running)
@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 # Source env files BEFORE other imports (may need env vars)
 for env_file in [
-    Path("/home/trading_ceo/antariksh/.env"),
+    Path("/home/trading_ceo/projects/antariksh/.env"),
     Path(__file__).parent / ".env",
 ]:
     if env_file.exists():

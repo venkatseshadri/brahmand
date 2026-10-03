@@ -3,7 +3,7 @@
 # Dual guard: pgrep liveness check + flock atomic lock. Cron-safe — no duplicates.
 #
 # Usage (cron):
-#   */5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_pattern_enricher.sh
+#   */5 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_pattern_enricher.sh
 
 set -e
 

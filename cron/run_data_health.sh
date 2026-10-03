@@ -3,7 +3,7 @@
 # Propagates data_health's own exit code (non-zero = unhealthy).
 #
 # Usage (cron):
-#   */5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_data_health.sh
+#   */5 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_data_health.sh
 
 set -e
 

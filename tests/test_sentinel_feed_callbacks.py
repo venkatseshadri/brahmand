@@ -15,7 +15,7 @@ def test_no_errors_silent():
         f.write("09:15:23 INFO: feed started\n09:16:00 INFO: bar close\n")
         tmp = f.name
     try:
-        log_path = Path("/home/trading_ceo/antariksh/logs/feed.log")
+        log_path = Path("/home/trading_ceo/projects/antariksh/logs/feed.log")
         os.makedirs(log_path.parent, exist_ok=True)
         # Save original, replace with clean test log
         orig_exists = log_path.exists()
@@ -36,7 +36,8 @@ def test_no_errors_silent():
         Path(tmp).unlink()
 
 
-def test_errors_warn():
+@patch("data_health._is_market_hours", return_value=True)
+def test_errors_warn(mock_market):
     with tempfile.NamedTemporaryFile(mode="w", suffix=".log", delete=False) as f:
         f.write(
             "09:15:23 INFO: feed started\n"
@@ -46,7 +47,7 @@ def test_errors_warn():
         )
         tmp = f.name
     try:
-        log_path = Path("/home/trading_ceo/antariksh/logs/feed.log")
+        log_path = Path("/home/trading_ceo/projects/antariksh/logs/feed.log")
         os.makedirs(log_path.parent, exist_ok=True)
         orig_exists = log_path.exists()
         if orig_exists:

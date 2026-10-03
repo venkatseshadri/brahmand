@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "period": "2024-01-01..2024-01-31",
+    "note": "signal exit = decide_entry() re-run vs open trade, mirrored"
+  },
+  "trades_total": 47,
+  "trades_with_flip_before_actual_exit": 9,
+  "flip_rate_pct": 19.1,
+  "signal_exit_better_count": 6,
+  "signal_exit_worse_count": 3,
+  "signal_exit_equal_count": 0,
+  "total_pnl_delta_signal_minus_actual": 1068.34,
+  "sl_hit_trades_with_prior_flip": 4,
+  "sl_hit_trades_flip_wouldve_reduced_loss": 4,
+  "avg_minutes_flip_precedes_actual_exit": 95.1,
+  "flip_records": [
+    {
+      "entry_ts": "2024-01-04 09:30:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-04 10:15:00",
+      "signal_pnl": -2422.79,
+      "minutes_since_entry": 45.0,
+      "actual_exit_ts": "2024-01-04 15:25:00",
+      "actual_exit_reason": "EOD",
+      "actual_pnl": -5090.97,
+      "pnl_delta_signal_minus_actual": 2668.18
+    },
+    {
+      "entry_ts": "2024-01-08 11:10:00",
+      "strategy": "PUT_SPREAD",
+      "flip_ts": "2024-01-08 11:15:00",
+      "signal_pnl": -400.57,
+      "minutes_since_entry": 5.0,
+      "actual_exit_ts": "2024-01-08 11:53:00",
+      "actual_exit_reason": "SL_HIT",
+      "actual_pnl": -4921.53,
+      "pnl_delta_signal_minus_actual": 4520.96
+    },
+    {
+      "entry_ts": "2024-01-10 10:20:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-10 15:15:00",
+      "signal_pnl": -4506.25,
+      "minutes_since_entry": 295.0,
+      "actual_exit_ts": "2024-01-10 15:25:00",
+      "actual_exit_reason": "EOD",
+      "actual_pnl": -5855.25,
+      "pnl_delta_signal_minus_actual": 1349.0
+    },
+    {
+      "entry_ts": "2024-01-11 10:55:00",
+      "strategy": "PUT_SPREAD",
+      "flip_ts": "2024-01-11 14:15:00",
+      "signal_pnl": -3445.44,
+      "minutes_since_entry": 200.0,
+      "actual_exit_ts": "2024-01-11 15:25:00",
+      "actual_exit_reason": "EOD",
+      "actual_pnl": -180.71,
+      "pnl_delta_signal_minus_actual": -3264.73
+    },
+    {
+      "entry_ts": "2024-01-17 09:30:00",
+      "strategy": "PUT_SPREAD",
+      "flip_ts": "2024-01-17 10:15:00",
+      "signal_pnl": -349.9,
+      "minutes_since_entry": 45.0,
+      "actual_exit_ts": "2024-01-17 11:39:00",
+      "actual_exit_reason": "SL_HIT",
+      "actual_pnl": -6540.05,
+      "pnl_delta_signal_minus_actual": 6190.15
+    },
+    {
+      "entry_ts": "2024-01-20 09:30:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-20 10:15:00",
+      "signal_pnl": -78.83,
+      "minutes_since_entry": 45.0,
+      "actual_exit_ts": "2024-01-20 15:25:00",
+      "actual_exit_reason": "EOD",
+      "actual_pnl": 7702.3,
+      "pnl_delta_signal_minus_actual": -7781.13
+    },
+    {
+      "entry_ts": "2024-01-23 10:00:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-23 10:15:00",
+      "signal_pnl": -1180.69,
+      "minutes_since_entry": 15.0,
+      "actual_exit_ts": "2024-01-23 10:23:00",
+      "actual_exit_reason": "TP_HIT",
+      "actual_pnl": 6886.29,
+      "pnl_delta_signal_minus_actual": -8066.98
+    },
+    {
+      "entry_ts": "2024-01-29 10:05:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-29 10:15:00",
+      "signal_pnl": -1663.19,
+      "minutes_since_entry": 10.0,
+      "actual_exit_ts": "2024-01-29 10:39:00",
+      "actual_exit_reason": "SL_HIT",
+      "actual_pnl": -7021.7,
+      "pnl_delta_signal_minus_actual": 5358.51
+    },
+    {
+      "entry_ts": "2024-01-31 09:30:00",
+      "strategy": "CALL_SPREAD",
+      "flip_ts": "2024-01-31 10:15:00",
+      "signal_pnl": -7529.42,
+      "minutes_since_entry": 45.0,
+      "actual_exit_ts": "2024-01-31 10:17:00",
+      "actual_exit_reason": "SL_HIT",
+      "actual_pnl": -7623.8,
+      "pnl_delta_signal_minus_actual": 94.38
+    }
+  ]
+}

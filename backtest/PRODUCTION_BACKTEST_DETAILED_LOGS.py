@@ -494,7 +494,7 @@ def main():
         "signal_log": bt.signals_log,
     }
 
-    output_path = Path("/home/trading_ceo/brahmand/data/production_backtest_audit_trail.json")
+    output_path = Path("/home/trading_ceo/projects/brahmand/data/production_backtest_audit_trail.json")
     output_path.write_text(json.dumps(output, indent=2))
 
     print(f"\n✅ Full audit trail saved: data/production_backtest_audit_trail.json")

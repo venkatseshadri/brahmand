@@ -6,9 +6,9 @@ Branch: `master` | Live data: DuckDB reads verified, paper trading active
 ## Locations
 
 ```
-/home/trading_ceo/brahmand/           ← Brahmand (execution engine)
-/home/trading_ceo/antariksh/          ← Antariksh (orchestration + signals)
-/home/trading_ceo/python-trader/      ← Data capture + utilities
+/home/trading_ceo/projects/brahmand/           ← Brahmand (execution engine)
+/home/trading_ceo/projects/antariksh/          ← Antariksh (orchestration + signals)
+/home/trading_ceo/projects/python-trader/      ← Data capture + utilities
 /root/.claude/projects/-home-trading-ceo/memory/  ← Persistent memory
 ```
 
@@ -26,7 +26,7 @@ GitHub: `github.com/venkatseshadri/antariskh` (submodule)
 
 ### ⭐ #1 BLOCKING: Wire EMA to v4 Aggregator (15 min)
 
-**File:** `/home/trading_ceo/antariksh/data_capture_v4_queue_aggregator.py`
+**File:** `/home/trading_ceo/projects/antariksh/data_capture_v4_queue_aggregator.py`
 
 **What's Missing:**
 - EMA backfill exists ✅
@@ -61,7 +61,7 @@ python3 -c "from brahmand.ema_aggregator import load_ema; print(load_ema('NIFTY'
 
 **Check:**
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 tail -20 logs/kickoff_$(date +%Y%m%d).log
 # Should see entries every 5 min starting 9:15 AM
 ```
@@ -71,7 +71,7 @@ tail -20 logs/kickoff_$(date +%Y%m%d).log
 ### #3 Test Full Flow (20 min)
 
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 
 # Mock test (no real data)
 python3 e2e_chain.py --mock
@@ -164,16 +164,16 @@ python3 kickoff.py  # Runs once; scheduled every 5 min
 ## Verify State (May 21 Morning)
 
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 
 # 1. Check DuckDB data flowing
 python3 -c "from duckdb_tool import get_latest_market_snapshot; import json; print(json.dumps(get_latest_market_snapshot(), default=str, indent=2))"
 
 # 2. Check EMA files exist (after wire fix)
-ls -lah /home/trading_ceo/antariksh/ema_state/
+ls -lah /home/trading_ceo/projects/antariksh/ema_state/
 
 # 3. Check entry signal (from Antariksh)
-cat /home/trading_ceo/antariksh/entry_signals/entry_check_latest.json | jq .
+cat /home/trading_ceo/projects/antariksh/entry_signals/entry_check_latest.json | jq .
 
 # 4. Check state.db schema
 sqlite3 state.db ".tables"
@@ -293,7 +293,7 @@ BRAHMAND_MODE         (PAPER | LIVE, default: PAPER)
 ## Quick Start
 
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 
 # 1. Check system ready
 python3 -c "print('DuckDB:', end=' '); from duckdb_tool import get_latest_market_snapshot; print('✅' if get_latest_market_snapshot() else '❌')"

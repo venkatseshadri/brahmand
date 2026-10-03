@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-LOG="/home/trading_ceo/antariksh/logs/cleanup_zombies.log"
+LOG="/home/trading_ceo/projects/antariksh/logs/cleanup_zombies.log"
 exec >>"$LOG" 2>&1
 
 # ── Refuse to run during market hours ──
@@ -34,11 +34,11 @@ done
 
 # ── Release DuckDB file locks (fuser -k kills lock holders) ──
 for DB in \
-    /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb \
+    /home/trading_ceo/projects/varaha/data/varaha_data.duckdb \
+    /home/trading_ceo/projects/varaha/data/varaha_data_sensex.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf_nifty.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf_sensex.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf.duckdb \
 ; do
     if [ -f "$DB" ]; then
         fuser -k "$DB" 2>/dev/null && echo "[$(date)] Released lock on $DB" || true
@@ -46,18 +46,18 @@ for DB in \
 done
 
 # ── Clean stale lock/pid files from project lock dirs ──
-find /home/trading_ceo/antariksh/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
+find /home/trading_ceo/projects/antariksh/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
     -mmin +60 -delete 2>/dev/null || true
-find /home/trading_ceo/brahmand/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
+find /home/trading_ceo/projects/brahmand/locks -maxdepth 1 \( -name "*.lock" -o -name "*.pid" \) \
     -mmin +60 -delete 2>/dev/null || true
 
 # ── Verify DuckDBs are writable ──
 for DB in \
-    /home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb \
-    /home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb \
+    /home/trading_ceo/projects/varaha/data/varaha_data.duckdb \
+    /home/trading_ceo/projects/varaha/data/varaha_data_sensex.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf_nifty.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf_sensex.duckdb \
+    /home/trading_ceo/projects/varaha/data/market_data_multitf.duckdb \
 ; do
     if python3 -c "import duckdb; duckdb.connect('$DB').close()" 2>/dev/null; then
         echo "[$(date)] $DB: writable"

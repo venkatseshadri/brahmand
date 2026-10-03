@@ -42,7 +42,7 @@ class DiscoveredPattern:
 class FullDatabaseResearchAgent:
     """Analyzes ENTIRE historical database for patterns"""
 
-    def __init__(self, db_path: str = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"):
+    def __init__(self, db_path: str = "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb"):
         self.db_path = db_path
         self.db = duckdb.connect(db_path, read_only=True)
         self.family = "base"

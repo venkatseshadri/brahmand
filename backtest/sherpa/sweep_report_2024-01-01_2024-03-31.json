@@ -1,0 +1,42 @@
+[
+  {
+    "min_confidence": 70,
+    "trades": 89,
+    "win_rate_pct": 38.2,
+    "pct_return_per_month": -8.75,
+    "total_pnl_net": -52513.63,
+    "max_drawdown": 104869.57
+  },
+  {
+    "min_confidence": 75,
+    "trades": 63,
+    "win_rate_pct": 41.3,
+    "pct_return_per_month": -5.32,
+    "total_pnl_net": -31931.95,
+    "max_drawdown": 82371.46
+  },
+  {
+    "min_confidence": 80,
+    "trades": 2,
+    "win_rate_pct": 0.0,
+    "pct_return_per_month": -1.62,
+    "total_pnl_net": -9703.6,
+    "max_drawdown": 9703.6
+  },
+  {
+    "min_confidence": 85,
+    "trades": 0,
+    "win_rate_pct": 0,
+    "pct_return_per_month": 0.0,
+    "total_pnl_net": 0,
+    "max_drawdown": 0.0
+  },
+  {
+    "min_confidence": 90,
+    "trades": 0,
+    "win_rate_pct": 0,
+    "pct_return_per_month": 0.0,
+    "total_pnl_net": 0,
+    "max_drawdown": 0.0
+  }
+]

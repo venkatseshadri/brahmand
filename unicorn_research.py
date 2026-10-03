@@ -154,10 +154,10 @@ def _call_llm(
         )
         return None
 
-    api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-    base_url = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+    api_key = os.environ.get("OMNIROUTE_API_KEY") or os.environ.get("OPENROUTER_API_KEY") or os.environ.get("DEEPSEEK_API_KEY", "")
+    base_url = os.environ.get("OMNIROUTE_BASE_URL") or os.environ.get("OPENROUTER_BASE_URL") or os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
     if not api_key:
-        log_error(PHASE_RESEARCH, "DEEPSEEK_API_KEY not set", gate=gate)
+        log_error(PHASE_RESEARCH, "OMNIROUTE_API_KEY or OPENROUTER_API_KEY or DEEPSEEK_API_KEY not set", gate=gate)
         return None
 
     client = OpenAI(api_key=api_key, base_url=base_url)

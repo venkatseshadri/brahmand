@@ -155,7 +155,7 @@ TOTAL: ~25 hours of work
 
 ### Run all tests
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 pytest tests/ -v
 ```
 

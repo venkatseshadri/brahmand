@@ -19,7 +19,7 @@ _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 if _SANDBOX:
     _CAPTURE_DIR = Path(_SANDBOX)
 else:
-    _CAPTURE_DIR = Path("/home/trading_ceo/python-trader/varaha/data")
+    _CAPTURE_DIR = Path("/home/trading_ceo/projects/varaha/data")
 
 _IST = timezone(timedelta(hours=5, minutes=30))
 

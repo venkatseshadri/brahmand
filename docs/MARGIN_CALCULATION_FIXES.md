@@ -68,7 +68,7 @@
 
 ```bash
 # Before market opens tomorrow
-python3 /home/trading_ceo/brahmand/test_margin_calculations_premarket.py
+python3 /home/trading_ceo/projects/brahmand/test_margin_calculations_premarket.py
 ```
 
 This tests:
@@ -160,17 +160,17 @@ Example:
 
 ## Files Modified
 
-1. `/home/trading_ceo/brahmand/wing_optimizer.py`
+1. `/home/trading_ceo/projects/brahmand/wing_optimizer.py`
    - Added freshness checks
    - Added safety validations
    - Added logging for criteria relaxation
 
-2. `/home/trading_ceo/brahmand/margin_capture.py`
+2. `/home/trading_ceo/projects/brahmand/margin_capture.py`
    - Added failure tracking
    - Added success logging
    - Better error messages
 
-3. `/home/trading_ceo/brahmand/test_margin_calculations_premarket.py` (NEW)
+3. `/home/trading_ceo/projects/brahmand/test_margin_calculations_premarket.py` (NEW)
    - 5-point validation suite
    - Run before trading each day
 

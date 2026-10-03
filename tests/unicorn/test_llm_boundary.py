@@ -74,13 +74,16 @@ def test_parse_empty_string():
     reason="DEEPSEEK_API_KEY not set — live API test skipped",
 )
 def test_llm_api_smoke():
+    import os
+    expected_research = os.environ.get("UNICORN_RESEARCH_MODEL", "deepseek-v4-pro")
+    expected_skeptic = os.environ.get("UNICORN_SKEPTIC_MODEL", "deepseek-v4-flash")
     from unicorn_research import _call_llm, RESEARCH_MODEL, SKEPTIC_MODEL
 
-    assert RESEARCH_MODEL == "deepseek-v4-pro", (
-        f"Model name changed: {RESEARCH_MODEL} != deepseek-v4-pro"
+    assert RESEARCH_MODEL == expected_research, (
+        f"Model name changed: {RESEARCH_MODEL} != {expected_research}"
     )
-    assert SKEPTIC_MODEL == "deepseek-v4-flash", (
-        f"Skeptic model changed: {SKEPTIC_MODEL} != deepseek-v4-flash"
+    assert SKEPTIC_MODEL == expected_skeptic, (
+        f"Skeptic model changed: {SKEPTIC_MODEL} != {expected_skeptic}"
     )
 
     result = _call_llm(
@@ -97,8 +100,11 @@ def test_llm_api_smoke():
 
 
 def test_model_defaults():
+    import os
+    expected_research = os.environ.get("UNICORN_RESEARCH_MODEL", "deepseek-v4-pro")
+    expected_skeptic = os.environ.get("UNICORN_SKEPTIC_MODEL", "deepseek-v4-flash")
     from unicorn_research import RESEARCH_MODEL, SKEPTIC_MODEL
 
-    assert RESEARCH_MODEL == "deepseek-v4-pro"
-    assert SKEPTIC_MODEL == "deepseek-v4-flash"
-    assert RESEARCH_MODEL != SKEPTIC_MODEL
+    assert RESEARCH_MODEL == expected_research
+    assert SKEPTIC_MODEL == expected_skeptic
+

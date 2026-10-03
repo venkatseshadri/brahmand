@@ -2,7 +2,7 @@
 """
 EMA Aggregator — Persistent rolling EMA per timeframe per period.
 
-State files: /home/trading_ceo/brahmand/data/ema_state/{tf}/ema_{period}.json
+State files: /home/trading_ceo/projects/brahmand/data/ema_state/{tf}/ema_{period}.json
 Once threshold crossed (N bars), EMA is always available (rolling).
 Before threshold: returns None ("not_enough_data").
 
@@ -27,12 +27,12 @@ from datetime import datetime
 from typing import Optional
 
 _EMA_BASE = (
-    Path(os.environ.get("BRAHMAND_SANDBOX", "/home/trading_ceo/brahmand"))
+    Path(os.environ.get("BRAHMAND_SANDBOX", "/home/trading_ceo/projects/brahmand"))
     / "data"
     / "ema_state"
 )
 if not os.environ.get("BRAHMAND_SANDBOX"):
-    _EMA_BASE = Path("/home/trading_ceo/brahmand/data/ema_state")
+    _EMA_BASE = Path("/home/trading_ceo/projects/brahmand/data/ema_state")
 EMA_BASE_DIR = _EMA_BASE
 PERIODS = [5, 9, 20, 50, 100, 200]
 TIMEFRAMES = ["1min", "5min", "15min", "60min", "1D"]

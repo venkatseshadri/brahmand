@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-CAPTURE_DIR = Path("/home/trading_ceo/python-trader/varaha/data")
+CAPTURE_DIR = Path("/home/trading_ceo/projects/varaha/data")
 SANDBOX = REPO / "data" / "verify_sandbox"
 (SANDBOX / "state").mkdir(parents=True, exist_ok=True)
 (SANDBOX / "state" / "order_ledger.json").write_text(

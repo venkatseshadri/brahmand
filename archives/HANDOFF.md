@@ -14,7 +14,7 @@
 - ✅ CONTEXT.md updated with status
 
 ### Brahmand (MVP Project)  
-- ✅ Repo initialized at `/home/trading_ceo/brahmand/`
+- ✅ Repo initialized at `/home/trading_ceo/projects/brahmand/`
 - ✅ BUILD_PLAN.md (11-step, 3-wave build order)
 - ✅ SCHEMAS.md (5 Pydantic models with examples)
 - ✅ REVIEW_BEFORE_WAVE1.md (3 clarifications needed before coding)
@@ -23,15 +23,15 @@
 
 ## What's Needed From DeepSeek
 
-**Read:** `/home/trading_ceo/brahmand/REVIEW_BEFORE_WAVE1.md`
+**Read:** `/home/trading_ceo/projects/brahmand/REVIEW_BEFORE_WAVE1.md`
 
 **Answer 3 questions:**
 
 1. **schemas.py location** — Flat or nested?
-   - Recommend: Flat at `/home/trading_ceo/brahmand/schemas.py`
+   - Recommend: Flat at `/home/trading_ceo/projects/brahmand/schemas.py`
 
 2. **RiskLimits YAML** — Does `antariksh/config/antariksh_rules.yaml` exist?
-   - If no: Create `/home/trading_ceo/brahmand/config/risk_limits.yaml`
+   - If no: Create `/home/trading_ceo/projects/brahmand/config/risk_limits.yaml`
 
 3. **Persistence strategy** — Use @persist only, or custom state.db?
    - Recommend: Custom state.db only (simpler for MVP)
@@ -44,10 +44,10 @@
 
 | Item | Location |
 |------|----------|
-| MVP Spec | `/home/trading_ceo/antariksh/BRAHMAND_MVP_SPEC.md` |
-| Build Plan | `/home/trading_ceo/brahmand/BUILD_PLAN.md` |
-| Schemas Doc | `/home/trading_ceo/brahmand/docs/SCHEMAS.md` |
-| Wave 1 Q's | `/home/trading_ceo/brahmand/REVIEW_BEFORE_WAVE1.md` |
+| MVP Spec | `/home/trading_ceo/projects/antariksh/BRAHMAND_MVP_SPEC.md` |
+| Build Plan | `/home/trading_ceo/projects/brahmand/BUILD_PLAN.md` |
+| Schemas Doc | `/home/trading_ceo/projects/brahmand/docs/SCHEMAS.md` |
+| Wave 1 Q's | `/home/trading_ceo/projects/brahmand/REVIEW_BEFORE_WAVE1.md` |
 | Antariksh Tests | ✅ 54+ passing |
 | Brahmand Tests | ⏳ After Wave 2 |
 

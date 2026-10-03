@@ -71,7 +71,7 @@ systemctl list-timers 'penguin*' --all
 systemctl status feed.service consumer-nifty.service enricher-nifty.service
 
 # Check SQLite growing during market
-ls -la /home/trading_ceo/python-trader/varaha/data/capture_nifty.sqlite
+ls -la /home/trading_ceo/projects/varaha/data/capture_nifty.sqlite
 
 # EOD warehouse bridge (after 15:40)
 ls -la research/$(date +%Y-%m-%d)/nifty.duckdb

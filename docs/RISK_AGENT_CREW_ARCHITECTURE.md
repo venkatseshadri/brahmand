@@ -131,7 +131,7 @@ When LLM is unavailable (no API key, connection error), `position_manager.run_br
 
 ```
 # Position Manager Bridge — 1-min cycle, flock-guarded
-*/1 9-15 * * 1-5 /home/trading_ceo/brahmand/run_position_manager.sh
+*/1 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/run_position_manager.sh
 
 # Kickoff Entry — 5-min cycle (entry only in new architecture)
 1,6,11,16,21,26,31,36,41,46,51,56 9-15 * * 1-5 kickoff.py

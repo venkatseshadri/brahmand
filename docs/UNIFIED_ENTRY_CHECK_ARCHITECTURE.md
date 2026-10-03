@@ -71,7 +71,7 @@ COHERENT DECISION ✓
 
 ## Tool: EntryCheckTool (Fallback Chain)
 
-**Location:** `/home/trading_ceo/brahmand/tools/entry_check_tool.py`
+**Location:** `/home/trading_ceo/projects/brahmand/tools/entry_check_tool.py`
 
 **Fallback Strategy:**
 
@@ -236,11 +236,11 @@ E2E Chain runs (when regime agent executes)
 
 ```bash
 # Check if tool is available
-grep "query_entry_check" /home/trading_ceo/brahmand/config/agents_registry.yaml
+grep "query_entry_check" /home/trading_ceo/projects/brahmand/config/agents_registry.yaml
 
 # Verify tool can read all fallback sources
 - [ ] /tmp/entry_check_latest.json (updated by v4)
-- [ ] /home/trading_ceo/antariksh/logs/entry_check_YYYYMMDD.log
+- [ ] /home/trading_ceo/projects/antariksh/logs/entry_check_YYYYMMDD.log
 - [ ] DuckDB (varaha_data.duckdb)
 ```
 

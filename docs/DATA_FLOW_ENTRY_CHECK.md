@@ -58,7 +58,7 @@ Redis Queue: v3_ohlcv_queue
 
 ## 2. Entry Check Method — Location & Frequency
 
-**Location:** `/home/trading_ceo/antariksh/agents/entry/entry_check.py`
+**Location:** `/home/trading_ceo/projects/antariksh/agents/entry/entry_check.py`
 
 **Method:** `check_entry(index: str = "NIFTY") -> dict`
 

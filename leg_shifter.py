@@ -310,7 +310,7 @@ def run_leg_shifter(trade: dict, available_margin: float = 0) -> Dict:
     if available_margin <= 0:
         try:
             limits = json.loads(
-                Path("/home/trading_ceo/antariksh/data/broker_limits.json").read_text()
+                Path("/home/trading_ceo/projects/antariksh/data/broker_limits.json").read_text()
             )
             available_margin = limits.get("free_margin", 0)
             logging.getLogger(__name__).info(

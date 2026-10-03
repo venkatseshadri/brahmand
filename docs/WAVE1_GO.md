@@ -9,7 +9,7 @@
 
 | # | Question | Your Answer | Verdict |
 |---|----------|-------------|---------|
-| 1 | schemas.py location? | Flat: `/home/trading_ceo/brahmand/schemas.py` | ✅ APPROVED |
+| 1 | schemas.py location? | Flat: `/home/trading_ceo/projects/brahmand/schemas.py` | ✅ APPROVED |
 | 2 | RiskLimits source? | Self-contained `brahmand/config/risk_limits.yaml` | ✅ APPROVED |
 | 3 | Persistence strategy? | Custom `state.db` only (Post-Mortem needs queries) | ✅ APPROVED |
 
@@ -74,7 +74,7 @@ After Wave 1:
 
 **After each file (or pair):**
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 git add <file(s)>
 git commit -m "feat(wave1): <what this adds>
 

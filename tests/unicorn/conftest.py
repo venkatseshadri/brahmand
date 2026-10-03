@@ -17,7 +17,7 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 def pytest_configure(config):
     for env_path in (
-        Path("/home/trading_ceo/antariksh/.env"),
+        Path("/home/trading_ceo/projects/antariksh/.env"),
         Path(__file__).parent.parent.parent / ".env",
     ):
         if not env_path.exists():

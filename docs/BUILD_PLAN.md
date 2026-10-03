@@ -2,7 +2,7 @@
 # 2026-05-13
 
 **Architecture:** 3-agent CrewAI Flow (Execution + Risk + Post-Mortem)
-**Location:** /home/trading_ceo/brahmand/ (sister to antariksh/)
+**Location:** /home/trading_ceo/projects/brahmand/ (sister to antariksh/)
 **Reuses:** antariksh/broker_manager.py, antariksh/telegram_bridge.py, antariksh/event_calendar.py
 
 ## Build Order (11 steps, 3 waves)

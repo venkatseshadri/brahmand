@@ -8,7 +8,7 @@
 
 ## EXECUTIVE SUMMARY
 
-You have **6 comprehensive documents** in `/home/trading_ceo/brahmand/`:
+You have **6 comprehensive documents** in `/home/trading_ceo/projects/brahmand/`:
 
 1. **BRAHMAND_BUILD_SPECIFICATION.md** ← **START HERE**
    - 8 Python files to implement with full class signatures

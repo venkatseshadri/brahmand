@@ -34,7 +34,7 @@ KAGGLE_CACHE = _Path(
     "nse-future-and-options-data/versions/2"
 )
 BACKTEST_EMA_DIR = _Path("/tmp/backtest_ema_state")
-BACKTEST_OUTPUT_DIR = _Path("/home/trading_ceo/brahmand/data")
+BACKTEST_OUTPUT_DIR = _Path("/home/trading_ceo/projects/brahmand/data")
 ENTRY_GATE_MIN_CONFIDENCE = 0.75
 ENTRY_DELAY_BARS = 30  # wait 30 mins after open (09:15 → 09:45)
 

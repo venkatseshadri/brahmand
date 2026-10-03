@@ -17,7 +17,7 @@ metadata:
 
 ### 1️⃣ execution_agent (USED ✓)
 
-**File:** `/home/trading_ceo/brahmand/e2e_chain.py:173-183`
+**File:** `/home/trading_ceo/projects/brahmand/e2e_chain.py:173-183`
 
 ```python
 execution_agent = af.create_agent(
@@ -64,7 +64,7 @@ execution_task = Task(
 
 ### 2️⃣ order_agent (NOT USED ✗ — DEAD CODE)
 
-**File:** `/home/trading_ceo/brahmand/e2e_chain.py:192-198`
+**File:** `/home/trading_ceo/projects/brahmand/e2e_chain.py:192-198`
 
 ```python
 order_agent = af.create_agent(
@@ -205,7 +205,7 @@ RISK PHASE:
 
 ### Remove Dead Code ✂️
 
-**File:** `/home/trading_ceo/brahmand/e2e_chain.py`
+**File:** `/home/trading_ceo/projects/brahmand/e2e_chain.py`
 
 **Delete lines 192-198:**
 ```python
@@ -226,7 +226,7 @@ order_agent.llm = llm
 
 ### Keep These ✓
 
-**order_agent module** (`/home/trading_ceo/brahmand/order_agent.py`)
+**order_agent module** (`/home/trading_ceo/projects/brahmand/order_agent.py`)
 - Contains actual order routing logic
 - Used by PlaceEntryOrdersTool and PlaceSLTPOrdersTool
 - Central hub for paper/live switching

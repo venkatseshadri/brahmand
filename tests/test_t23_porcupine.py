@@ -8,7 +8,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent  # /home/trading_ceo/brahmand
+ROOT = Path(__file__).resolve().parent.parent  # /home/trading_ceo/projects/brahmand
 # Insert antariksh first (needed by chain_tools), then brahmand LAST so its tools wins
 sys.path.insert(0, str(ROOT.parent / "antariksh"))
 sys.path.insert(0, str(ROOT))  # brahmand OVERRIDES antariksh tools

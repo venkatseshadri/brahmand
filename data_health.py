@@ -18,7 +18,7 @@ from typing import Tuple
 
 log = logging.getLogger("brahmand.data_health")
 
-HEARTBEAT_DIR = Path("/home/trading_ceo/antariksh/data/live")
+HEARTBEAT_DIR = Path("/home/trading_ceo/projects/antariksh/data/live")
 
 
 def _is_market_hours() -> bool:
@@ -166,7 +166,7 @@ def check_data_freshness() -> Tuple[bool, list]:
     from datetime import datetime
 
     for inst in ("NIFTY", "SENSEX"):
-        db = f"/home/trading_ceo/python-trader/varaha/data/capture_{inst.lower()}.sqlite"
+        db = f"/home/trading_ceo/projects/varaha/data/capture_{inst.lower()}.sqlite"
         try:
             conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
             for tbl, label in [
@@ -260,7 +260,7 @@ def check_mcx() -> Tuple[bool, list]:
     # SQLite per-commodity freshness
     import sqlite3
 
-    DB = "/home/trading_ceo/python-trader/varaha/data/capture_mcx.sqlite"
+    DB = "/home/trading_ceo/projects/varaha/data/capture_mcx.sqlite"
     MCX_COMMODITIES = [
         "ALUMINI",
         "CRUDEOILM",
@@ -293,7 +293,7 @@ def check_mcx() -> Tuple[bool, list]:
 
     # Expiry sentinel: WARN if any futures contract expires ≤ 3 days (T16)
     try:
-        resolved_path = Path("/home/trading_ceo/antariksh/data/live/resolved_contracts.json")
+        resolved_path = Path("/home/trading_ceo/projects/antariksh/data/live/resolved_contracts.json")
         if resolved_path.exists():
             contracts = json.loads(resolved_path.read_text())
             for name, info in contracts.items():
@@ -321,7 +321,7 @@ def check_feed_callbacks() -> Tuple[bool, list]:
     warnings = []
     if not _is_market_hours():
         return True, warnings
-    log_path = Path("/home/trading_ceo/antariksh/logs/feed.log")
+    log_path = Path("/home/trading_ceo/projects/antariksh/logs/feed.log")
     if not log_path.exists():
         return True, warnings
     try:

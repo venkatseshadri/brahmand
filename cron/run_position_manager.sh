@@ -3,7 +3,7 @@
 # Dispatches to risk_agent_crew (CrewAI LLM path) with P1-P7 fallback.
 #
 # Usage (cron):
-#   */1 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_position_manager.sh
+#   */1 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_position_manager.sh
 
 set -e
 
@@ -17,7 +17,7 @@ PYTHON_BIN="/usr/bin/python3"
 # Source and EXPORT environment for DEEPSEEK_API_KEY (needed by risk_agent_crew)
 set -a
 [ -f "$PROJECT_DIR/.env" ] && . "$PROJECT_DIR/.env"
-[ -f /home/trading_ceo/antariksh/.env ] && . /home/trading_ceo/antariksh/.env
+[ -f /home/trading_ceo/projects/antariksh/.env ] && . /home/trading_ceo/projects/antariksh/.env
 set +a
 
 exec {LOCK_FD}>"$LOCK_FILE"

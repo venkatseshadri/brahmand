@@ -148,7 +148,7 @@ Transform raw 1-minute candle data into **actionable entry patterns** by correla
 ## Databases & Columns
 
 ### Varaha v3.1 (Primary)
-**Path:** `/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb`  
+**Path:** `/home/trading_ceo/projects/varaha/data/varaha_data.duckdb`  
 **Table:** `market_data`  
 **Columns:** 50+
 
@@ -163,7 +163,7 @@ Transform raw 1-minute candle data into **actionable entry patterns** by correla
 - **Context:** market_regime, session_phase, volatility_regime, data_quality
 
 ### Varaha v4 (Secondary)
-**Path:** `/home/trading_ceo/python-trader/varaha/data/market_data_multitf.duckdb`  
+**Path:** `/home/trading_ceo/projects/varaha/data/market_data_multitf.duckdb`  
 **Table:** `market_data_multitf` (or `market_data`)  
 **Columns:** 80+
 
@@ -444,7 +444,7 @@ The **Entry Research Agent** transforms historical 1-minute market data into pre
 
 For quick start, run:
 ```bash
-cd /home/trading_ceo/brahmand && python entry_research_agent.py --date 2026-05-21
+cd /home/trading_ceo/projects/brahmand && python entry_research_agent.py --date 2026-05-21
 ```
 
 For complete documentation, read:

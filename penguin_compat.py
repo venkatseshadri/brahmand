@@ -15,7 +15,7 @@ from pathlib import Path
 
 import duckdb
 
-_DATA_DIR = Path("/home/trading_ceo/python-trader/varaha/data")
+_DATA_DIR = Path("/home/trading_ceo/projects/varaha/data")
 
 # Maps capture_{index}.sqlite onto the old varaha_data.duckdb `market_data` column names.
 # Based solely on market_data_enriched (e) — the analytical twin of the old market_data,
@@ -117,7 +117,7 @@ def capture_path(index: str) -> Path:
 
 
 def warehouse_path(index: str, date: str) -> Path:
-    return Path(f"/home/trading_ceo/research/{date}/{index.lower()}.duckdb")
+    return Path(f"/home/trading_ceo/projects/research/{date}/{index.lower()}.duckdb")
 
 
 def connect_live(index: str) -> duckdb.DuckDBPyConnection:

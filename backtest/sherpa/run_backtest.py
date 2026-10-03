@@ -11,6 +11,7 @@ Usage (from brahmand/):
 """
 
 import argparse
+import dataclasses
 import json
 import sys
 from datetime import datetime, timedelta
@@ -30,9 +31,41 @@ DECISION_EVERY_MIN = 5
 EOD_HHMM = "15:25"
 CAPITAL = 200_000.0
 MAX_TRADES_PER_DAY = 3  # live iron-fly discipline: initial entry + 2 re-entries
+ATR_TF_MIN = 15
+ATR_PERIOD = 14
+ATR_MEDIAN_LOOKBACK_BARS = 130  # ~5 trading days of 15-min bars
 
 
-def run(start: str, end: str, capital: float, out_path: Path) -> dict:
+def _atr_ratio_series(nifty: pd.DataFrame) -> pd.Series:
+    """15-min ATR(14) / its own trailing ~5-day median, forward-filled onto the
+    1-min index. >1 = currently more volatile than its own recent norm."""
+    g = nifty.resample(f"{ATR_TF_MIN}min", origin="start_day", offset="15min")
+    tf = pd.DataFrame({
+        "high": g["high"].max(), "low": g["low"].min(), "close": g["close"].last(),
+    }).dropna()
+    tr = pd.concat([
+        tf["high"] - tf["low"],
+        (tf["high"] - tf["close"].shift()).abs(),
+        (tf["low"] - tf["close"].shift()).abs(),
+    ], axis=1).max(axis=1)
+    atr = tr.ewm(alpha=1 / ATR_PERIOD, adjust=False).mean()
+    median_atr = atr.rolling(ATR_MEDIAN_LOOKBACK_BARS, min_periods=20).median()
+    ratio = (atr / median_atr).shift(1)  # shift 1: only use last COMPLETED bar's ATR
+    return ratio.reindex(nifty.index, method="ffill")
+
+
+def run(start: str, end: str, capital: float, out_path: Path, signal_exit_log: list = None,
+        atr_sl_multiplier: float = None) -> dict:
+    """signal_exit_log: if given, appends a shadow-exit record each time the live
+    NOT_UP/NOT_DOWN entry signal flips against an open trade (mirror of decide_entry,
+    re-run during the trade instead of at entry). Does not alter real exits/PnL —
+    default None reproduces the original SHERPA numbers unchanged.
+
+    atr_sl_multiplier: if given, replaces the fixed sl_pct with
+    base_sl_pct * clip(current_ATR/trailing_median_ATR, 0.5, 2.0) * multiplier
+    at entry time — SL widens on high-vol days, tightens on quiet ones. TP/EOD
+    untouched, isolating the effect to the SL leg. Default None = fixed sl_pct,
+    original SHERPA behavior."""
     import canonical_strategy
 
     warmup_start = (datetime.fromisoformat(start) - timedelta(days=45)).date().isoformat()
@@ -41,6 +74,8 @@ def run(start: str, end: str, capital: float, out_path: Path) -> dict:
     days = [d for d in data_loader.trading_days(nifty) if str(d) >= start]
     if not days:
         raise SystemExit(f"no trading days in [{start}, {end}]")
+
+    atr_ratio = _atr_ratio_series(nifty) if atr_sl_multiplier is not None else None
 
     sandbox = BRAHMAND / "backtest" / "sherpa" / "sandbox"
     io = ReplayIO(sandbox)
@@ -80,6 +115,8 @@ def run(start: str, end: str, capital: float, out_path: Path) -> dict:
         open_trade: trade_sim.Trade | None = None
         day_trades = 0
         last_60m_mark = None
+        flip_logged = False
+        pending_signal = None
 
         for ts, row in bars.iterrows():
             hhmm = ts.strftime("%H:%M")
@@ -112,7 +149,32 @@ def run(start: str, end: str, capital: float, out_path: Path) -> dict:
                     trade_sim.close_trade(open_trade, sell_px, buy_px, ts.to_pydatetime(), reason)
                     equity += open_trade.pnl
                     trades.append(open_trade)
+                    if pending_signal is not None:
+                        pending_signal.update(
+                            actual_exit_ts=str(ts), actual_exit_reason=reason,
+                            actual_pnl=open_trade.pnl,
+                        )
+                        signal_exit_log.append(pending_signal)
+                        pending_signal = None
                     open_trade = None
+                    continue
+                if signal_exit_log is not None and not flip_logged and ts.minute % DECISION_EVERY_MIN == 0:
+                    io.set_as_of(str(ts))
+                    live = canonical_strategy.decide_entry(vix=v, adx=None, session="mid")
+                    opposite = "NOT_DOWN" if open_trade.strategy == "CALL_SPREAD" else "NOT_UP"
+                    if live["go"] and live["signal"] == opposite:
+                        shadow = dataclasses.replace(open_trade)
+                        trade_sim.close_trade(shadow, sell_px, buy_px, ts.to_pydatetime(), "SIGNAL_FLIP")
+                        pending_signal = {
+                            "entry_ts": str(open_trade.entry_ts),
+                            "strategy": open_trade.strategy,
+                            "flip_ts": str(ts),
+                            "signal_pnl": shadow.pnl,
+                            "minutes_since_entry": round(
+                                (ts.to_pydatetime() - open_trade.entry_ts).total_seconds() / 60, 1
+                            ),
+                        }
+                        flip_logged = True
                 continue
 
             # decision points: every 5 min inside the entry window, flat only,
@@ -137,6 +199,13 @@ def run(start: str, end: str, capital: float, out_path: Path) -> dict:
                 decisions["refused_pricing"] += 1
                 continue
             open_trade = trade_sim.open_trade(decision, spot, ts.to_pydatetime(), v, lots=lots)
+            if atr_sl_multiplier is not None and open_trade is not None:
+                ratio = atr_ratio.get(ts, None)
+                if ratio is not None and not pd.isna(ratio):
+                    ratio = min(max(ratio, 0.5), 2.0)
+                    open_trade.sl_pct = open_trade.sl_pct * ratio * atr_sl_multiplier
+            flip_logged = False
+            pending_signal = None
             day_trades += 1
 
         # day end: force-close anything still open at the last bar
@@ -148,6 +217,13 @@ def run(start: str, end: str, capital: float, out_path: Path) -> dict:
             trade_sim.close_trade(open_trade, sell_px, buy_px, ts.to_pydatetime(), "EOD")
             equity += open_trade.pnl
             trades.append(open_trade)
+            if pending_signal is not None:
+                pending_signal.update(
+                    actual_exit_ts=str(ts), actual_exit_reason="EOD",
+                    actual_pnl=open_trade.pnl,
+                )
+                signal_exit_log.append(pending_signal)
+                pending_signal = None
             open_trade = None
 
         equity_curve.append({"date": str(d), "equity": round(equity, 2)})
@@ -219,6 +295,8 @@ def _report(trades, decisions, equity_curve, capital, start, end) -> dict:
                 "entry": str(t.entry_ts), "exit": str(t.exit_ts), "strategy": t.strategy,
                 "sell_k": t.sell_strike, "buy_k": t.buy_strike, "lots": t.lots,
                 "credit": round(t.net_credit, 2), "reason": t.exit_reason,
+                "sell_entry": t.sell_entry, "sell_exit": t.sell_exit,
+                "buy_entry": t.buy_entry, "buy_exit": t.buy_exit,
                 "pnl": t.pnl, "costs": t.costs,
             }
             for t in trades

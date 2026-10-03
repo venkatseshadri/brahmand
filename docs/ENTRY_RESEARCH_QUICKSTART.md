@@ -14,7 +14,7 @@ The **Entry Research Agent** is an AI-powered backtesting tool that analyzes com
 
 ### Example 1: Analyze Today's NIFTY Data
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python entry_research_agent.py --date 2026-05-21 --index NIFTY --min-move 50
 ```
 
@@ -338,7 +338,7 @@ python entry_research_agent.py --date 2026-05-21 --index NIFTY --min-move 50
 **Solution:** Check that date exists in DuckDB and has trading
 ```bash
 # Quick check
-ls -l /home/trading_ceo/python-trader/varaha/data/*.duckdb
+ls -l /home/trading_ceo/projects/varaha/data/*.duckdb
 ```
 
 ### Issue: Agent seems slow

@@ -6,3 +6,10 @@ data/ema_state/
 logs/
 tests/_tmp_position_cache/
 tests/_tmp_stale_cleanup/
+*.log
+*.csv
+*.sqlite
+*.tar.gz
+*.db
+__pycache__/
+*.parquet

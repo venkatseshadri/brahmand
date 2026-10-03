@@ -44,7 +44,7 @@ Entry Agent receives: Yesterday's approved patterns + backtest results
 
 **Run Command:**
 ```bash
-python3 /home/trading_ceo/brahmand/nightly_research_scheduler.py
+python3 /home/trading_ceo/projects/brahmand/nightly_research_scheduler.py
 ```
 
 **What Happens:**
@@ -354,7 +354,7 @@ OR
 crontab -e
 
 # Add this line (runs at 11 PM Mon-Fri)
-0 23 * * 1-5 cd /home/trading_ceo/brahmand && /usr/bin/python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
+0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && /usr/bin/python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
 
 # Verify installation
 crontab -l
@@ -527,7 +527,7 @@ Entry_Confidence = (
 ### 1. Manual Test (Before Cron):
 ```bash
 # Run research + backtest manually
-python3 /home/trading_ceo/brahmand/nightly_research_scheduler.py
+python3 /home/trading_ceo/projects/brahmand/nightly_research_scheduler.py
 
 # Expected output:
 # ✓ Discovered 5 patterns

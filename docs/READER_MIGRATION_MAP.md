@@ -77,7 +77,7 @@ If a reader needs spot/VIX/greeks at a timeframe, source those from `market_data
 |---|---|---|---|
 | `research_agents.py` | market_data, market_data_multitf | capture sqlite + multitf | `db_path_v31` + `db_path_v4` ctor args. Repoint v31→capture sqlite VIEW; v4 already live. |
 | `research_agents_full_db.py` | market_data | capture sqlite | "full db" historical research — confirm it wants live vs history. |
-| `nightly_research_scheduler.py` | market_data | research warehouse | Runs EOD → prefer `/home/trading_ceo/research/{date}/{index}.duckdb` (Penguin EOD ETL) over live sqlite. |
+| `nightly_research_scheduler.py` | market_data | research warehouse | Runs EOD → prefer `/home/trading_ceo/projects/research/{date}/{index}.duckdb` (Penguin EOD ETL) over live sqlite. |
 | `wing_optimizer.py` | option_snapshots (ltp by strike) | option_prices | Needs only `ltp` ✅. Repoint to `option_prices` (sqlite). |
 | `pattern_analyzer.py` | market_data, market_data_multitf | multitf (primary) | Already multitf-centric; check whether market_data leg is actually used. |
 | `pattern_enricher.py` | market_data, market_data_multitf | multitf (primary) | Same as above. |

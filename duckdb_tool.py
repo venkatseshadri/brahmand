@@ -25,12 +25,12 @@ _SANDBOX = os.environ.get("BRAHMAND_SANDBOX", "")
 VARAH_DATA = (
     Path(_SANDBOX) / "varaha_data.duckdb"
     if _SANDBOX
-    else Path("/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb")
+    else Path("/home/trading_ceo/projects/varaha/data/varaha_data.duckdb")
 )
-STATIC_DB = Path("/home/trading_ceo/antariksh/data/static_metadata.db")
+STATIC_DB = Path("/home/trading_ceo/projects/antariksh/data/static_metadata.db")
 
 
-_CAPTURE_DIR = Path("/home/trading_ceo/python-trader/varaha/data")
+_CAPTURE_DIR = Path("/home/trading_ceo/projects/varaha/data")
 
 
 def _is_market_hours() -> bool:
@@ -48,7 +48,7 @@ def _resolve_db_path() -> str:
     from datetime import date
 
     warehouse = Path(
-        f"/home/trading_ceo/research/{date.today().isoformat()}/nifty.duckdb"
+        f"/home/trading_ceo/projects/research/{date.today().isoformat()}/nifty.duckdb"
     )
     if warehouse.exists():
         return str(warehouse)

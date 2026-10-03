@@ -1,6 +1,6 @@
 """
 Entry Check Tool — Regime Agent queries the deterministic entry gate signal
-Fallback chain: /home/trading_ceo/antariksh/logs/entry_check_latest.json → DuckDB
+Fallback chain: /home/trading_ceo/projects/antariksh/logs/entry_check_latest.json → DuckDB
 """
 
 from crewai.tools import BaseTool
@@ -20,7 +20,7 @@ class EntryCheckTool(BaseTool):
     def _run(self, index: str = "NIFTY") -> dict:
         """
         Query entry check with fallback chain:
-        1. /home/trading_ceo/antariksh/logs/entry_check_latest.json (updated by entry_check every 5 min)
+        1. /home/trading_ceo/projects/antariksh/logs/entry_check_latest.json (updated by entry_check every 5 min)
         2. DuckDB direct query
         """
 
@@ -53,11 +53,11 @@ class EntryCheckTool(BaseTool):
 
     def _read_from_persistent_file(self, index: str) -> dict | None:
         """
-        Read from /home/trading_ceo/antariksh/logs/entry_check_latest.json
+        Read from /home/trading_ceo/projects/antariksh/logs/entry_check_latest.json
         Risk: Potential race condition if file is being written
         Mitigation: Try 3 times with small delays
         """
-        p = Path("/home/trading_ceo/antariksh/logs/entry_check_latest.json")
+        p = Path("/home/trading_ceo/projects/antariksh/logs/entry_check_latest.json")
         if not p.exists():
             return None
 
@@ -96,7 +96,7 @@ class EntryCheckTool(BaseTool):
         Log format expected:
         [HH:MM:SS] entry_check.py | signal | confidence | trend_signal | traffic_light
         """
-        log_dir = Path("/home/trading_ceo/antariksh/logs")
+        log_dir = Path("/home/trading_ceo/projects/antariksh/logs")
         if not log_dir.exists():
             return None
 
@@ -149,7 +149,7 @@ class EntryCheckTool(BaseTool):
             import sqlite3
 
             db_path = Path(
-                f"/home/trading_ceo/python-trader/varaha/data/capture_{index.lower()}.sqlite"
+                f"/home/trading_ceo/projects/varaha/data/capture_{index.lower()}.sqlite"
             )
             if not db_path.exists():
                 return None

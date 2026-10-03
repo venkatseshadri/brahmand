@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field
 from crewai.tools import BaseTool
 
 # ── Broker SDK path (python-trader) ──────────────────────────────────────────
-SDK_PATH = Path("/home/trading_ceo/python-trader/ShoonyaApi-py")
+SDK_PATH = Path("/home/trading_ceo/projects/python-trader/ShoonyaApi-py")
 sys.path.insert(0, str(SDK_PATH))
 
 # ── Auth state (lazy init) ───────────────────────────────────────────────────

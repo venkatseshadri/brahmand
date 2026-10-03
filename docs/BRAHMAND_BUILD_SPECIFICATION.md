@@ -82,7 +82,7 @@ Daily Config Updater (NEW)
 
 ## PART C: NEW FILES TO CREATE
 
-### 1. `/home/trading_ceo/brahmand/planning/strategy_planner.py`
+### 1. `/home/trading_ceo/projects/brahmand/planning/strategy_planner.py`
 ```python
 class StrategyPlanningAgent:
     """Plans which strategy to use based on market regime + learnings."""
@@ -125,7 +125,7 @@ class StrategyPlanningAgent:
         pass  # DeepSeek to implement
 ```
 
-### 2. `/home/trading_ceo/brahmand/planning/entry_planner.py`
+### 2. `/home/trading_ceo/projects/brahmand/planning/entry_planner.py`
 ```python
 class EntryPlanningAgent:
     """Plans which entry signals to use + entry window."""
@@ -163,7 +163,7 @@ class EntryPlanningAgent:
         pass  # DeepSeek to implement
 ```
 
-### 3. `/home/trading_ceo/brahmand/planning/exit_planner.py`
+### 3. `/home/trading_ceo/projects/brahmand/planning/exit_planner.py`
 ```python
 class ExitPlanningAgent:
     """Plans exit conditions + optimal hold time."""
@@ -198,7 +198,7 @@ class ExitPlanningAgent:
         pass  # DeepSeek to implement
 ```
 
-### 4. `/home/trading_ceo/brahmand/planning/daily_plan_synthesizer.py`
+### 4. `/home/trading_ceo/projects/brahmand/planning/daily_plan_synthesizer.py`
 ```python
 class DailyPlanSynthesizerAgent:
     """Combines all planning agents' outputs → daily_trade_plan.json"""
@@ -269,7 +269,7 @@ class DailyPlanSynthesizerAgent:
         pass  # DeepSeek to implement
 ```
 
-### 5. `/home/trading_ceo/brahmand/learning/strategy_postmortem.py`
+### 5. `/home/trading_ceo/projects/brahmand/learning/strategy_postmortem.py`
 ```python
 class StrategyPostMortemAgent:
     """Analyzes: Was the strategy choice correct for the regime?"""
@@ -302,7 +302,7 @@ class StrategyPostMortemAgent:
         pass  # DeepSeek to implement
 ```
 
-### 6. `/home/trading_ceo/brahmand/learning/entry_postmortem.py`
+### 6. `/home/trading_ceo/projects/brahmand/learning/entry_postmortem.py`
 ```python
 class EntryPostMortemAgent:
     """Analyzes: Was the entry timing optimal? Which signal worked?"""
@@ -337,7 +337,7 @@ class EntryPostMortemAgent:
         pass  # DeepSeek to implement
 ```
 
-### 7. `/home/trading_ceo/brahmand/learning/exit_postmortem.py`
+### 7. `/home/trading_ceo/projects/brahmand/learning/exit_postmortem.py`
 ```python
 class ExitPostMortemAgent:
     """Analyzes: Was the exit timing optimal? Should we hold longer/shorter?"""
@@ -370,7 +370,7 @@ class ExitPostMortemAgent:
         pass  # DeepSeek to implement
 ```
 
-### 8. `/home/trading_ceo/brahmand/learning/daily_config_updater.py`
+### 8. `/home/trading_ceo/projects/brahmand/learning/daily_config_updater.py`
 ```python
 class DailyConfigUpdaterAgent:
     """Synthesizes post-mortem learnings → updates daily_config.json for tomorrow."""

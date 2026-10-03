@@ -25,7 +25,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
-sys.path.insert(0, str(Path("/home/trading_ceo/python-trader/Shoonya_oAuthAPI-py")))
+sys.path.insert(0, str(Path("/home/trading_ceo/projects/python-trader/Shoonya_oAuthAPI-py")))
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(message)s")
 logger = logging.getLogger("MarginCapture")
@@ -38,10 +38,10 @@ DEFAULT_QTY = 65  # Per leg quantity (1 lot) for span calc
 MARKET_CLOSE = "15:30"
 
 # Output
-MARGIN_FILE = Path("/home/trading_ceo/brahmand/data/margin_matrix.json")
+MARGIN_FILE = Path("/home/trading_ceo/projects/brahmand/data/margin_matrix.json")
 
-CRED_FILE = Path("/home/trading_ceo/python-trader/Shoonya_oAuthAPI-py/cred.yml")
-EXPIRY_FILE = Path("/home/trading_ceo/python-trader/orbiter/config/expiry_dates.json")
+CRED_FILE = Path("/home/trading_ceo/projects/python-trader/Shoonya_oAuthAPI-py/cred.yml")
+EXPIRY_FILE = Path("/home/trading_ceo/projects/python-trader/orbiter/config/expiry_dates.json")
 
 
 def _load_cred() -> dict:

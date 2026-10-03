@@ -25,8 +25,8 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime, timedelta
 
-MARGIN_FILE = Path("/home/trading_ceo/brahmand/data/margin_matrix.json")
-DUCKDB_V31 = "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
+MARGIN_FILE = Path("/home/trading_ceo/projects/brahmand/data/margin_matrix.json")
+DUCKDB_V31 = "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb"
 
 logger = logging.getLogger("WingOptimizer")
 

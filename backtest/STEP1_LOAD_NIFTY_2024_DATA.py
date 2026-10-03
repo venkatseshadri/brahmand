@@ -232,7 +232,7 @@ class NIFTY2024DataLoader:
         """Save market snapshots to JSON."""
         if output_path is None:
             output_path = Path(
-                "/home/trading_ceo/brahmand/data/STEP1_NIFTY_2024_MARKET_SNAPSHOTS.json"
+                "/home/trading_ceo/projects/brahmand/data/STEP1_NIFTY_2024_MARKET_SNAPSHOTS.json"
             )
 
         output = {

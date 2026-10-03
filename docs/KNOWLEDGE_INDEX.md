@@ -9,7 +9,7 @@
 ## 📁 Directory Structure
 
 ```
-/home/trading_ceo/brahmand/
+/home/trading_ceo/projects/brahmand/
 ├── KNOWLEDGE_INDEX.md                    ← YOU ARE HERE
 ├── KNOWLEDGE_ARCHITECTURE.md             ← Full RL loop design
 ├── CREWAI_KNOWLEDGE_INTEGRATION.md       ← API reference + implementation
@@ -225,10 +225,10 @@ Before writing code, verify you have:
 - [ ] Understood RL loop flow (RL_CAPABILITY_SUMMARY.md Days 1-5)
 - [ ] Know the 7 success metrics (RL_CAPABILITY_SUMMARY.md)
 - [ ] Reviewed existing code:
-  - [ ] `/home/trading_ceo/brahmand/agents_registry.yaml`
-  - [ ] `/home/trading_ceo/brahmand/schemas.py`
-  - [ ] `/home/trading_ceo/brahmand/persistence.py`
-  - [ ] `/home/trading_ceo/brahmand/e2e_chain.py`
+  - [ ] `/home/trading_ceo/projects/brahmand/agents_registry.yaml`
+  - [ ] `/home/trading_ceo/projects/brahmand/schemas.py`
+  - [ ] `/home/trading_ceo/projects/brahmand/persistence.py`
+  - [ ] `/home/trading_ceo/projects/brahmand/e2e_chain.py`
 
 ---
 

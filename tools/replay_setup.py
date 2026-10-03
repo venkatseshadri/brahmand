@@ -20,18 +20,18 @@ from pathlib import Path
 
 DUCKDB_SOURCES = {
     "NIFTY": {
-        "v31": "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb",
-        "multitf": "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_nifty.duckdb",
+        "v31": "/home/trading_ceo/projects/varaha/data/varaha_data.duckdb",
+        "multitf": "/home/trading_ceo/projects/varaha/data/market_data_multitf_nifty.duckdb",
     },
     "SENSEX": {
-        "v31": "/home/trading_ceo/python-trader/varaha/data/varaha_data_sensex.duckdb",
-        "multitf": "/home/trading_ceo/python-trader/varaha/data/market_data_multitf_sensex.duckdb",
+        "v31": "/home/trading_ceo/projects/varaha/data/varaha_data_sensex.duckdb",
+        "multitf": "/home/trading_ceo/projects/varaha/data/market_data_multitf_sensex.duckdb",
     },
 }
 
-TRADE_EXECUTION_DB = "/home/trading_ceo/brahmand/data/trade_execution.duckdb"
-BRAHMAND_STATE_DIR = Path("/home/trading_ceo/brahmand/data")
-ANTARIKSH_STATE = "/home/trading_ceo/antariksh/logs/entry_check_latest.json"
+TRADE_EXECUTION_DB = "/home/trading_ceo/projects/brahmand/data/trade_execution.duckdb"
+BRAHMAND_STATE_DIR = Path("/home/trading_ceo/projects/brahmand/data")
+ANTARIKSH_STATE = "/home/trading_ceo/projects/antariksh/logs/entry_check_latest.json"
 SIGNALS_FILE = "/tmp/entry_signals.jsonl"
 
 
@@ -168,7 +168,7 @@ def _precompute_emas(sandbox: Path, replay_date: str, index: str):
 
 def setup(date_str: str, index: str):
     sandbox = (
-        Path("/home/trading_ceo/brahmand/data/replays") / f"{date_str}_{index.upper()}"
+        Path("/home/trading_ceo/projects/brahmand/data/replays") / f"{date_str}_{index.upper()}"
     )
     if sandbox.exists():
         print(f"Sandbox already exists: {sandbox}")

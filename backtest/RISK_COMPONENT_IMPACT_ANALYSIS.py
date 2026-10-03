@@ -186,5 +186,5 @@ output = {
     "ranking": [{"rank": i+1, **r} for i, r in enumerate(sorted_results)],
 }
 
-Path("/home/trading_ceo/brahmand/data/risk_component_impact.json").write_text(json.dumps(output, indent=2))
+Path("/home/trading_ceo/projects/brahmand/data/risk_component_impact.json").write_text(json.dumps(output, indent=2))
 print("✅ Results saved: data/risk_component_impact.json\n")

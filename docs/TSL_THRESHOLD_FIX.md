@@ -112,7 +112,7 @@ This appears in console log so you can see:
 
 | File | Change |
 |------|--------|
-| `/home/trading_ceo/brahmand/kickoff.py` | TSL activation threshold logic + diagnostic logging |
+| `/home/trading_ceo/projects/brahmand/kickoff.py` | TSL activation threshold logic + diagnostic logging |
 
 ---
 

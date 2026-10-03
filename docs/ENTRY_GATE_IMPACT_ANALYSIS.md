@@ -103,9 +103,9 @@ To know the REAL trade-off, we need:
 3. **P&L distribution** (do high-confidence trades win bigger?)
 
 ### Check These Files:
-- `/home/trading_ceo/brahmand/logs/entry_gate_*.log` — Entry signals by day
+- `/home/trading_ceo/projects/brahmand/logs/entry_gate_*.log` — Entry signals by day
 - `/home/trading_ceo/data/entry_signals_*.jsonl` — Per-signal details
-- `/home/trading_ceo/brahmand/tests/` — Any backtest data by confidence level
+- `/home/trading_ceo/projects/brahmand/tests/` — Any backtest data by confidence level
 
 ---
 

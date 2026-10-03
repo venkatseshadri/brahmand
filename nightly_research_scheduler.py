@@ -13,7 +13,7 @@ Runs every night at 11:00 PM (post-market):
   7. Next morning (9:15 AM): Entry Agent loads approved patterns
 
 Installation as cron job:
-  0 23 * * 1-5 cd /home/trading_ceo/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
+  0 23 * * 1-5 cd /home/trading_ceo/projects/brahmand && python3 nightly_research_scheduler.py >> /tmp/research_scheduler.log 2>&1
 
 Or run manually:
   python3 nightly_research_scheduler.py
@@ -210,18 +210,11 @@ def detect_market_regime(date: str) -> str:
     Used to understand pattern performance across regimes
     """
     try:
-        import duckdb
+        from penguin_compat import connect_research
 
-        # Project Penguin — prefer EOD warehouse DuckDB (fed from SQLite capture)
-        warehouse = Path(f"/home/trading_ceo/research/{date}/nifty.duckdb")
-        db_path = (
-            str(warehouse)
-            if warehouse.exists()
-            else "/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb"
-        )
-        db = duckdb.connect(db_path, read_only=True)
-
-        result = db.execute(f"""
+        con = connect_research("NIFTY", date)
+        
+        result = con.execute(f"""
             SELECT
                 open_price,
                 spot as close_price,
@@ -236,7 +229,7 @@ def detect_market_regime(date: str) -> str:
         if not result:
             return "UNKNOWN"
 
-        result2 = db.execute(f"""
+        result2 = con.execute(f"""
             SELECT spot
             FROM market_data
             WHERE date = '{date}' AND index_name = 'NIFTY'
@@ -248,6 +241,7 @@ def detect_market_regime(date: str) -> str:
         close_price = result2[0][0] if result2 else result[0][1]
         high = result[0][2]
         low = result[0][3]
+        con.close()
 
         # Simple regime detection
         change_pct = (close_price - open_price) / open_price * 100

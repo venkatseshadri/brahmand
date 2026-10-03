@@ -39,7 +39,7 @@ git commit -m "feat: research agents with field name fixes + ST_ADX_VIX_001 + en
 - `entry_signal_broker.py` (359 lines) — publishes signals with market context
 
 ### Step 2: ✅ Add Market Context to combine_entry_scores()
-**File:** `/home/trading_ceo/antariksh/tools/entry_tools.py:1648`
+**File:** `/home/trading_ceo/projects/antariksh/tools/entry_tools.py:1648`
 
 Added optional `market_ctx` parameter to combine_entry_scores():
 ```python
@@ -55,7 +55,7 @@ def combine_entry_scores(trend_score: dict, tl_score: dict, market_ctx: dict = N
   - ST_ADX_VIX patterns get highest boost
 
 ### Step 3: ✅ Wire EntrySignalBroker into entry_check.py
-**File:** `/home/trading_ceo/antariksh/agents/entry/entry_check.py`
+**File:** `/home/trading_ceo/projects/antariksh/agents/entry/entry_check.py`
 
 ```python
 from entry_signal_broker import EntrySignalBroker
@@ -259,11 +259,11 @@ Entry decision = Trend + TL + Market Context + Patterns
 ## Commands to Verify
 
 ```bash
-# Test entry check with patterns (from /home/trading_ceo/antariksh)
+# Test entry check with patterns (from /home/trading_ceo/projects/antariksh)
 python3 -c "from agents.entry.entry_check import check_entry; import json; print(json.dumps(check_entry('NIFTY'), indent=2))"
 
 # Run nightly research on current date
-python3 /home/trading_ceo/brahmand/nightly_research_scheduler.py
+python3 /home/trading_ceo/projects/brahmand/nightly_research_scheduler.py
 
 # Check ChromaDB patterns
 python3 << 'EOF'

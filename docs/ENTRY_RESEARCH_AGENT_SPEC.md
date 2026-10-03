@@ -128,7 +128,7 @@ Your goal: Find the deepest layer(s) that most consistently predicted surface-le
 ## 5. KNOWLEDGE & DATA SOURCES
 
 ### Primary Data Source
-**DuckDB:** `/home/trading_ceo/python-trader/varaha/data/varaha_data.duckdb`
+**DuckDB:** `/home/trading_ceo/projects/varaha/data/varaha_data.duckdb`
 
 #### Market Data Table Schema
 ```sql

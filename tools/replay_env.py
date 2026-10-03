@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-DEFAULT_SANDBOX = Path("/home/trading_ceo/brahmand/data/replays")
+DEFAULT_SANDBOX = Path("/home/trading_ceo/projects/brahmand/data/replays")
 
 
 def sandbox_root() -> Path:

@@ -31,7 +31,7 @@ All stateful modules check it at import time → redirect to sandbox.
 ### Setup (run once per date/index)
 
 ```bash
-cd /home/trading_ceo/brahmand
+cd /home/trading_ceo/projects/brahmand
 python3 tools/replay_setup.py 2026-05-22 --index NIFTY
 ```
 
@@ -196,7 +196,7 @@ python3 tools/replay_session.py data/replays/2026-05-22_NIFTY --fast --real
 # Then compare sandbox trade_execution.duckdb vs production
 python3 -c "
 import duckdb
-prod = duckdb.connect('/home/trading_ceo/brahmand/data/trade_execution.duckdb', read_only=True)
+prod = duckdb.connect('/home/trading_ceo/projects/brahmand/data/trade_execution.duckdb', read_only=True)
 replay = duckdb.connect('data/replays/2026-05-22_NIFTY/state/trade_execution.duckdb', read_only=True)
 print('Production trades:', prod.execute('SELECT COUNT(*) FROM active_trades').fetchone()[0])
 print('Replay trades:', replay.execute('SELECT COUNT(*) FROM active_trades').fetchone()[0])
@@ -231,8 +231,8 @@ if _SANDBOX:
     DATA_DIR = Path(_SANDBOX) / "data"
     STATE_FILE = Path(_SANDBOX) / "state" / "file.json"
 else:
-    DATA_DIR = Path("/home/trading_ceo/brahmand/data")
-    STATE_FILE = Path("/home/trading_ceo/brahmand/data/file.json")
+    DATA_DIR = Path("/home/trading_ceo/projects/brahmand/data")
+    STATE_FILE = Path("/home/trading_ceo/projects/brahmand/data/file.json")
 ```
 
 ## Files

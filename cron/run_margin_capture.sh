@@ -7,7 +7,7 @@
 # is what actually prevents that. (2026-06-01: this leaked 2 live --loop daemons.)
 #
 # Usage (cron):
-#   */5 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_margin_capture.sh
+#   */5 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_margin_capture.sh
 
 set -e
 

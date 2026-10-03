@@ -51,13 +51,13 @@
 ┌─ DATABASES ACCESSIBLE ──────────────────────────────────────────────────────┐
 │                                                                             │
 │ ┌─ Varaha v3.1 (Primary)                                                   │
-│ │  Path: /home/trading_ceo/python-trader/varaha/varaha_data.duckdb       │
+│ │  Path: /home/trading_ceo/projects/varaha/varaha_data.duckdb       │
 │ │  Columns: 50+ (OHLC, ST15/60, EMA5/9/20, ADX, RSI, VIX, PCR, etc.)     │
 │ │  Granularity: 1-min bars                                                │
 │ │  Quality: Live, current                                                 │
 │ │                                                                          │
 │ └─ Varaha v4 (Secondary)                                                   │
-│    Path: /home/trading_ceo/python-trader/varaha/market_data_multitf.duckdb│
+│    Path: /home/trading_ceo/projects/varaha/market_data_multitf.duckdb│
 │    Columns: 80+ (v3.1 + cross-TF indicators)                               │
 │    Granularity: Multi-TF aggregation (1/5/15/60/240-min)                   │
 │    Quality: Aggregated from multiple sources                               │

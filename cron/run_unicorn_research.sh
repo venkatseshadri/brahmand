@@ -6,7 +6,7 @@
 # Logs to brahmand/logs/unicorn_YYYYMMDD.log (same file as execution path).
 #
 # Usage (crontab):
-#   0,15,30,45 9-15 * * 1-5 /home/trading_ceo/brahmand/cron/run_unicorn_research.sh
+#   0,15,30,45 9-15 * * 1-5 /home/trading_ceo/projects/brahmand/cron/run_unicorn_research.sh
 
 set -e
 
@@ -26,7 +26,7 @@ fi
 cd "$PROJECT_DIR"
 
 # Load environment (DeepSeek API key from antariksh/.env)
-for env in "$PROJECT_DIR/.env" "/home/trading_ceo/antariksh/.env"; do
+for env in "$PROJECT_DIR/.env" "/home/trading_ceo/projects/antariksh/.env"; do
     if [ -f "$env" ]; then
         set -a; source "$env"; set +a
     fi
