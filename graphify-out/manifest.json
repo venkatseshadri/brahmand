@@ -1,1607 +1,1662 @@
 {
-  "/home/trading_ceo/brahmand/factory.py": {
-    "mtime": 1780547489.0203216,
+  "/home/trading_ceo/projects/brahmand/factory.py": {
+    "mtime": 1790966013.2742448,
     "ast_hash": "22e190ec23ca4f286adf8d5c2f0de08a",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/persistence.py": {
-    "mtime": 1779102503.8604345,
+  "/home/trading_ceo/projects/brahmand/persistence.py": {
+    "mtime": 1790966013.2742448,
     "ast_hash": "a7941783c81fe5f61a46210cb47b9988",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/broker_manager.py": {
-    "mtime": 1785132776.9558525,
+  "/home/trading_ceo/projects/brahmand/broker_manager.py": {
+    "mtime": 1790966013.2832441,
     "ast_hash": "c21f79906cc27240cae1d1eda7b71b17",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/schemas.py": {
-    "mtime": 1780230622.9737468,
+  "/home/trading_ceo/projects/brahmand/schemas.py": {
+    "mtime": 1790966013.285244,
     "ast_hash": "5d2fc20d1e294a9651ec7ac03c8b1556",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/research_backtest_framework.py": {
-    "mtime": 1779388306.2730076,
-    "ast_hash": "995042be383fa78e675440dbb035fd37",
+  "/home/trading_ceo/projects/brahmand/research_backtest_framework.py": {
+    "mtime": 1790966013.285244,
+    "ast_hash": "f420c167c3665c05a6ded8d574886460",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/research_agents_full_db.py": {
-    "mtime": 1779520639.3363407,
-    "ast_hash": "cb00de3a93eb7b831c281be9ff8d321d",
+  "/home/trading_ceo/projects/brahmand/research_agents_full_db.py": {
+    "mtime": 1790966013.285244,
+    "ast_hash": "2e8fd6e67753ad5d3d6f98efb941edaa",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/kickoff.py": {
-    "mtime": 1780220009.2795894,
+  "/home/trading_ceo/projects/brahmand/unicorn_anomaly.py": {
+    "mtime": 1790966013.286244,
+    "ast_hash": "4a1b131828b5f2f96ac564170052b45d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/canonical_strategy.py": {
+    "mtime": 1790966013.2882438,
+    "ast_hash": "33919d1cc8d2280c94cac8ace4d6979f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/unicorn_debate.py": {
+    "mtime": 1790966013.2882438,
+    "ast_hash": "eeecae5534407c1211d15ce507bebfec",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/kickoff.py": {
+    "mtime": 1790966013.2882438,
     "ast_hash": "f6ab62c7342b1b7c90008b475f30b6a8",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/crewai_chain.py": {
-    "mtime": 1780596101.2820287,
+  "/home/trading_ceo/projects/brahmand/position_research.py": {
+    "mtime": 1790966013.2882438,
+    "ast_hash": "fd3371fc817727d3312707f836832d37",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/crewai_chain.py": {
+    "mtime": 1790966013.2902436,
     "ast_hash": "b2fd1d20c776e506917ae516ed971d93",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/ema_integration_hook.py": {
-    "mtime": 1779259179.8944058,
+  "/home/trading_ceo/projects/brahmand/ema_integration_hook.py": {
+    "mtime": 1790966013.2942433,
     "ast_hash": "aa55702b8566625a15378e155e0dd225",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/strategy_check.py": {
-    "mtime": 1780596101.2730289,
+  "/home/trading_ceo/projects/brahmand/margin_gate.py": {
+    "mtime": 1790966013.2942433,
+    "ast_hash": "68f7a51a90691ac2a3dd22f0a8a8ac45",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/unicorn_research.py": {
+    "mtime": 1790966013.2952433,
+    "ast_hash": "bca9cc265af4eccc5097c8f5847ece19",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/verification.py": {
+    "mtime": 1790966013.2952433,
+    "ast_hash": "c41098363dd04ce61e69e0f405f382b8",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/state.py": {
+    "mtime": 1790966013.2952433,
+    "ast_hash": "00ce579df5fee4217058929d6785196f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/strategy_check.py": {
+    "mtime": 1790966013.2952433,
     "ast_hash": "4680c10f2be81bca6f9f41f7acf05a21",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/leg_shifter.py": {
-    "mtime": 1781259096.330881,
-    "ast_hash": "5d3db3a93db6c3c2d1363302f62eb833",
+  "/home/trading_ceo/projects/brahmand/order_routing.py": {
+    "mtime": 1790966013.2962432,
+    "ast_hash": "74bbb47f80d2aa9a81db5e9ba11823c8",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/logger.py": {
-    "mtime": 1781031725.5603113,
+  "/home/trading_ceo/projects/brahmand/post_mortem.py": {
+    "mtime": 1790966013.298243,
+    "ast_hash": "a5f917e3308c7fc825c07f33ef2e357d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/notify.py": {
+    "mtime": 1790966013.299243,
+    "ast_hash": "a17647c90ed7ee914bd356f545373ecc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/leg_shifter.py": {
+    "mtime": 1790966013.300243,
+    "ast_hash": "98af195d50b3b64654c88e0981568de1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/llm.py": {
+    "mtime": 1790966013.300243,
+    "ast_hash": "d19febf65a854b20351d708d24893a6f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/lock.py": {
+    "mtime": 1790966013.300243,
+    "ast_hash": "852a5865d8c4af594d35ca777906d220",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/penguin_compat.py": {
+    "mtime": 1790966013.300243,
+    "ast_hash": "1a8df5bde7190814c42709054bf7fa4f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/contract_builder.py": {
+    "mtime": 1790966013.3012428,
+    "ast_hash": "e94741f9ef7c816a381bb7ff209e016a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/unicorn_judge.py": {
+    "mtime": 1790966013.3052425,
+    "ast_hash": "a4db58a7daac6e03527879cc9b3414f2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/logger.py": {
+    "mtime": 1790966013.3052425,
     "ast_hash": "f024794b6039fa72076ff9c1a9527908",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/entry_agent.py": {
-    "mtime": 1780229025.8040752,
+  "/home/trading_ceo/projects/brahmand/entry_agent.py": {
+    "mtime": 1790966013.3072424,
     "ast_hash": "e0a3e49c6a83c489901e0404944bfba0",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/data_health.py": {
-    "mtime": 1781256400.669815,
-    "ast_hash": "3d33f3351793abe8cf62436d70139104",
+  "/home/trading_ceo/projects/brahmand/data_health.py": {
+    "mtime": 1790966013.3082423,
+    "ast_hash": "f319b85cd464c0f70795f46caa8d7314",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/wing_optimizer.py": {
-    "mtime": 1779131055.489038,
-    "ast_hash": "37ce184ec5b92d6671c68662370b3cb9",
+  "/home/trading_ceo/projects/brahmand/unicorn_research_cache.py": {
+    "mtime": 1790966013.3082423,
+    "ast_hash": "04b8c324f03333947ee31f0a4d456809",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/pattern_analyzer.py": {
-    "mtime": 1779785679.246279,
-    "ast_hash": "f56d04b50d78bd5f666e45035151c9a9",
+  "/home/trading_ceo/projects/brahmand/wing_optimizer.py": {
+    "mtime": 1790966013.3082423,
+    "ast_hash": "a39fd8ee6a3a5bc1f5a9d85ff3cea525",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/e2e_chain.py": {
-    "mtime": 1781265666.9863045,
-    "ast_hash": "0de76f85a67692b373a746b84dcfcab7",
+  "/home/trading_ceo/projects/brahmand/pattern_analyzer.py": {
+    "mtime": 1790966013.3382404,
+    "ast_hash": "0503aa2b88b38a0ebfbb53333a05901c",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/pull_all.sh": {
-    "mtime": 1779770047.5613916,
+  "/home/trading_ceo/projects/brahmand/market_data.py": {
+    "mtime": 1790966013.3392403,
+    "ast_hash": "53cff0a7e3ed69ccf3a6f7d9eeeb1b41",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/e2e_chain.py": {
+    "mtime": 1790966013.3402402,
+    "ast_hash": "f491a74c0c4fd1c90d71e50cd51b397e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/pull_all.sh": {
+    "mtime": 1789287558.5655441,
     "ast_hash": "043fdfb3e40b32154e4e747e3793ac63",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/entry_research_agent.py": {
-    "mtime": 1780596101.3050287,
-    "ast_hash": "3d7f382265995051540e8231713319e9",
+  "/home/trading_ceo/projects/brahmand/entry_research_agent.py": {
+    "mtime": 1790966013.3412402,
+    "ast_hash": "02bee1659a24ffbb86f7e9d1c9d5ba20",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/risk_monitor.py": {
-    "mtime": 1781031787.5199914,
-    "ast_hash": "2164814b0d7a0bf9377751c3a018100e",
+  "/home/trading_ceo/projects/brahmand/unicorn_verify.py": {
+    "mtime": 1790966013.3412402,
+    "ast_hash": "f22e7211a3485d842c853a60b6e40e76",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/regime_check.py": {
-    "mtime": 1780596101.266029,
+  "/home/trading_ceo/projects/brahmand/risk_monitor.py": {
+    "mtime": 1791052719.7986453,
+    "ast_hash": "91dc2c37fba4b3670678b538f0baad87",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/regime_check.py": {
+    "mtime": 1790966013.371238,
     "ast_hash": "88b80d0c4e5f36eda8f915af23029c57",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/risk_agent_crew.py": {
-    "mtime": 1780596101.2890286,
+  "/home/trading_ceo/projects/brahmand/agentops_compat.py": {
+    "mtime": 1790966013.371238,
+    "ast_hash": "d99c3947cc540d3dab64e940a2c8baa8",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/order_status.py": {
+    "mtime": 1790966013.371238,
+    "ast_hash": "dc8dad0b0f04131e13548cd751ccee27",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/risk_agent_crew.py": {
+    "mtime": 1790966013.371238,
     "ast_hash": "88def2a52ce672b1b460c9245b72ea28",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/trade_execution_db.py": {
-    "mtime": 1781031791.8399692,
-    "ast_hash": "26f64ad04c4d7cc712c106f859870ba3",
+  "/home/trading_ceo/projects/brahmand/trade_execution_db.py": {
+    "mtime": 1791052719.8056452,
+    "ast_hash": "988e0f07536046bf9d8acc9e22b22e5b",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/position_manager.py": {
-    "mtime": 1781374133.6421173,
-    "ast_hash": "4a08b271bcfc248888db1f2a3486eaac",
+  "/home/trading_ceo/projects/brahmand/position_manager.py": {
+    "mtime": 1790966013.3732378,
+    "ast_hash": "d9b093291c889396d8a550754ecab4a7",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/nightly_research_scheduler.py": {
-    "mtime": 1780063703.6727252,
-    "ast_hash": "97e666f22ba3d35b7acce8b49fcd3ef9",
+  "/home/trading_ceo/projects/brahmand/nightly_research_scheduler.py": {
+    "mtime": 1790966013.3732378,
+    "ast_hash": "2b52b4af9a23ef787e78b4bcfe7af58b",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/__init__.py": {
-    "mtime": 1779296293.7452006,
+  "/home/trading_ceo/projects/brahmand/fallback.py": {
+    "mtime": 1790966013.3752377,
+    "ast_hash": "09fdfdbf1083a33e7db6aea54737506f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/__init__.py": {
+    "mtime": 1790966013.3752377,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/chromadb_tool.py": {
-    "mtime": 1779102503.8554344,
+  "/home/trading_ceo/projects/brahmand/chromadb_tool.py": {
+    "mtime": 1790966013.3752377,
     "ast_hash": "a8a79ee9fb302db68d564c4031b40ea4",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/research_agents.py": {
-    "mtime": 1780064152.7886202,
-    "ast_hash": "46ecd178c31e2eb41d927cbe7418ea59",
+  "/home/trading_ceo/projects/brahmand/research_agents.py": {
+    "mtime": 1790966013.3762376,
+    "ast_hash": "2aa7ec0d5743816ca2a4eead8e35d5cb",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/ema_aggregator.py": {
-    "mtime": 1779788742.8295846,
-    "ast_hash": "e84547bc92ba50392984d91747550858",
+  "/home/trading_ceo/projects/brahmand/unicorn_raw_query.py": {
+    "mtime": 1790966013.3762376,
+    "ast_hash": "03c08fb043755fa49acc883f088df393",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/duckdb_tool.py": {
-    "mtime": 1780595207.0409448,
-    "ast_hash": "8fac2b0b89dadf69abda11919967342d",
+  "/home/trading_ceo/projects/brahmand/unicorn_logger.py": {
+    "mtime": 1790966013.3782375,
+    "ast_hash": "4c8ae1bc233422871d45f73cd477eaac",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/pattern_enricher.py": {
-    "mtime": 1779785627.4475136,
-    "ast_hash": "732ad6eecef81c5aa0f132fc9325a707",
+  "/home/trading_ceo/projects/brahmand/parsing.py": {
+    "mtime": 1790966013.3782375,
+    "ast_hash": "64f6783ad045746a48f1924c840749db",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/margin_capture.py": {
-    "mtime": 1781257448.2522142,
-    "ast_hash": "b74c3aadecc22a4cb392ea524d0efc62",
+  "/home/trading_ceo/projects/brahmand/ema_aggregator.py": {
+    "mtime": 1790966013.3782375,
+    "ast_hash": "c6531f37ea8993501ce87d5a7ec8459b",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/entry_signal_broker.py": {
-    "mtime": 1780595271.328702,
+  "/home/trading_ceo/projects/brahmand/duckdb_tool.py": {
+    "mtime": 1790966013.3792374,
+    "ast_hash": "6c4be3c04b17c73a0c72eddb699d0b11",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/pattern_enricher.py": {
+    "mtime": 1790966013.3802373,
+    "ast_hash": "6775efc70ee548f86643a6312703fab0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/position_research_cache.py": {
+    "mtime": 1790966013.3802373,
+    "ast_hash": "5c45ace52125e292f596955120ddd1f2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/margin_capture.py": {
+    "mtime": 1790966013.3822372,
+    "ast_hash": "77589269f06e0b106c0b0fe1cb9b52e4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/entry_setup.py": {
+    "mtime": 1790966013.3822372,
+    "ast_hash": "7c0067f72db3fc7af84411d7b246c1e2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/entry_signal_broker.py": {
+    "mtime": 1790966013.3822372,
     "ast_hash": "bfe59e9b2ca82db2f22b0f3ad7c0e62b",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/replay_session.py": {
-    "mtime": 1780200887.4108162,
-    "ast_hash": "c5f5fd0dadb760479767e74228c06fa5",
+  "/home/trading_ceo/projects/brahmand/tools/replay_session.py": {
+    "mtime": 1790966013.2742448,
+    "ast_hash": "7c4474a771fa0caf55047b517fd86fae",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/monitor_tools.py": {
-    "mtime": 1780230600.2178485,
-    "ast_hash": "a9c9852ffcb35299c5fe1a769abb5e32",
+  "/home/trading_ceo/projects/brahmand/tools/monitor_tools.py": {
+    "mtime": 1790966013.2742448,
+    "ast_hash": "c0b7c88fc9bd9c352b4a0a7762857ca9",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/execution_tools.py": {
-    "mtime": 1780230600.2178485,
-    "ast_hash": "454d4ff678d73d8df3fcb4a0cfd35b5b",
+  "/home/trading_ceo/projects/brahmand/tools/execution_tools.py": {
+    "mtime": 1790966013.2752447,
+    "ast_hash": "2a86a49c3633025e67d05da4f2e61604",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/risk_tools.py": {
-    "mtime": 1780461126.0538592,
+  "/home/trading_ceo/projects/brahmand/tools/record_option_timeseries.py": {
+    "mtime": 1790966013.2752447,
+    "ast_hash": "27a850ff129e8e06e23d0ac8ae4bc4bc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tools/risk_tools.py": {
+    "mtime": 1790966013.2782445,
     "ast_hash": "6115588584cda27cd2fb5ceea24fb13f",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/replay_setup.py": {
-    "mtime": 1779788787.0443478,
-    "ast_hash": "3cddd109fa62cfcfeae1a452dc636fde",
+  "/home/trading_ceo/projects/brahmand/tools/replay_setup.py": {
+    "mtime": 1790966013.2782445,
+    "ast_hash": "8ad9ab2cd081bdac7ae59b7ce60ffa1a",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/entry_check_tool.py": {
-    "mtime": 1780038997.863068,
-    "ast_hash": "46e5002604f423acd35225ac408664c9",
+  "/home/trading_ceo/projects/brahmand/tools/entry_check_tool.py": {
+    "mtime": 1790966013.2792444,
+    "ast_hash": "e5c3f4fc768dc9a91af23a1c0432c776",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/entry_gate_tools.py": {
-    "mtime": 1780229912.4087188,
+  "/home/trading_ceo/projects/brahmand/tools/entry_gate_tools.py": {
+    "mtime": 1790966013.2822442,
     "ast_hash": "7d748c127c22ab9d495056f564e6e15d",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/__init__.py": {
-    "mtime": 1779296293.7452006,
+  "/home/trading_ceo/projects/brahmand/tools/__init__.py": {
+    "mtime": 1790966013.2822442,
     "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/contract_tools.py": {
-    "mtime": 1781257426.5673113,
-    "ast_hash": "7a3fafe2876c33f136e98e806cd9a525",
+  "/home/trading_ceo/projects/brahmand/tools/replay_env.py": {
+    "mtime": 1790966013.2832441,
+    "ast_hash": "d442b9b577dd9bd09bb56388f355ba37",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tools/replay_env.py": {
-    "mtime": 1779788735.9046218,
-    "ast_hash": "4c87a595ebfe6ca1860f44a04b9a8502",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tools/chain_tools.py": {
-    "mtime": 1781262995.4481206,
+  "/home/trading_ceo/projects/brahmand/tools/chain_tools.py": {
+    "mtime": 1790966013.2832441,
     "ast_hash": "0d942f48095ebe22092b11c2b5afabc2",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/.opencode/opencode.json": {
+  "/home/trading_ceo/projects/brahmand/.opencode/opencode.json": {
     "mtime": 1779988400.4671435,
     "ast_hash": "abcc8b9dcd80bca5f9dde6d9f0c3ae79",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/.opencode/plugins/graphify.js": {
+  "/home/trading_ceo/projects/brahmand/.opencode/plugins/graphify.js": {
     "mtime": 1779988400.4671435,
     "ast_hash": "64ccd3c03dbfe0980b6095766f5c4e52",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tests/conftest.py": {
-    "mtime": 1780150656.4015412,
-    "ast_hash": "dfc021cdaa753b95092deabbe8f02593",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/__init__.py": {
-    "mtime": 1779543048.5799313,
-    "ast_hash": "1442cc0d921b6b8073789a24072a6a77",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/scenarios/test_scenarios.py": {
-    "mtime": 1779546489.4984982,
-    "ast_hash": "015e975581b423796f46c691757dee07",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/scenarios/__init__.py": {
-    "mtime": 1779543130.902538,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/fixtures/__init__.py": {
-    "mtime": 1779543130.902538,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/e2e/test_paper_lifecycle.py": {
-    "mtime": 1780147374.8301358,
-    "ast_hash": "5473c80760c0f6003106732460141914",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/e2e/__init__.py": {
-    "mtime": 1779543130.902538,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/e2e/test_e2e_workflows.py": {
-    "mtime": 1779546500.1964524,
-    "ast_hash": "78b4e3143f19747ae1ff06a8064f42d0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_risk_agent.py": {
-    "mtime": 1779546445.9096844,
-    "ast_hash": "3fe1954e373cf7565eff9af7f7ed36eb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_execution_agent.py": {
-    "mtime": 1779546437.2097218,
-    "ast_hash": "2d0109d585e4a323774770be8c0ba3a7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_contract_agent.py": {
-    "mtime": 1779546433.8297362,
-    "ast_hash": "a8881fde0af86af1ea5d039c3b2fc3b4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_morpher_agent.py": {
-    "mtime": 1779546450.6696641,
-    "ast_hash": "0e6b63146d580cc4f80c1790dd5f8721",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_strategy_agent.py": {
-    "mtime": 1779546430.815749,
-    "ast_hash": "20d9c3f49568830d757e5794638799ee",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_entry_agents.py": {
-    "mtime": 1779546250.9905133,
-    "ast_hash": "25ba5287430c441de2153983452990dd",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_shifter_agent.py": {
-    "mtime": 1779546453.4426525,
-    "ast_hash": "9e7b098f4b3ed3c1a9121f447613ea3a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_regime_agent.py": {
-    "mtime": 1779546425.693771,
-    "ast_hash": "d7c055cae46f5891d26b25b794ef2475",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_order_agent.py": {
-    "mtime": 1780150657.8185346,
-    "ast_hash": "b779c8e93b713f4dc4ae3ecb2ab6ce86",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_postmortem_agent.py": {
-    "mtime": 1779546456.6966383,
-    "ast_hash": "d7105205943a3ee903e9c7cbc2326c25",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/test_tedb_concurrent_writes.py": {
-    "mtime": 1779666918.2978406,
-    "ast_hash": "e353d3cbbddf882e246c7a9fa8c9a74d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unit/__init__.py": {
-    "mtime": 1779543089.810734,
-    "ast_hash": "4d475203ed15e8ac4b28b47ef4042c81",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/phase/test_entry_phase.py": {
-    "mtime": 1779546468.2135892,
-    "ast_hash": "17fe81c225e0db89d0ff6e544fc56d75",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/phase/test_post_trade_phase.py": {
-    "mtime": 1779546479.242542,
-    "ast_hash": "d4ec841d72b000cefde78515f7a3a402",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/phase/test_monitoring_phase.py": {
-    "mtime": 1779546474.9625604,
-    "ast_hash": "5b9748db30f7757693bbfa3440e0a149",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/phase/__init__.py": {
-    "mtime": 1779543130.902538,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_autonomous_dryrun.sh": {
-    "mtime": 1779770513.5941358,
-    "ast_hash": "34f206f33bf343a283cc18d889b6a3d7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_pattern_enricher.sh": {
-    "mtime": 1779786247.6247008,
-    "ast_hash": "6f43c63b99947548112773dcba3101f7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_kickoff.sh": {
-    "mtime": 1780305876.3632836,
-    "ast_hash": "fdfd7c1cfe37907a7755161cfcd9fa22",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_position_manager.sh": {
-    "mtime": 1779771480.0804732,
-    "ast_hash": "28bc8300e0216e4a3f8fd3476dc3f223",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_data_health.sh": {
-    "mtime": 1779786650.5107486,
-    "ast_hash": "d179a7e442c6d3aa2289385029a591d7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_risk_monitor.sh": {
-    "mtime": 1779771480.0874732,
-    "ast_hash": "be3d05e2aeb9835c9f8322ae77fb00fd",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_margin_capture.sh": {
-    "mtime": 1780293369.6151457,
-    "ast_hash": "756abf2c8e49e0be9b1b94b636fccfc5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/cleanup_zombies.sh": {
-    "mtime": 1779786286.306525,
-    "ast_hash": "d8d8e920126f0450f284943dc75f131b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/STEP1_REVIEW_SUMMARY.md": {
-    "mtime": 1779627307.9372249,
-    "ast_hash": "02e1f248dde834d261d33d1e35590eda",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/REPLAY_GUIDE.md": {
-    "mtime": 1779790045.5470922,
-    "ast_hash": "25fbe99d688a07d2e9f1d1166cf9f0eb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/AGENT_CONFORMANCE_HARNESS_SPEC.md": {
-    "mtime": 1779629378.594753,
-    "ast_hash": "356412c3ca5fa25632e362b509d74a16",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/REPLAY_HARNESS_REVIEW.md": {
-    "mtime": 1779629813.7131515,
-    "ast_hash": "2fe9997ac2d7613bd89b3a4d3aaa7645",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SESSION_20260525_FINDINGS.md": {
-    "mtime": 1779727969.9255757,
-    "ast_hash": "84f59cffd8212154e546b1fb101a6fb3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/OPEN_TASKS_FOR_DEEPSEEK.md": {
-    "mtime": 1779667236.6802726,
-    "ast_hash": "c3206aea7868dc0f052b1f146ae8bc0f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/OPEN_CONCERNS_BACKTEST_AND_AGENTS.md": {
-    "mtime": 1779630246.5854566,
-    "ast_hash": "60e3ae15430807268ae3a94fe899a5e9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/NIFTY_AGENT_TOOLS_VALIDATION.md": {
-    "mtime": 1779628882.7132728,
-    "ast_hash": "e4975bea92aad1188d56f23fdd0b1b19",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SCHEMAS.md": {
-    "mtime": 1779102503.8584344,
-    "ast_hash": "9f29ab9745149f451688fa95c2e52b3a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/TAURIC_REUSE_PLAN.md": {
-    "mtime": 1778690334.4820004,
-    "ast_hash": "8afd05c9e2b1c2153f4e38279d313991",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/HANDOFF.md": {
-    "mtime": 1778689392.7396805,
-    "ast_hash": "2948744fe1890ede3c1d5c7c2ec66cd6",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/RESEARCH_REFERENCES.md": {
-    "mtime": 1778690885.1444235,
-    "ast_hash": "efd2211a272fd364bbe0b93509d88822",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/REVIEW_BEFORE_WAVE1.md": {
-    "mtime": 1778689652.1696513,
-    "ast_hash": "0fd6c4f69ccbddcb08b2a1d9d34c1a04",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/BUILD_PLAN.md": {
-    "mtime": 1778689138.1222103,
-    "ast_hash": "2812d2f9fc4887ce4463dc7ce2db8d70",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/NEXT_STEPS.md": {
-    "mtime": 1778697829.250793,
-    "ast_hash": "5b00f372064857d4e7cf49d4944651a0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/WAVE1_GO.md": {
-    "mtime": 1778689704.7239351,
-    "ast_hash": "6a7fd9d3a3284545aeedbd93dbea7358",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/archives/DUCKDB_CONCURRENCY.md": {
-    "mtime": 1778784722.620003,
-    "ast_hash": "b945cb96718c5e77fee27b9421ed129b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/config/agents_registry.yaml": {
-    "mtime": 1780547560.4349852,
-    "ast_hash": "af6e063aee3dd9175c2025d91f3aac9b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/config/tools_registry.yaml": {
-    "mtime": 1779102503.8574345,
-    "ast_hash": "36feea95ebb40d0fd47fa3d60bdf3a13",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/config/risk_limits.yaml": {
-    "mtime": 1779102503.8574345,
-    "ast_hash": "8586fec13978eb67d1f0ef026339804c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/README.md": {
-    "mtime": 1779543124.7485673,
-    "ast_hash": "74486e22ec6d920da077e2c281f01d30",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/logs/TRADE_ANALYSIS_20260529.md": {
-    "mtime": 1780054537.1312835,
-    "ast_hash": "f472cde551872cb7ae4bee7160e7cd02",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/state.py": {
-    "mtime": 1780218872.9178004,
-    "ast_hash": "00ce579df5fee4217058929d6785196f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/lock.py": {
-    "mtime": 1780145788.0588226,
-    "ast_hash": "852a5865d8c4af594d35ca777906d220",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/order_routing.py": {
-    "mtime": 1781374085.7983367,
-    "ast_hash": "74bbb47f80d2aa9a81db5e9ba11823c8",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/market_data.py": {
-    "mtime": 1781031579.6500645,
-    "ast_hash": "af4755c154deb790d1c496c6452850f7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/post_mortem.py": {
-    "mtime": 1780596140.342855,
-    "ast_hash": "a5f917e3308c7fc825c07f33ef2e357d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/order_status.py": {
-    "mtime": 1780160131.6740913,
-    "ast_hash": "dc8dad0b0f04131e13548cd751ccee27",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_WITH_ENTRY_GATE_FILTERS.py": {
-    "mtime": 1779557087.7558057,
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_WITH_ENTRY_GATE_FILTERS.py": {
+    "mtime": 1790966013.311242,
     "ast_hash": "39adaa36c1a7a8d1770366cc14926f04",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_2024_WITH_RISK_MGMT.py": {
-    "mtime": 1779555413.2196705,
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_2024_WITH_RISK_MGMT.py": {
+    "mtime": 1790966013.314242,
     "ast_hash": "f78f13579e301dc6e0943a65a8cae963",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/SCALING_REINVESTMENT_MODEL.py": {
-    "mtime": 1779556730.8704567,
+  "/home/trading_ceo/projects/brahmand/backtest/SCALING_REINVESTMENT_MODEL.py": {
+    "mtime": 1790966013.314242,
     "ast_hash": "72c49544d2a9afaebe4f206b92f99947",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/REPLAY_REDIS_DRYRUN.py": {
-    "mtime": 1779783823.4746776,
-    "ast_hash": "0a122dc01b79069e39810df7795ae632",
+  "/home/trading_ceo/projects/brahmand/backtest/REPLAY_REDIS_DRYRUN.py": {
+    "mtime": 1790966013.314242,
+    "ast_hash": "6ab929a8dc7c4d42c5b995225ec98508",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/MONTHLY_PROFIT_BREAKDOWN.py": {
-    "mtime": 1779556634.724902,
+  "/home/trading_ceo/projects/brahmand/backtest/MONTHLY_PROFIT_BREAKDOWN.py": {
+    "mtime": 1790966013.314242,
     "ast_hash": "e6a7bd6fca0455dadaa9ecdce11b2854",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/PRODUCTION_BACKTEST_FROM_SCRATCH.py": {
-    "mtime": 1779626300.6360164,
-    "ast_hash": "df5f3269562251184de26cebe2cac17f",
+  "/home/trading_ceo/projects/brahmand/backtest/PRODUCTION_BACKTEST_FROM_SCRATCH.py": {
+    "mtime": 1790966013.3152418,
+    "ast_hash": "9f7503cc3476406da7f6c754ead84692",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/SCALING_REALISTIC_MODEL.py": {
-    "mtime": 1779556753.6473515,
+  "/home/trading_ceo/projects/brahmand/backtest/SCALING_REALISTIC_MODEL.py": {
+    "mtime": 1790966013.3152418,
     "ast_hash": "0db897d804a10cdf7f1d4cf652434fc8",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/RISK_COMPONENT_IMPACT_ANALYSIS.py": {
-    "mtime": 1779558139.802765,
-    "ast_hash": "de2815d96d50f8ce19ce176ad9d0e4b7",
+  "/home/trading_ceo/projects/brahmand/backtest/RISK_COMPONENT_IMPACT_ANALYSIS.py": {
+    "mtime": 1790966013.3152418,
+    "ast_hash": "6aaf0ecfd00b5c0259fbad1ef0b1615f",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_2024_WITH_LEG_SHIFTING.py": {
-    "mtime": 1779604692.289376,
-    "ast_hash": "0c6acd8ca912c3b0c613310be3a84927",
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_2024_WITH_LEG_SHIFTING.py": {
+    "mtime": 1790966013.3162417,
+    "ast_hash": "a3865d83fb3114a45e017f4fc42a13f6",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/STEP1_LOAD_NIFTY_2024_DATA.py": {
-    "mtime": 1779628647.3380818,
-    "ast_hash": "3a8056002a11af956605a2638dc4eaef",
+  "/home/trading_ceo/projects/brahmand/backtest/STEP1_LOAD_NIFTY_2024_DATA.py": {
+    "mtime": 1790966013.3192415,
+    "ast_hash": "26f21a26ec9e35ad01200436ba7dd4c7",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/SIMULATE_LEG_SHIFT_MECHANICS.py": {
-    "mtime": 1779604804.2088945,
-    "ast_hash": "3e72dce59c71e2a342ba2404671fdfd4",
+  "/home/trading_ceo/projects/brahmand/backtest/SIMULATE_LEG_SHIFT_MECHANICS.py": {
+    "mtime": 1790966013.3192415,
+    "ast_hash": "3a58062e75f2ad3bb8071d77ea952437",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/LEG_SHIFT_SCENARIO_ANALYSIS.py": {
-    "mtime": 1779603342.277438,
-    "ast_hash": "be6f599bdc7e7634a96a7a64b27620cc",
+  "/home/trading_ceo/projects/brahmand/backtest/LEG_SHIFT_SCENARIO_ANALYSIS.py": {
+    "mtime": 1790966013.3192415,
+    "ast_hash": "56a303aa2b30514531383b91bc510812",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/NIFTY_BACKTEST_AGENT_TOOLS.py": {
-    "mtime": 1779633375.2570403,
-    "ast_hash": "c007bcb77c7ddb66f12f1914cedd73fc",
+  "/home/trading_ceo/projects/brahmand/backtest/NIFTY_BACKTEST_AGENT_TOOLS.py": {
+    "mtime": 1790966013.3212414,
+    "ast_hash": "f7f6e5bb2b27972c16867e4ad9617717",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/REPLAY_KAGGLE_TO_REDIS.py": {
-    "mtime": 1779631608.542342,
-    "ast_hash": "6dc7d801cb1f9c2ceb08d75a5fda3436",
+  "/home/trading_ceo/projects/brahmand/backtest/REPLAY_KAGGLE_TO_REDIS.py": {
+    "mtime": 1790966013.3222413,
+    "ast_hash": "b0e5727bebb8c75312f96b10f4936833",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_2024_FULL_RISK_MGMT.py": {
-    "mtime": 1779555705.909253,
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_2024_FULL_RISK_MGMT.py": {
+    "mtime": 1790966013.3232412,
     "ast_hash": "2cd87aa0b3ce5edd2748a69678565b73",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/LOSS_SCENARIO_ANALYSIS_DETAILED.py": {
-    "mtime": 1779605888.848011,
-    "ast_hash": "aac2fb586064bcd3b39ac9155f76f85e",
+  "/home/trading_ceo/projects/brahmand/backtest/LOSS_SCENARIO_ANALYSIS_DETAILED.py": {
+    "mtime": 1790966013.3342407,
+    "ast_hash": "dc310d4ac51c62da0dc9a7393404ab56",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_2024_MINI.py": {
-    "mtime": 1779548871.2848845,
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_2024_MINI.py": {
+    "mtime": 1790966013.3362405,
     "ast_hash": "67716790734c833ff53416b17fea7e49",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/CAPITAL_COMPOUNDING_MODEL_2024.py": {
-    "mtime": 1779556466.1066835,
+  "/home/trading_ceo/projects/brahmand/backtest/CAPITAL_COMPOUNDING_MODEL_2024.py": {
+    "mtime": 1790966013.3362405,
     "ast_hash": "09c5d31ff3c624901c83f6db9edae430",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/PRODUCTION_BACKTEST_DETAILED_LOGS.py": {
-    "mtime": 1779626397.2226071,
-    "ast_hash": "9bd83bffcf58a258c9730e838c3c2557",
+  "/home/trading_ceo/projects/brahmand/backtest/PRODUCTION_BACKTEST_DETAILED_LOGS.py": {
+    "mtime": 1790966013.3362405,
+    "ast_hash": "579408da66c2b4f60c279fd2bf89c933",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/NIFTY_SPOT_2024_LOADER.py": {
-    "mtime": 1779631953.6636255,
+  "/home/trading_ceo/projects/brahmand/backtest/NIFTY_SPOT_2024_LOADER.py": {
+    "mtime": 1790966013.3382404,
     "ast_hash": "ec27c8c1c66a8d4fac794f7748096d52",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/BACKTEST_2024_DUCKDB.py": {
-    "mtime": 1779555239.6545348,
+  "/home/trading_ceo/projects/brahmand/backtest/BACKTEST_2024_DUCKDB.py": {
+    "mtime": 1790966013.3382404,
     "ast_hash": "b48c3c3458f00eb2adf444ada57511e6",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/tests/autonomous_dryrun.py": {
-    "mtime": 1780547495.6602902,
-    "ast_hash": "c521dd9327d9af134536a37c7121735e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_order_agent_routing.py": {
-    "mtime": 1780219181.433556,
-    "ast_hash": "63979d009754669bcc3a4db71e064868",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_full_cycle.py": {
-    "mtime": 1780589514.8126988,
-    "ast_hash": "c40f206d23631f79b36ca120147154cc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/AGENT_CONFORMANCE_HARNESS.py": {
-    "mtime": 1779630191.3266761,
-    "ast_hash": "40a24950fdc6aefed84e0facfb5b45b7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_margin_calculations_premarket.py": {
-    "mtime": 1780219293.758441,
-    "ast_hash": "fb262672468d9dc0b295006680311b23",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_with_kaggle_data.py": {
-    "mtime": 1780589502.7667935,
-    "ast_hash": "b572a1089a60f2a1964787b3c5d69464",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/TEST_SYSTEM_NOW.py": {
-    "mtime": 1780589508.1957507,
-    "ast_hash": "f41db089e5ea9db04876510d4c3d7cfa",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TEST_IMPLEMENTATION_ROADMAP.md": {
-    "mtime": 1779546938.2146542,
-    "ast_hash": "ec6a56d28265c06110785e69d7010c49",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/README.md": {
-    "mtime": 1779331514.0434437,
-    "ast_hash": "b51d03b7ee68fad5e5dfd8b0780c32eb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PATTERN_INTEGRATION_FRAMEWORK.md": {
-    "mtime": 1779386976.0302064,
-    "ast_hash": "0abeaf6bfde284e5205a05f14a40f9e4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/CREWAI_KNOWLEDGE_INTEGRATION.md": {
-    "mtime": 1778813852.6386688,
-    "ast_hash": "85ca16b4cedbbe676947b9282d4fc03a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/CONTEXT.md": {
-    "mtime": 1779331484.7075639,
-    "ast_hash": "57cff5b44f958ec7be41d792fbfda834",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/KNOWLEDGE_ARCHITECTURE.md": {
-    "mtime": 1778813793.9629955,
-    "ast_hash": "dd017e2a74a2bae5fe5852bcc9ea6964",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RISK_AGENT_CREW_ARCHITECTURE.md": {
-    "mtime": 1779444927.184195,
-    "ast_hash": "ff318e9bee8befbc27d967065f18bf11",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/POSTMORTEM_DATA_FLOW.md": {
-    "mtime": 1779356084.9291434,
-    "ast_hash": "4edb3e30c8ed2e55b80e070636891544",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SYSTEM_TEST_REPORT_20260523.md": {
-    "mtime": 1779548107.5750659,
-    "ast_hash": "379e3fd81bc67efaf998a5a5b16ed1ea",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/POSTMORTEM_KNOWLEDGE_SCAFFOLD.md": {
-    "mtime": 1778815286.543406,
-    "ast_hash": "d047d6d1b518bdffa7a3925212ad5e65",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SYSTEM_OVERVIEW.txt": {
-    "mtime": 1779387576.6550455,
-    "ast_hash": "e6e1d9774fb3bb8b314335536153e6cb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/AGENT_ARCHITECTURE_COMPLETE.md": {
-    "mtime": 1779526466.956986,
-    "ast_hash": "16d1bbe5c81116eed5afa1bc278f8de8",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SESSION_COMPLETION.md": {
-    "mtime": 1779163350.263503,
-    "ast_hash": "82ac52a9607b0c730ce5d26858297f0b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TEST_STRATEGY.md": {
-    "mtime": 1779543044.68695,
-    "ast_hash": "02bb99fea731dfeade88ad6e9052f0f7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TAURIC_REUSE_PLAN.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "8afd05c9e2b1c2153f4e38279d313991",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_AGENT_SUMMARY.md": {
-    "mtime": 1779375666.9727414,
-    "ast_hash": "134d3cfcdf4086226f789d987df46c2a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MORPH_AGENT_ENHANCEMENT.md": {
-    "mtime": 1780065032.020401,
-    "ast_hash": "02bea58fe730885a2156422337801dca",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MORPHING_STATE_MACHINE.md": {
-    "mtime": 1779131496.4376125,
-    "ast_hash": "c82366baa80a396d295be94a6c0635d5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RESEARCH_PATTERNS_WIRED.md": {
-    "mtime": 1779521368.5448017,
-    "ast_hash": "7a5826f88acf47fd8053ea01a6c2e79c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/HANDOFF.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "2948744fe1890ede3c1d5c7c2ec66cd6",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MORPH_EXECUTION_CODE_REFERENCE.md": {
-    "mtime": 1779206663.469114,
-    "ast_hash": "09db4b1e23fd360a120ea76eb4d77537",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_GATE_IMPACT_ANALYSIS.md": {
-    "mtime": 1779557337.6315768,
-    "ast_hash": "74ae5d1573e554f9d6edecbff8e785b3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/BRAHMAND_VS_ANTARIKSH_AGENTS.md": {
-    "mtime": 1779526562.6435232,
-    "ast_hash": "5dcca274f73f9da95cb5d5d8a0261560",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/COMPLETE_BRAHMAND_FLOW.md": {
-    "mtime": 1778814771.9194233,
-    "ast_hash": "406d912d69ea33f175be0e3032c71ed9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TRAFFIC_LIGHT_WITH_GAP_7TH_PARAMETER.md": {
-    "mtime": 1779203090.8882005,
-    "ast_hash": "715ffe8ab7bae5e48744f3dce2e1ff04",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/DATA_FLOW_ENTRY_CHECK.md": {
-    "mtime": 1779201070.5373273,
-    "ast_hash": "9a19abd7f403fcd323ba0937ff9bb64e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MONITORING_PHASE_LOGGING.md": {
-    "mtime": 1779523134.078339,
-    "ast_hash": "26f966d2392a6dd2913d3ad55e97f897",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/UNIFIED_ENTRY_CHECK_ARCHITECTURE.md": {
-    "mtime": 1779201562.0184479,
-    "ast_hash": "2504a79f2e02c12e810db8a938460b2d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MORPHING_POSITION_REVIEW.md": {
-    "mtime": 1779131461.2106738,
-    "ast_hash": "92df3c244cedab2ed03b90a309c0ef5c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_CHECK_INTEGRATION_SUMMARY.md": {
-    "mtime": 1779200970.4757957,
-    "ast_hash": "aa09bf51aaada6c4b8967786f9222d73",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MARGIN_AND_WING_OPTIMIZER_CODE_REFERENCE.md": {
-    "mtime": 1779209529.1862338,
-    "ast_hash": "360ccb05ed70e468aafc9517fc98dcb4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ORDER_AGENT_REFACTORING.md": {
-    "mtime": 1779353439.8259554,
-    "ast_hash": "2c2c2bb74fcc36e56fe948197546d104",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/KICKOFF_VERIFICATION.md": {
-    "mtime": 1779331599.282094,
-    "ast_hash": "cf8104af21c906aad7fa401757660b5b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/EXECUTION_AGENT_MULTI_ASSET_ROADMAP.md": {
-    "mtime": 1779526303.0827653,
-    "ast_hash": "880e8bd8eda304acdf3f3b5816223ab5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RESEARCH_REFERENCES.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "efd2211a272fd364bbe0b93509d88822",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/MARGIN_CALCULATION_FIXES.md": {
-    "mtime": 1779131116.3797348,
-    "ast_hash": "c1fd98a306be7037a9f0c1e545307b4d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/REVIEW_BEFORE_WAVE1.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "0fd6c4f69ccbddcb08b2a1d9d34c1a04",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RL_CAPABILITY_SUMMARY.md": {
-    "mtime": 1778813902.5873804,
-    "ast_hash": "4dd640adac042680ca575a1ccce45e44",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/BUILD_PLAN.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "2812d2f9fc4887ce4463dc7ce2db8d70",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/NEXT_STEPS.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "5b00f372064857d4e7cf49d4944651a0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TOMORROW_TRADING_CONFIG.md": {
-    "mtime": 1779388943.4141834,
-    "ast_hash": "c26f8a59de3d770ee1fdabe1cbc6c0a3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/IMPLEMENTATION_SUMMARY.md": {
-    "mtime": 1779387529.7302244,
-    "ast_hash": "41298851a49388e0a882ed1e93fb6c5a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RESEARCH_AGENTS_IMPLEMENTATION_COMPLETE.md": {
-    "mtime": 1779388393.0746279,
-    "ast_hash": "39341fd5275bde8d651ce8a72aef47b3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_CHECK_FIX_SUMMARY.md": {
-    "mtime": 1779200876.6086748,
-    "ast_hash": "d5c63faf55c6a66a6c67f79126dbe51c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_AGENT_SPEC.md": {
-    "mtime": 1779375516.7372055,
-    "ast_hash": "1ba4c06866cf1e069d0db5da82c27fc2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RUN_BACKTEST_2024_VALIDATION.md": {
-    "mtime": 1779555711.313227,
-    "ast_hash": "91dba2369920b0a2cca584cccf01e366",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/REFACTORING_COMPLETE.md": {
-    "mtime": 1779353501.4326665,
-    "ast_hash": "7665a10219b088aad70000aa00a238f6",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_TOOLS_REFERENCE.md": {
-    "mtime": 1779375584.3339968,
-    "ast_hash": "58b9995b4407357e0f1ff9a40fb8e073",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/LIVE_TRADING_SETUP.md": {
-    "mtime": 1779388669.089408,
-    "ast_hash": "c393818a259ef4d41e4020bc63de3b39",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_GATE_FIX_PENDING.md": {
-    "mtime": 1779557903.247877,
-    "ast_hash": "f2913952ed0a3756561f57e2e27af1f1",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_QUICK_REFERENCE.txt": {
-    "mtime": 1779375697.743646,
-    "ast_hash": "d1dec4e1c41b3e3b46fd14ef252ff277",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/BRAHMAND_BUILD_SPECIFICATION.md": {
-    "mtime": 1778815179.0312,
-    "ast_hash": "dd2cb7e5039caa73fb1a4c8b85984cf7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RELEASE_NOTES_2026-05-19.md": {
-    "mtime": 1779181256.2291453,
-    "ast_hash": "0a0df17f88eb1fc5ecb29031e6cb0109",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/KNOWLEDGE_INDEX.md": {
-    "mtime": 1778813932.868201,
-    "ast_hash": "31e8d7e15a0774c03dff855c2935f466",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_RESEARCH_QUICKSTART.md": {
-    "mtime": 1779375621.6538815,
-    "ast_hash": "8b199da318b69d5e6b7b1171fdd1b12e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/BACKTEST_2024_RESULTS_SUMMARY.md": {
-    "mtime": 1779555737.5751016,
-    "ast_hash": "022e3bacab59cc14e4d82c8770753562",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TEST_STRATEGY_WITH_RESEARCH_PATTERNS.md": {
-    "mtime": 1779547339.6471648,
-    "ast_hash": "0708bc6c62dfea38d5976d0ee305d9fb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/WAVE1_GO.md": {
-    "mtime": 1779102503.8524346,
-    "ast_hash": "6a7fd9d3a3284545aeedbd93dbea7358",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/TSL_THRESHOLD_FIX.md": {
-    "mtime": 1779523726.3255193,
-    "ast_hash": "729df24cb7152976cd4280de674235df",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ORDER_LEDGER_AND_EXECUTION_DB_ARCHITECTURE.md": {
-    "mtime": 1779525245.3803754,
-    "ast_hash": "85a3d96df2e8f4430c11cd95e0ae1eb1",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ORDER_AGENT_ACTIVATION.md": {
-    "mtime": 1779354506.5761173,
-    "ast_hash": "b461dda96473380623b408b58a817e0b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/POSTMORTEM_AGENT_DESIGN.md": {
-    "mtime": 1778814300.5968595,
-    "ast_hash": "3d2cddffecb9486a6609f0da7384256d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ARCHITECTURE.md": {
-    "mtime": 1779331453.9576898,
-    "ast_hash": "f2f38055e8a7bc85867f1e30939d8fb7",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/AUTONOMOUS_RESEARCH_WORKFLOW.md": {
-    "mtime": 1779387445.9225357,
-    "ast_hash": "4e218ace31ceb71fca1fc26393813db9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/ENTRY_SYSTEM_ARCHITECTURE.md": {
-    "mtime": 1780064836.5503442,
-    "ast_hash": "468d110f1cdc57710cf58296589c8afc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/RESEARCH_AGENT_ENTRY_GATE_GAPS.md": {
-    "mtime": 1779521532.966023,
-    "ast_hash": "7488d97bbb2b18b9db215f96db1cc065",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/BACKTEST_2024_MINI_SUMMARY.md": {
-    "mtime": 1779554908.7301562,
-    "ast_hash": "541d4ccaad0ef3e9fc3e48d0d046f17e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/fix_research_agent_indicator_mismatch.md": {
-    "mtime": 1779520695.1510615,
-    "ast_hash": "d9e57138af66f491e97be92d1deeaea2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/SESSION_20260519.md": {
-    "mtime": 1779163316.7014692,
-    "ast_hash": "805bec71158d768736f19ba735021a7a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/POSTMORTEM_AGENT_ARCHITECTURE.md": {
-    "mtime": 1778814484.1976614,
-    "ast_hash": "d1fd044cf82b83b78a67679b15992a76",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/DESIGN_OPTION_FEED.md": {
-    "mtime": 1780109096.7869272,
-    "ast_hash": "d8d1827aeb538d1b614621e05f03f220",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/HANDOFF_TO_DEEPSEEK.md": {
-    "mtime": 1778815436.9652278,
-    "ast_hash": "8f6c90e2b872295e987c270185bb283b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/EXECUTION_vs_ORDER_AGENT_ANALYSIS.md": {
-    "mtime": 1779524299.2908056,
-    "ast_hash": "b3eec95959f9396d68233c61a2cbe876",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/DEPLOYMENT_READY.md": {
-    "mtime": 1779389179.7001626,
-    "ast_hash": "e5b8ba9c8d7b2621a0ace5d2f1c883c0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/entry_setup.py": {
-    "mtime": 1781031758.3751419,
-    "ast_hash": "dd061b834d75bdeb3b33e8c5d2fc1b5b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/config/tasks.yaml": {
-    "mtime": 1780230424.5876243,
-    "ast_hash": "fad0ee2af34e7e9200790a2c1df5c1a5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/verification.py": {
-    "mtime": 1780230605.962823,
-    "ast_hash": "c41098363dd04ce61e69e0f405f382b8",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/contract_builder.py": {
-    "mtime": 1780229890.8207984,
-    "ast_hash": "e94741f9ef7c816a381bb7ff209e016a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/llm.py": {
-    "mtime": 1780547487.7663276,
-    "ast_hash": "d19febf65a854b20351d708d24893a6f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/fallback.py": {
-    "mtime": 1781118540.8026657,
-    "ast_hash": "09fdfdbf1083a33e7db6aea54737506f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/parsing.py": {
-    "mtime": 1781027800.6311052,
-    "ast_hash": "64f6783ad045746a48f1924c840749db",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PROJECT_UNICORN.md": {
-    "mtime": 1780253710.722703,
-    "ast_hash": "f846b675d1b56dd5ef744710290cdba5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PROJECT_UNICORN_TDD.md": {
-    "mtime": 1780285671.5954185,
-    "ast_hash": "f0f0aae20292aa306158108759604c05",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_anomaly.py": {
-    "mtime": 1780507254.846382,
-    "ast_hash": "4a1b131828b5f2f96ac564170052b45d",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_debate.py": {
-    "mtime": 1781118705.6539683,
-    "ast_hash": "eeecae5534407c1211d15ce507bebfec",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_research.py": {
-    "mtime": 1780592522.8218129,
-    "ast_hash": "9c41ab673f4dd52c71c6e6493fedc4ce",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/penguin_compat.py": {
-    "mtime": 1780500325.9664197,
-    "ast_hash": "1cd126e9419ef6ea1da47786a8b4cae3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_judge.py": {
-    "mtime": 1780507223.8005412,
-    "ast_hash": "a4db58a7daac6e03527879cc9b3414f2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_research_cache.py": {
-    "mtime": 1780507277.9172642,
-    "ast_hash": "04b8c324f03333947ee31f0a4d456809",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_verify.py": {
-    "mtime": 1780507186.2647345,
-    "ast_hash": "f22e7211a3485d842c853a60b6e40e76",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/agentops_compat.py": {
-    "mtime": 1780595794.2624416,
-    "ast_hash": "d99c3947cc540d3dab64e940a2c8baa8",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_raw_query.py": {
-    "mtime": 1780507171.243812,
-    "ast_hash": "03c08fb043755fa49acc883f088df393",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/unicorn_logger.py": {
-    "mtime": 1780507315.2500741,
-    "ast_hash": "4c8ae1bc233422871d45f73cd477eaac",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/verify_entry_path.py": {
-    "mtime": 1780590052.8621216,
-    "ast_hash": "b9c4ca8f87f74c51c170f86a146c956e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/verify_exit_path.py": {
-    "mtime": 1780591701.838742,
-    "ast_hash": "21bf84f7372a003cd2bbc14517bc63e8",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/fixtures/sandbox_order_ledger.json": {
-    "mtime": 1780589545.9704585,
-    "ast_hash": "5185fb0a9958da8d2c44aab5051852e9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_research_cache.py": {
-    "mtime": 1780506408.6855464,
-    "ast_hash": "467be17aed5a5e9a2df8c1f0a898183f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_raw_query.py": {
-    "mtime": 1780501504.6939394,
-    "ast_hash": "d938c853ca1c58dce9950834ed8eebaa",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/conftest.py": {
-    "mtime": 1780590179.843397,
-    "ast_hash": "280c3909d5d8ece801462db063537852",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_verify.py": {
-    "mtime": 1780501804.0465455,
-    "ast_hash": "77fe97cfc46dd75f10838c8656aecaf5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_debate.py": {
-    "mtime": 1780547572.1129303,
-    "ast_hash": "ca8d38bff04f1404b539af0aa91740ab",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_judge.py": {
-    "mtime": 1780502550.2260702,
-    "ast_hash": "66d5e734558835b1250d0fc5184c90fb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_integration.py": {
-    "mtime": 1780506609.8906028,
-    "ast_hash": "e2fca85eb82007b1b783d27fc5fefef1",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/__init__.py": {
-    "mtime": 1780501286.3019562,
-    "ast_hash": "e950d50d0461a00424dbbab9460f6b42",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/test_llm_boundary.py": {
-    "mtime": 1780591395.4972193,
-    "ast_hash": "424c70c083bd7be7fd5df9ff6343216c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/fixtures/debate_bullish_not_down.json": {
-    "mtime": 1780502107.9381304,
-    "ast_hash": "3a8c2643ac9bba3c9864da033b3eccda",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/fixtures/debate_ambiguous.json": {
-    "mtime": 1780502124.2320545,
-    "ast_hash": "59747df1172f03a31dc0f35bdd91cd70",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/fixtures/raw_data_sample.json": {
-    "mtime": 1780501285.1089616,
-    "ast_hash": "9873ff6319dda072e8dac5f679a93dd2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/unicorn/fixtures/debate_bearish_not_up.json": {
-    "mtime": 1780502090.7192104,
-    "ast_hash": "6356d779491e0e7328ea6ae9afab409e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/eod_close_stale_trades.py": {
-    "mtime": 1781030684.641715,
-    "ast_hash": "213731c0cffb936970eab4c92cce6c3c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_unicorn_research.sh": {
-    "mtime": 1780507635.8234687,
-    "ast_hash": "983fde0477a9e3225137d3891dad1d24",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/DEEPSEEK_FIX_TASKS.md": {
-    "mtime": 1780595933.4677894,
-    "ast_hash": "2738667d6f09ea93abbd2428bb4132f5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/READER_MIGRATION_MAP.md": {
-    "mtime": 1780500406.2420473,
-    "ast_hash": "ef18a018f2afe6b269d23d31ff4c5e93",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PENGUIN_VARAHA_DUCKDB_MIGRATION_TRIAGE.md": {
-    "mtime": 1780424068.8275216,
-    "ast_hash": "44debe74972bbf5746db7448568cb969",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/UNICORN_PHASE0_FINDINGS.md": {
-    "mtime": 1780501321.100794,
-    "ast_hash": "0d4fceaa9f8883eeec60639b35475965",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PROJECT_UNICORN_DEEPSEEK_HANDOFF.md": {
-    "mtime": 1780301471.9574473,
-    "ast_hash": "0a4953a7cf7e6bd5f3ed2bc8e8be0747",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/DATACAPTURE_FAILURE_20260602.md": {
-    "mtime": 1780423027.8535347,
-    "ast_hash": "349b79e1683c860db51ad90922a32a14",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/UNICORN_PROGRESS.md": {
-    "mtime": 1780502729.978233,
-    "ast_hash": "49d4d4a0755bc2e7257bc4f77747afcc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/PENGUIN_REPOINT_LOG.md": {
-    "mtime": 1780455801.531413,
-    "ast_hash": "d6e260625347a6fb561ee511b0445cd4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/UNICORN_ARCHITECTURE.md": {
-    "mtime": 1780503348.7959378,
-    "ast_hash": "c1f88179356b64332c11a2615b3caa4b",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/config/unicorn_agents.yaml": {
-    "mtime": 1780547568.8789454,
-    "ast_hash": "9261adb26058e7a131da3b1e0e66e4e1",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tools/record_option_timeseries.py": {
-    "mtime": 1780633708.0336745,
-    "ast_hash": "27a850ff129e8e06e23d0ac8ae4bc4bc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_output_parsing.py": {
-    "mtime": 1781027933.147473,
-    "ast_hash": "308e872a181ca30113767e101623b8b9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/position_research.py": {
-    "mtime": 1781029091.0329762,
-    "ast_hash": "fd3371fc817727d3312707f836832d37",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/position_research_cache.py": {
-    "mtime": 1781029307.4045365,
-    "ast_hash": "5c45ace52125e292f596955120ddd1f2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_position_research.py": {
-    "mtime": 1781029463.9895234,
-    "ast_hash": "5ad568b1d9cd09bd67cd05e448c92cbe",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/cron/run_position_research.sh": {
-    "mtime": 1781029110.3518846,
-    "ast_hash": "3eb9b347f200db6fe0db5f3e51d300a0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_stale_trade_cleanup.py": {
-    "mtime": 1781030744.0964034,
-    "ast_hash": "1984d5f372d99fda559a3384e935c1d5",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/notify.py": {
-    "mtime": 1781118062.4526007,
-    "ast_hash": "a17647c90ed7ee914bd356f545373ecc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_honest_entry_fills.py": {
-    "mtime": 1781118151.8322535,
-    "ast_hash": "4d646e3bd45819170f1b6c1f89fb7e8e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/docs/CANONICAL_STRATEGY_PLAN.md": {
-    "mtime": 1781146215.1380236,
-    "ast_hash": "8ffbe632a81b9a51f5c0d76631cba8fc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/canonical_strategy.py": {
-    "mtime": 1781143923.552112,
-    "ast_hash": "33919d1cc8d2280c94cac8ace4d6979f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_canonical_strategy.py": {
-    "mtime": 1781118595.7354345,
-    "ast_hash": "b31612ad589a7ba11337007f410598cb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_llm_down_coherence.py": {
-    "mtime": 1781118799.0905688,
-    "ast_hash": "371cad909f898c59a8415c3d4c082e8c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/bs_pricer.py": {
-    "mtime": 1781143941.4450026,
-    "ast_hash": "e163064620d193f86e70cd64fdd0d6ac",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/run_backtest.py": {
-    "mtime": 1784105074.8960195,
-    "ast_hash": "5cfcfc9233aabb743846e908b38b5abf",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/report_2024-01-01_2024-12-31.json": {
-    "mtime": 1781144174.1856456,
-    "ast_hash": "20f77d9fe5bed5cffa5b101f201b58ec",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/report_2024-01-01_2024-01-12.json": {
-    "mtime": 1781144023.2285128,
-    "ast_hash": "d1eb519acbb07d5e5d0edc69247256f9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/data_loader.py": {
-    "mtime": 1781143865.3154743,
-    "ast_hash": "72986f74e160016a09125277acf409b4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/report_2024-01-01_2024-01-31.json": {
-    "mtime": 1781144107.871021,
-    "ast_hash": "39da3614c45a47525d31ef588c773dc0",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/replay_io.py": {
-    "mtime": 1781143888.8573267,
-    "ast_hash": "c0ec9ec2fcb2e3d0fcfd4d42772a683a",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/__init__.py": {
-    "mtime": 1781143852.3305564,
-    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/trade_sim.py": {
-    "mtime": 1781144072.1672268,
-    "ast_hash": "a80014f5ff4679b9ffa2d44a953bb309",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_100.json": {
-    "mtime": 1784105210.614837,
-    "ast_hash": "30174d2af27e5721ea2d5a2739aa1ac2",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_20.json": {
-    "mtime": 1784105210.614837,
-    "ast_hash": "dd24f9e04b72b7bd331eb18dc64a21b9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_200.json": {
-    "mtime": 1784105210.614837,
-    "ast_hash": "e389310a7e0ce1e2184bcbe3dc2a70d3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_50.json": {
-    "mtime": 1784105210.614837,
-    "ast_hash": "aef5ccdd8c97b1f9ab689ae2a81056fc",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_5.json": {
-    "mtime": 1784105210.614837,
-    "ast_hash": "ebf8a1f9eda4a217fa02415f238af73f",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sweep.py": {
-    "mtime": 1781144786.4394267,
-    "ast_hash": "3ca389878d4689d32a85c8fd0600f3f6",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/trace_2025-01-01_2025-12-31.json": {
-    "mtime": 1781144899.620861,
-    "ast_hash": "903b147e39b4dc705a300c4f57442f80",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sweep_results.json": {
-    "mtime": 1781145304.1678753,
-    "ast_hash": "0e74085c29adfbebc7495f0d8cba30a4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/trace_decisions.py": {
-    "mtime": 1781144683.9949439,
-    "ast_hash": "2f652d5baa45c856b4faaa0c17dfb738",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/trace_2024-01-01_2024-12-31.json": {
-    "mtime": 1781144825.3112316,
-    "ast_hash": "d6f28b85889da1b60876d69facfa45a6",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_100.json": {
-    "mtime": 1781144899.5318615,
-    "ast_hash": "c0caa736895833dd160988aae9bb2a50",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_20.json": {
-    "mtime": 1781144899.5318615,
-    "ast_hash": "02acb12442f99217a8665efc14e82609",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_200.json": {
-    "mtime": 1781144899.5318615,
-    "ast_hash": "ed24647a60a1bc488141572e903abca3",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_50.json": {
-    "mtime": 1781144899.5318615,
-    "ast_hash": "25096471dcc7884a5bca53b0bd6921f4",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_5.json": {
-    "mtime": 1781144899.5318615,
-    "ast_hash": "b36518da1b91725cb285aa8a619561df",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/fly_sweep_results.json": {
-    "mtime": 1781146165.6302006,
-    "ast_hash": "59d5f3a4e95fa143469e046028429f11",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/fly_sweep.py": {
-    "mtime": 1781146026.4106708,
-    "ast_hash": "f7537ad1e1550e61971dca4d5469888e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/margin_gate.py": {
-    "mtime": 1781199448.8859231,
-    "ast_hash": "68f7a51a90691ac2a3dd22f0a8a8ac45",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_t17_margin_gate.py": {
-    "mtime": 1781199140.4063547,
-    "ast_hash": "c28bf3dbadd5ac1c3d1a5c40315581d9",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_t23f_stale_ltp.py": {
-    "mtime": 1781374188.6838644,
-    "ast_hash": "68c2a2b7d1669ece3052ace5f55acd7e",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_t23_porcupine.py": {
-    "mtime": 1781374933.6972327,
-    "ast_hash": "7efa29ae0244ae6afc05fae1db67965c",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/tests/test_sentinel_feed_callbacks.py": {
-    "mtime": 1781374846.2175088,
-    "ast_hash": "b458e0c315f07969415789d46b9b3ecb",
-    "semantic_hash": ""
-  },
-  "/home/trading_ceo/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-01-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-01-31.json": {
     "mtime": 1784088080.3539968,
     "ast_hash": "c9cedb57b7a323d728eab9f7309db91f",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_0.5.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_0.5.json": {
     "mtime": 1784105110.4443715,
     "ast_hash": "606ff1051630b8a7bd446ed504b133a4",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_1.0.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/bs_pricer.py": {
+    "mtime": 1790966013.3252413,
+    "ast_hash": "e163064620d193f86e70cd64fdd0d6ac",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/run_backtest.py": {
+    "mtime": 1790966013.3252413,
+    "ast_hash": "5cfcfc9233aabb743846e908b38b5abf",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_1.0.json": {
     "mtime": 1784105127.1569839,
     "ast_hash": "24e27289722ebc357205ba31f4ca32f6",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sweep_report_2024-01-01_2024-03-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sweep_report_2024-01-01_2024-03-31.json": {
     "mtime": 1784098436.3616095,
     "ast_hash": "ff01d90034b56fcb7569cd4fdd2dedda",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan.json": {
     "mtime": 1784105086.1914566,
     "ast_hash": "097ea6cec83dcc129334148dfb3b7b50",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/reverse_move_report_supertrend_2024-01-01_2024-12-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/report_2024-01-01_2024-12-31.json": {
+    "mtime": 1781144174.1856456,
+    "ast_hash": "20f77d9fe5bed5cffa5b101f201b58ec",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/report_2024-01-01_2024-01-12.json": {
+    "mtime": 1781144023.2285128,
+    "ast_hash": "d1eb519acbb07d5e5d0edc69247256f9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/reverse_move_report_supertrend_2024-01-01_2024-12-31.json": {
     "mtime": 1784108187.8069344,
     "ast_hash": "4acfaf57aac13d5f593e0167f1ac61a5",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sweep_report_2024-01-01_2024-12-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/data_loader.py": {
+    "mtime": 1790966013.3262413,
+    "ast_hash": "72986f74e160016a09125277acf409b4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sweep_report_2024-01-01_2024-12-31.json": {
     "mtime": 1784099387.2812998,
     "ast_hash": "e62849352b4148d4f933056928f0ad0a",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_2.0.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/report_2024-01-01_2024-01-31.json": {
+    "mtime": 1781144107.871021,
+    "ast_hash": "39da3614c45a47525d31ef588c773dc0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sweep.py": {
+    "mtime": 1790966013.3262413,
+    "ast_hash": "3ca389878d4689d32a85c8fd0600f3f6",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_2.0.json": {
     "mtime": 1784105145.6906462,
     "ast_hash": "0f1d1fb06aa2b98640f412dfee168246",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-01-31_base.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/replay_io.py": {
+    "mtime": 1790966013.3262413,
+    "ast_hash": "c0ec9ec2fcb2e3d0fcfd4d42772a683a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-01-31_base.json": {
     "mtime": 1784088080.3509972,
     "ast_hash": "6e4ad350e9dc86529e3c46ba84bda00f",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-12-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-12-31.json": {
     "mtime": 1784088159.1183674,
     "ast_hash": "dc697d7789ff54526648518187ca1f2b",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/reverse_move_report_2024-01-01_2024-12-31.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/reverse_move_report_2024-01-01_2024-12-31.json": {
     "mtime": 1784103804.5207973,
     "ast_hash": "f63b2ccb75f47e397e9cb53cd8eb95b6",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_jan2024_detailed.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/trace_2025-01-01_2025-12-31.json": {
+    "mtime": 1781144899.620861,
+    "ast_hash": "903b147e39b4dc705a300c4f57442f80",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_jan2024_detailed.json": {
     "mtime": 1784104695.44292,
     "ast_hash": "875200e9217194b2fce61c424d567c72",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_0.75.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sweep_results.json": {
+    "mtime": 1781145304.1678753,
+    "ast_hash": "0e74085c29adfbebc7495f0d8cba30a4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_0.75.json": {
     "mtime": 1784105121.3357723,
     "ast_hash": "3d6df8e865cbedd3e7f679dac2c30799",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/reverse_move_analysis.py": {
-    "mtime": 1784103796.5008328,
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/fly_sweep_results.json": {
+    "mtime": 1781146165.6302006,
+    "ast_hash": "59d5f3a4e95fa143469e046028429f11",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/trace_decisions.py": {
+    "mtime": 1790966013.3262413,
+    "ast_hash": "2f652d5baa45c856b4faaa0c17dfb738",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/reverse_move_analysis.py": {
+    "mtime": 1790966013.3272412,
     "ast_hash": "7b99453671c3212a3e4ccfd324dc18c9",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/reverse_move_analysis_supertrend.py": {
-    "mtime": 1784108180.5629542,
-    "ast_hash": "b74ba57e4b356fee0c25d014f6b8fa24",
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/__init__.py": {
+    "mtime": 1790966013.3272412,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-12-31_base.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/reverse_move_analysis_supertrend.py": {
+    "mtime": 1790966013.3272412,
+    "ast_hash": "faf2314a9e15182907f07402c10be9c4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/trade_sim.py": {
+    "mtime": 1790966013.3272412,
+    "ast_hash": "a80014f5ff4679b9ffa2d44a953bb309",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/trace_2024-01-01_2024-12-31.json": {
+    "mtime": 1781144825.3112316,
+    "ast_hash": "d6f28b85889da1b60876d69facfa45a6",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/signal_exit_report_2024-01-01_2024-12-31_base.json": {
     "mtime": 1784088159.1133678,
     "ast_hash": "8afb9cccddb58e5ba23d2b63b775ea91",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_1.5.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_1.5.json": {
     "mtime": 1784105140.2044518,
     "ast_hash": "d5c88fe72452f6b2ad4cee811b04765f",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/run_signal_exit_compare.py": {
-    "mtime": 1784088061.4954982,
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/run_signal_exit_compare.py": {
+    "mtime": 1790966013.3322408,
     "ast_hash": "67ef14a369a1afcd5f1f126b1bdb14a5",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_jan_1.25.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/fly_sweep.py": {
+    "mtime": 1790966013.3322408,
+    "ast_hash": "f7537ad1e1550e61971dca4d5469888e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_jan_1.25.json": {
     "mtime": 1784105134.1972375,
     "ast_hash": "2acfd39fa6746723e74a821fc541a867",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/intraday_ic_025delta_backtest.py": {
-    "mtime": 1784109827.0802329,
-    "ast_hash": "c45f3cff79e513b890272fc6988f1d70",
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/intraday_ic_025delta_backtest.py": {
+    "mtime": 1790966013.3322408,
+    "ast_hash": "82f1dcf95eea9a26217c230d8c6fe022",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/_atr_full2024.json": {
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/_atr_full2024.json": {
     "mtime": 1784105210.6288373,
     "ast_hash": "efeaffd66a08b518084cd1bebd5239d5",
     "semantic_hash": ""
   },
-  "/home/trading_ceo/brahmand/backtest/sherpa/sweep_entry_confidence.py": {
-    "mtime": 1784098186.4336383,
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sweep_entry_confidence.py": {
+    "mtime": 1790966013.3332407,
     "ast_hash": "b3deb39d05670b524879e1dc0f5f6a21",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_100.json": {
+    "mtime": 1784105210.614837,
+    "ast_hash": "30174d2af27e5721ea2d5a2739aa1ac2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_20.json": {
+    "mtime": 1784105210.614837,
+    "ast_hash": "dd24f9e04b72b7bd331eb18dc64a21b9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_200.json": {
+    "mtime": 1784105210.614837,
+    "ast_hash": "e389310a7e0ce1e2184bcbe3dc2a70d3",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_50.json": {
+    "mtime": 1784105210.614837,
+    "ast_hash": "aef5ccdd8c97b1f9ab689ae2a81056fc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox/ema_state/60min/ema_5.json": {
+    "mtime": 1784105210.614837,
+    "ast_hash": "ebf8a1f9eda4a217fa02415f238af73f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_100.json": {
+    "mtime": 1781144899.5318615,
+    "ast_hash": "c0caa736895833dd160988aae9bb2a50",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_20.json": {
+    "mtime": 1781144899.5318615,
+    "ast_hash": "02acb12442f99217a8665efc14e82609",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_200.json": {
+    "mtime": 1781144899.5318615,
+    "ast_hash": "ed24647a60a1bc488141572e903abca3",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_50.json": {
+    "mtime": 1781144899.5318615,
+    "ast_hash": "25096471dcc7884a5bca53b0bd6921f4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/backtest/sherpa/sandbox_trace/ema_state/60min/ema_5.json": {
+    "mtime": 1781144899.5318615,
+    "ast_hash": "b36518da1b91725cb285aa8a619561df",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/autonomous_dryrun.py": {
+    "mtime": 1790966013.34424,
+    "ast_hash": "902f744eb1fa437db7c58ca320c37e5c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/conftest.py": {
+    "mtime": 1790966013.34424,
+    "ast_hash": "dfc021cdaa753b95092deabbe8f02593",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_order_agent_routing.py": {
+    "mtime": 1790966013.3462398,
+    "ast_hash": "a63702eb07e25b60e6a673f82c984e82",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_llm_down_coherence.py": {
+    "mtime": 1790966013.3462398,
+    "ast_hash": "371cad909f898c59a8415c3d4c082e8c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_position_research.py": {
+    "mtime": 1790966013.3462398,
+    "ast_hash": "5ad568b1d9cd09bd67cd05e448c92cbe",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_full_cycle.py": {
+    "mtime": 1790966013.3462398,
+    "ast_hash": "c40f206d23631f79b36ca120147154cc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/verify_entry_path.py": {
+    "mtime": 1790966013.3462398,
+    "ast_hash": "8d086edef1208b37dd06a94527c1ce56",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_t17_margin_gate.py": {
+    "mtime": 1790966013.3472397,
+    "ast_hash": "c28bf3dbadd5ac1c3d1a5c40315581d9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/AGENT_CONFORMANCE_HARNESS.py": {
+    "mtime": 1790966013.3472397,
+    "ast_hash": "8bc31e9d4f0b6446207e4faf09bed8df",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_margin_calculations_premarket.py": {
+    "mtime": 1790966013.3472397,
+    "ast_hash": "17f3c43fb02dde62bedb035ff189c00c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_canonical_strategy.py": {
+    "mtime": 1790966013.3502395,
+    "ast_hash": "b31612ad589a7ba11337007f410598cb",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_t23_porcupine.py": {
+    "mtime": 1790966013.3502395,
+    "ast_hash": "47965921518cc665a6fedd1319f92a5d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_sentinel_feed_callbacks.py": {
+    "mtime": 1790966013.3532393,
+    "ast_hash": "d7a27b85934677e27412e273526215ff",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/verify_exit_path.py": {
+    "mtime": 1790966013.3602388,
+    "ast_hash": "ed92aeed297168395c83770cdd708f70",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_with_kaggle_data.py": {
+    "mtime": 1790966013.3602388,
+    "ast_hash": "b572a1089a60f2a1964787b3c5d69464",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/__init__.py": {
+    "mtime": 1790966013.3632386,
+    "ast_hash": "1442cc0d921b6b8073789a24072a6a77",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_stale_trade_cleanup.py": {
+    "mtime": 1790966013.3642385,
+    "ast_hash": "1984d5f372d99fda559a3384e935c1d5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_output_parsing.py": {
+    "mtime": 1790966013.3642385,
+    "ast_hash": "308e872a181ca30113767e101623b8b9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_honest_entry_fills.py": {
+    "mtime": 1790966013.3662384,
+    "ast_hash": "4d646e3bd45819170f1b6c1f89fb7e8e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/test_t23f_stale_ltp.py": {
+    "mtime": 1790966013.3662384,
+    "ast_hash": "68c2a2b7d1669ece3052ace5f55acd7e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/TEST_SYSTEM_NOW.py": {
+    "mtime": 1790966013.3662384,
+    "ast_hash": "f41db089e5ea9db04876510d4c3d7cfa",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/scenarios/test_scenarios.py": {
+    "mtime": 1790966013.3502395,
+    "ast_hash": "015e975581b423796f46c691757dee07",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/scenarios/__init__.py": {
+    "mtime": 1790966013.3532393,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/fixtures/sandbox_order_ledger.json": {
+    "mtime": 1788977226.21964,
+    "ast_hash": "5185fb0a9958da8d2c44aab5051852e9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/fixtures/__init__.py": {
+    "mtime": 1790966013.3532393,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/e2e/test_paper_lifecycle.py": {
+    "mtime": 1790966013.3532393,
+    "ast_hash": "5473c80760c0f6003106732460141914",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/e2e/__init__.py": {
+    "mtime": 1790966013.3542392,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/e2e/test_e2e_workflows.py": {
+    "mtime": 1790966013.3542392,
+    "ast_hash": "78b4e3143f19747ae1ff06a8064f42d0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_risk_agent.py": {
+    "mtime": 1790966013.3542392,
+    "ast_hash": "3fe1954e373cf7565eff9af7f7ed36eb",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_execution_agent.py": {
+    "mtime": 1790966013.3542392,
+    "ast_hash": "2d0109d585e4a323774770be8c0ba3a7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_contract_agent.py": {
+    "mtime": 1790966013.3542392,
+    "ast_hash": "a8881fde0af86af1ea5d039c3b2fc3b4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_morpher_agent.py": {
+    "mtime": 1790966013.3552392,
+    "ast_hash": "0e6b63146d580cc4f80c1790dd5f8721",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_strategy_agent.py": {
+    "mtime": 1790966013.3552392,
+    "ast_hash": "20d9c3f49568830d757e5794638799ee",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_entry_agents.py": {
+    "mtime": 1790966013.357239,
+    "ast_hash": "25ba5287430c441de2153983452990dd",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_shifter_agent.py": {
+    "mtime": 1790966013.357239,
+    "ast_hash": "9e7b098f4b3ed3c1a9121f447613ea3a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_regime_agent.py": {
+    "mtime": 1790966013.358239,
+    "ast_hash": "d7c055cae46f5891d26b25b794ef2475",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_order_agent.py": {
+    "mtime": 1790966013.358239,
+    "ast_hash": "b779c8e93b713f4dc4ae3ecb2ab6ce86",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_postmortem_agent.py": {
+    "mtime": 1790966013.3592389,
+    "ast_hash": "d7105205943a3ee903e9c7cbc2326c25",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/test_tedb_concurrent_writes.py": {
+    "mtime": 1790966013.3592389,
+    "ast_hash": "e353d3cbbddf882e246c7a9fa8c9a74d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unit/__init__.py": {
+    "mtime": 1790966013.3602388,
+    "ast_hash": "4d475203ed15e8ac4b28b47ef4042c81",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/phase/test_entry_phase.py": {
+    "mtime": 1790966013.3612387,
+    "ast_hash": "17fe81c225e0db89d0ff6e544fc56d75",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/phase/test_post_trade_phase.py": {
+    "mtime": 1790966013.3632386,
+    "ast_hash": "d4ec841d72b000cefde78515f7a3a402",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/phase/test_monitoring_phase.py": {
+    "mtime": 1790966013.3632386,
+    "ast_hash": "5b9748db30f7757693bbfa3440e0a149",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/phase/__init__.py": {
+    "mtime": 1790966013.3632386,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_research_cache.py": {
+    "mtime": 1790966013.3662384,
+    "ast_hash": "467be17aed5a5e9a2df8c1f0a898183f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_raw_query.py": {
+    "mtime": 1790966013.3662384,
+    "ast_hash": "d938c853ca1c58dce9950834ed8eebaa",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/conftest.py": {
+    "mtime": 1790966013.3672383,
+    "ast_hash": "20696f25445dbf1eb2def45faf433a80",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_verify.py": {
+    "mtime": 1790966013.3672383,
+    "ast_hash": "77fe97cfc46dd75f10838c8656aecaf5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_debate.py": {
+    "mtime": 1790966013.3672383,
+    "ast_hash": "ca8d38bff04f1404b539af0aa91740ab",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_judge.py": {
+    "mtime": 1790966013.3682382,
+    "ast_hash": "66d5e734558835b1250d0fc5184c90fb",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_integration.py": {
+    "mtime": 1790966013.370238,
+    "ast_hash": "e2fca85eb82007b1b783d27fc5fefef1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/__init__.py": {
+    "mtime": 1790966013.370238,
+    "ast_hash": "e950d50d0461a00424dbbab9460f6b42",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/test_llm_boundary.py": {
+    "mtime": 1790966013.370238,
+    "ast_hash": "c17be164f63621f25ee65a1b8cb98348",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/fixtures/debate_bullish_not_down.json": {
+    "mtime": 1780502107.9381304,
+    "ast_hash": "3a8c2643ac9bba3c9864da033b3eccda",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/fixtures/debate_ambiguous.json": {
+    "mtime": 1780502124.2320545,
+    "ast_hash": "59747df1172f03a31dc0f35bdd91cd70",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/fixtures/raw_data_sample.json": {
+    "mtime": 1780501285.1089616,
+    "ast_hash": "9873ff6319dda072e8dac5f679a93dd2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/unicorn/fixtures/debate_bearish_not_up.json": {
+    "mtime": 1780502090.7192104,
+    "ast_hash": "6356d779491e0e7328ea6ae9afab409e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_autonomous_dryrun.sh": {
+    "mtime": 1789287558.576544,
+    "ast_hash": "34f206f33bf343a283cc18d889b6a3d7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_pattern_enricher.sh": {
+    "mtime": 1789287558.576544,
+    "ast_hash": "ace8318c242a3aa5c95c2361bdeae409",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_kickoff.sh": {
+    "mtime": 1789287558.576544,
+    "ast_hash": "762e4a26aa3189a3295e1048e4451b97",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_position_manager.sh": {
+    "mtime": 1789287558.577544,
+    "ast_hash": "b42df67d8f0faeaaaa3221e2371ae01d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/eod_close_stale_trades.py": {
+    "mtime": 1790966013.3752377,
+    "ast_hash": "213731c0cffb936970eab4c92cce6c3c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_data_health.sh": {
+    "mtime": 1789287558.577544,
+    "ast_hash": "5a303372f79c7c75a9f4d331b523336a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_risk_monitor.sh": {
+    "mtime": 1789287558.578544,
+    "ast_hash": "3979da7135cd165106fc11181897f132",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_margin_capture.sh": {
+    "mtime": 1789287558.578544,
+    "ast_hash": "43874f8b5cae74c8dfbceeab6f389d4d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_unicorn_research.sh": {
+    "mtime": 1789287558.578544,
+    "ast_hash": "9438d2c8f291dd97acdfe1dfb6ea4c9c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/run_position_research.sh": {
+    "mtime": 1789287558.578544,
+    "ast_hash": "3ccf8edeb6f351fb21334e7bd04e46d0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/cron/cleanup_zombies.sh": {
+    "mtime": 1789287558.579544,
+    "ast_hash": "6e2b5b092d7024dafb018157ca5ea845",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/README.md": {
+    "mtime": 1791025900.5323882,
+    "ast_hash": "250c43870457ab872fe59ab0cb3eb861",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/STEP1_REVIEW_SUMMARY.md": {
+    "mtime": 1789287558.5165446,
+    "ast_hash": "02e1f248dde834d261d33d1e35590eda",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CODEBASE_ARCHITECTURE.md": {
+    "mtime": 1791050651.781472,
+    "ast_hash": "172ff6419938291cda94ff6b3954f00f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CANONICAL_STRATEGY_PLAN.md": {
+    "mtime": 1789287558.5165446,
+    "ast_hash": "8ffbe632a81b9a51f5c0d76631cba8fc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/REPLAY_GUIDE.md": {
+    "mtime": 1789287558.5165446,
+    "ast_hash": "6e4a228453a0fecae32d1d905357ee29",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PENGUIN_VARAHA_DUCKDB_MIGRATION_TRIAGE.md": {
+    "mtime": 1789287558.5165446,
+    "ast_hash": "44debe74972bbf5746db7448568cb969",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TEST_IMPLEMENTATION_ROADMAP.md": {
+    "mtime": 1789287558.5175445,
+    "ast_hash": "a0cdf2a2d88d4330a03d6b6c72158729",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/AGENT_CONFORMANCE_HARNESS_SPEC.md": {
+    "mtime": 1789287558.5185447,
+    "ast_hash": "356412c3ca5fa25632e362b509d74a16",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/REPLAY_HARNESS_REVIEW.md": {
+    "mtime": 1789287558.5185447,
+    "ast_hash": "2fe9997ac2d7613bd89b3a4d3aaa7645",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PATTERN_INTEGRATION_FRAMEWORK.md": {
+    "mtime": 1789287558.5185447,
+    "ast_hash": "0abeaf6bfde284e5205a05f14a40f9e4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CREWAI_KNOWLEDGE_INTEGRATION.md": {
+    "mtime": 1789287558.5195446,
+    "ast_hash": "de01ac1c090776ef981e54622cd9c573",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CONTEXT.md": {
+    "mtime": 1789287558.5195446,
+    "ast_hash": "7423b57f0a224e38a2e4fa269ca5a1dd",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/KNOWLEDGE_ARCHITECTURE.md": {
+    "mtime": 1789287558.5205445,
+    "ast_hash": "dd017e2a74a2bae5fe5852bcc9ea6964",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SESSION_20260525_FINDINGS.md": {
+    "mtime": 1789287558.5205445,
+    "ast_hash": "622b7b3f8b89512a3ad92822c2695ba9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RISK_AGENT_CREW_ARCHITECTURE.md": {
+    "mtime": 1789287558.5205445,
+    "ast_hash": "bde9034c8f41c8a82aae08c2556bc178",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/POSTMORTEM_DATA_FLOW.md": {
+    "mtime": 1789287558.5215447,
+    "ast_hash": "4edb3e30c8ed2e55b80e070636891544",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SYSTEM_TEST_REPORT_20260523.md": {
+    "mtime": 1789287558.5215447,
+    "ast_hash": "379e3fd81bc67efaf998a5a5b16ed1ea",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/OPEN_TASKS_FOR_DEEPSEEK.md": {
+    "mtime": 1789287558.5215447,
+    "ast_hash": "c3206aea7868dc0f052b1f146ae8bc0f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/POSTMORTEM_KNOWLEDGE_SCAFFOLD.md": {
+    "mtime": 1789287558.5215447,
+    "ast_hash": "d047d6d1b518bdffa7a3925212ad5e65",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SYSTEM_OVERVIEW.txt": {
+    "mtime": 1789285631.5024292,
+    "ast_hash": "db84996a3b9e34c115ccd1838479a137",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/AGENT_ARCHITECTURE_COMPLETE.md": {
+    "mtime": 1789287558.5225446,
+    "ast_hash": "16d1bbe5c81116eed5afa1bc278f8de8",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SESSION_COMPLETION.md": {
+    "mtime": 1789287558.5225446,
+    "ast_hash": "82ac52a9607b0c730ce5d26858297f0b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TEST_STRATEGY.md": {
+    "mtime": 1789287558.5225446,
+    "ast_hash": "02bb99fea731dfeade88ad6e9052f0f7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TAURIC_REUSE_PLAN.md": {
+    "mtime": 1789287558.5225446,
+    "ast_hash": "8afd05c9e2b1c2153f4e38279d313991",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_RESEARCH_AGENT_SUMMARY.md": {
+    "mtime": 1789287558.5235445,
+    "ast_hash": "ed6c19fb60a04819f66c8743a718ce73",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MORPH_AGENT_ENHANCEMENT.md": {
+    "mtime": 1789287558.5235445,
+    "ast_hash": "02bea58fe730885a2156422337801dca",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MORPHING_STATE_MACHINE.md": {
+    "mtime": 1789287558.5235445,
+    "ast_hash": "c82366baa80a396d295be94a6c0635d5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RESEARCH_PATTERNS_WIRED.md": {
+    "mtime": 1789287558.5235445,
+    "ast_hash": "23d9e32a0866bb62fa173d1a01bf1f47",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/HANDOFF.md": {
+    "mtime": 1789287558.5245445,
+    "ast_hash": "b5f08df9f9a8331d14526681f2892f18",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/UNICORN_PHASE0_FINDINGS.md": {
+    "mtime": 1789287558.5245445,
+    "ast_hash": "0d4fceaa9f8883eeec60639b35475965",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MORPH_EXECUTION_CODE_REFERENCE.md": {
+    "mtime": 1789287558.5245445,
+    "ast_hash": "09db4b1e23fd360a120ea76eb4d77537",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_GATE_IMPACT_ANALYSIS.md": {
+    "mtime": 1789287558.5245445,
+    "ast_hash": "9f953d8136bfa89c14a7e422bb980be4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PROJECT_UNICORN_DEEPSEEK_HANDOFF.md": {
+    "mtime": 1789287558.5245445,
+    "ast_hash": "0a4953a7cf7e6bd5f3ed2bc8e8be0747",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/BRAHMAND_VS_ANTARIKSH_AGENTS.md": {
+    "mtime": 1789287558.5255446,
+    "ast_hash": "5dcca274f73f9da95cb5d5d8a0261560",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/COMPLETE_BRAHMAND_FLOW.md": {
+    "mtime": 1789287558.5255446,
+    "ast_hash": "406d912d69ea33f175be0e3032c71ed9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TRAFFIC_LIGHT_WITH_GAP_7TH_PARAMETER.md": {
+    "mtime": 1789287558.5255446,
+    "ast_hash": "715ffe8ab7bae5e48744f3dce2e1ff04",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/DATA_FLOW_ENTRY_CHECK.md": {
+    "mtime": 1789287558.5255446,
+    "ast_hash": "98e7b720b6f507f9f72c14138233f386",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CODEBASE_INTEGRATIONS.md": {
+    "mtime": 1791050651.779472,
+    "ast_hash": "f74da1bf663af309318229b386d6057f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MONITORING_PHASE_LOGGING.md": {
+    "mtime": 1789287558.5265446,
+    "ast_hash": "72913c3e2e6fca799272fde53591bc52",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/UNIFIED_ENTRY_CHECK_ARCHITECTURE.md": {
+    "mtime": 1789287558.5265446,
+    "ast_hash": "bb7a7561029780449f2793d9672dadd7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MORPHING_POSITION_REVIEW.md": {
+    "mtime": 1789287558.5265446,
+    "ast_hash": "a62711dd0651192837567f1ebea0250d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_CHECK_INTEGRATION_SUMMARY.md": {
+    "mtime": 1789287558.5275445,
+    "ast_hash": "b996bd73e6682faf22b67b39e9c40dc8",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CODEBASE_STRUCTURE.md": {
+    "mtime": 1791050651.780472,
+    "ast_hash": "12ce63083ed928f7c5c65a3cb982d831",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MARGIN_AND_WING_OPTIMIZER_CODE_REFERENCE.md": {
+    "mtime": 1789287558.5275445,
+    "ast_hash": "360ccb05ed70e468aafc9517fc98dcb4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ORDER_AGENT_REFACTORING.md": {
+    "mtime": 1789287558.5275445,
+    "ast_hash": "2c2c2bb74fcc36e56fe948197546d104",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/KICKOFF_VERIFICATION.md": {
+    "mtime": 1789287558.5275445,
+    "ast_hash": "cf8104af21c906aad7fa401757660b5b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/OPEN_CONCERNS_BACKTEST_AND_AGENTS.md": {
+    "mtime": 1789287558.5275445,
+    "ast_hash": "60e3ae15430807268ae3a94fe899a5e9",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/EXECUTION_AGENT_MULTI_ASSET_ROADMAP.md": {
+    "mtime": 1789287558.5285444,
+    "ast_hash": "880e8bd8eda304acdf3f3b5816223ab5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/DEEPSEEK_FIX_TASKS.md": {
+    "mtime": 1789287558.5495443,
+    "ast_hash": "e8fdb1eb15b33f7749fc9b2bd039362e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/DATACAPTURE_FAILURE_20260602.md": {
+    "mtime": 1789287558.5285444,
+    "ast_hash": "b0aff54344ff5bd1712c2ce1b07e0491",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RESEARCH_REFERENCES.md": {
+    "mtime": 1789287558.5285444,
+    "ast_hash": "efd2211a272fd364bbe0b93509d88822",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/MARGIN_CALCULATION_FIXES.md": {
+    "mtime": 1789287558.5285444,
+    "ast_hash": "99090ddb394d0aa9e7c12e25a8c859a2",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/REVIEW_BEFORE_WAVE1.md": {
+    "mtime": 1789287558.5295446,
+    "ast_hash": "f2faedffdb703016364f79a1aeaec45b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RL_CAPABILITY_SUMMARY.md": {
+    "mtime": 1789287558.5305445,
+    "ast_hash": "18b6f149104cc8398f4aaf78fdad8849",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/BUILD_PLAN.md": {
+    "mtime": 1789287558.5315444,
+    "ast_hash": "0751ee34cc75a63cb308dac21c06c1a0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PROJECT_UNICORN_TDD.md": {
+    "mtime": 1789287558.5315444,
+    "ast_hash": "f0f0aae20292aa306158108759604c05",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/NEXT_STEPS.md": {
+    "mtime": 1789287558.5325444,
+    "ast_hash": "5b00f372064857d4e7cf49d4944651a0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/NIFTY_AGENT_TOOLS_VALIDATION.md": {
+    "mtime": 1789287558.5325444,
+    "ast_hash": "e4975bea92aad1188d56f23fdd0b1b19",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ARCHITECTURE_MAP.md": {
+    "mtime": 1791050643.7056513,
+    "ast_hash": "172ff6419938291cda94ff6b3954f00f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/CODEBASE_STACK.md": {
+    "mtime": 1791050651.776472,
+    "ast_hash": "eec518444d33bf56b042cd7febfc3ee1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TOMORROW_TRADING_CONFIG.md": {
+    "mtime": 1789287558.5335445,
+    "ast_hash": "d4a36b98c84e9230eefbdaad133ed4b0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/IMPLEMENTATION_SUMMARY.md": {
+    "mtime": 1789287558.5345445,
+    "ast_hash": "a4ac57f4b5560dfe6ac65e25f125891a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RESEARCH_AGENTS_IMPLEMENTATION_COMPLETE.md": {
+    "mtime": 1789287558.5345445,
+    "ast_hash": "503fef53f5f6f0896ed5d5a0c38ad2ae",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_CHECK_FIX_SUMMARY.md": {
+    "mtime": 1789287558.5345445,
+    "ast_hash": "3f9463a315cc122bee5d836fb7e297ec",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_RESEARCH_AGENT_SPEC.md": {
+    "mtime": 1789287558.5355444,
+    "ast_hash": "2630a9f8ada436a3160e9deb10903e8d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RUN_BACKTEST_2024_VALIDATION.md": {
+    "mtime": 1789287558.5355444,
+    "ast_hash": "91dba2369920b0a2cca584cccf01e366",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/INTEGRATIONS.md": {
+    "mtime": 1791050643.7046514,
+    "ast_hash": "f74da1bf663af309318229b386d6057f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/REFACTORING_COMPLETE.md": {
+    "mtime": 1789287558.5365443,
+    "ast_hash": "f784e1863de6a54f63c65523423854d7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_RESEARCH_TOOLS_REFERENCE.md": {
+    "mtime": 1789287558.5365443,
+    "ast_hash": "a757bbfb420beec5596afd0a66e1733a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SYSTEM_CODEBASE_MAP.md": {
+    "mtime": 1791050634.7918508,
+    "ast_hash": "beb6ee3e0e73df78fd423d869f578564",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/LIVE_TRADING_SETUP.md": {
+    "mtime": 1789287558.5365443,
+    "ast_hash": "24661016eab8a5fc804fbe493b797b97",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/READER_MIGRATION_MAP.md": {
+    "mtime": 1789287558.574544,
+    "ast_hash": "1efc642d7fde6c3d348eb4949313054b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TECH_STACK.md": {
+    "mtime": 1791050643.7016516,
+    "ast_hash": "eec518444d33bf56b042cd7febfc3ee1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_GATE_FIX_PENDING.md": {
+    "mtime": 1789287558.5365443,
+    "ast_hash": "f2913952ed0a3756561f57e2e27af1f1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_RESEARCH_QUICK_REFERENCE.txt": {
+    "mtime": 1789285631.5194292,
+    "ast_hash": "0e528674bc9d6032c478a66ee16d7127",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/UNICORN_PROGRESS.md": {
+    "mtime": 1789287558.5375445,
+    "ast_hash": "49d4d4a0755bc2e7257bc4f77747afcc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/BRAHMAND_BUILD_SPECIFICATION.md": {
+    "mtime": 1789287558.5375445,
+    "ast_hash": "77093e4a38708f3439efd2b3abc5f09f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RELEASE_NOTES_2026-05-19.md": {
+    "mtime": 1789287558.5375445,
+    "ast_hash": "0a0df17f88eb1fc5ecb29031e6cb0109",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PENGUIN_REPOINT_LOG.md": {
+    "mtime": 1789287558.5375445,
+    "ast_hash": "d6e260625347a6fb561ee511b0445cd4",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/STRUCTURE.md": {
+    "mtime": 1791050643.7066514,
+    "ast_hash": "12ce63083ed928f7c5c65a3cb982d831",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/KNOWLEDGE_INDEX.md": {
+    "mtime": 1789287558.5385444,
+    "ast_hash": "2dfde94b8d387b99591ec0a46d492e85",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_RESEARCH_QUICKSTART.md": {
+    "mtime": 1789287558.5385444,
+    "ast_hash": "3dc10e25ed46ee90628a5d601534f1d3",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/BACKTEST_2024_RESULTS_SUMMARY.md": {
+    "mtime": 1789287558.5395443,
+    "ast_hash": "022e3bacab59cc14e4d82c8770753562",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TEST_STRATEGY_WITH_RESEARCH_PATTERNS.md": {
+    "mtime": 1789287558.5395443,
+    "ast_hash": "a433c862c524844aa627256a97355f5c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/WAVE1_GO.md": {
+    "mtime": 1789287558.5395443,
+    "ast_hash": "0c8c912ffdd1161f3afc5a159791dd48",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/TSL_THRESHOLD_FIX.md": {
+    "mtime": 1789287558.5395443,
+    "ast_hash": "dbd2033922d26fcff67d11a3d28775e7",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/UNICORN_ARCHITECTURE.md": {
+    "mtime": 1789287558.5405443,
+    "ast_hash": "c1f88179356b64332c11a2615b3caa4b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ORDER_LEDGER_AND_EXECUTION_DB_ARCHITECTURE.md": {
+    "mtime": 1789287558.5405443,
+    "ast_hash": "965bc9a1759dd5d98eb545b37f15e665",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ORDER_AGENT_ACTIVATION.md": {
+    "mtime": 1789287558.5405443,
+    "ast_hash": "b461dda96473380623b408b58a817e0b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/POSTMORTEM_AGENT_DESIGN.md": {
+    "mtime": 1789287558.5405443,
+    "ast_hash": "3d2cddffecb9486a6609f0da7384256d",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ARCHITECTURE.md": {
+    "mtime": 1789287558.5415444,
+    "ast_hash": "25cac8938b9814abcee649097195eb14",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/AUTONOMOUS_RESEARCH_WORKFLOW.md": {
+    "mtime": 1789287558.5415444,
+    "ast_hash": "440260acebf2fabdc4503332204be351",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/ENTRY_SYSTEM_ARCHITECTURE.md": {
+    "mtime": 1789287558.5415444,
+    "ast_hash": "468d110f1cdc57710cf58296589c8afc",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/PROJECT_UNICORN.md": {
+    "mtime": 1789287558.5415444,
+    "ast_hash": "f846b675d1b56dd5ef744710290cdba5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/RESEARCH_AGENT_ENTRY_GATE_GAPS.md": {
+    "mtime": 1789287558.5415444,
+    "ast_hash": "7488d97bbb2b18b9db215f96db1cc065",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SCHEMAS.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "9f29ab9745149f451688fa95c2e52b3a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/BACKTEST_2024_MINI_SUMMARY.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "541d4ccaad0ef3e9fc3e48d0d046f17e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/fix_research_agent_indicator_mismatch.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "c52ca91a9e10f976b86b56483e191697",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/SESSION_20260519.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "805bec71158d768736f19ba735021a7a",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/POSTMORTEM_AGENT_ARCHITECTURE.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "d1fd044cf82b83b78a67679b15992a76",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/DESIGN_OPTION_FEED.md": {
+    "mtime": 1789287558.5425444,
+    "ast_hash": "d8d1827aeb538d1b614621e05f03f220",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/HANDOFF_TO_DEEPSEEK.md": {
+    "mtime": 1789287558.5435443,
+    "ast_hash": "697d71464f8ccb9f22304cbe63d98115",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/EXECUTION_vs_ORDER_AGENT_ANALYSIS.md": {
+    "mtime": 1789287558.5435443,
+    "ast_hash": "1811501104bc59ad0c1b7ffa5cbb5f5e",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/docs/DEPLOYMENT_READY.md": {
+    "mtime": 1789287558.5455444,
+    "ast_hash": "e5b8ba9c8d7b2621a0ace5d2f1c883c0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/TAURIC_REUSE_PLAN.md": {
+    "mtime": 1789287558.5495443,
+    "ast_hash": "8afd05c9e2b1c2153f4e38279d313991",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/HANDOFF.md": {
+    "mtime": 1789287558.5505443,
+    "ast_hash": "b5f08df9f9a8331d14526681f2892f18",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/RESEARCH_REFERENCES.md": {
+    "mtime": 1789287558.5505443,
+    "ast_hash": "efd2211a272fd364bbe0b93509d88822",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/REVIEW_BEFORE_WAVE1.md": {
+    "mtime": 1789287558.5505443,
+    "ast_hash": "f2faedffdb703016364f79a1aeaec45b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/BUILD_PLAN.md": {
+    "mtime": 1789287558.5515442,
+    "ast_hash": "0751ee34cc75a63cb308dac21c06c1a0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/NEXT_STEPS.md": {
+    "mtime": 1789287558.5515442,
+    "ast_hash": "5b00f372064857d4e7cf49d4944651a0",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/WAVE1_GO.md": {
+    "mtime": 1789287558.5515442,
+    "ast_hash": "0c8c912ffdd1161f3afc5a159791dd48",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/archives/DUCKDB_CONCURRENCY.md": {
+    "mtime": 1789287558.5525444,
+    "ast_hash": "b945cb96718c5e77fee27b9421ed129b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/config/unicorn_agents.yaml": {
+    "mtime": 1780547568.8789454,
+    "ast_hash": "9261adb26058e7a131da3b1e0e66e4e1",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/config/tasks.yaml": {
+    "mtime": 1780230424.5876243,
+    "ast_hash": "fad0ee2af34e7e9200790a2c1df5c1a5",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/config/agents_registry.yaml": {
+    "mtime": 1780547560.4349852,
+    "ast_hash": "af6e063aee3dd9175c2025d91f3aac9b",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/config/tools_registry.yaml": {
+    "mtime": 1779102503.8574345,
+    "ast_hash": "36feea95ebb40d0fd47fa3d60bdf3a13",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/config/risk_limits.yaml": {
+    "mtime": 1779102503.8574345,
+    "ast_hash": "8586fec13978eb67d1f0ef026339804c",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/tests/README.md": {
+    "mtime": 1789287558.5655441,
+    "ast_hash": "74486e22ec6d920da077e2c281f01d30",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/.planning/codebase/INTEGRATIONS.md": {
+    "mtime": 1791050599.0896654,
+    "ast_hash": "f74da1bf663af309318229b386d6057f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/.planning/codebase/STRUCTURE.md": {
+    "mtime": 1791050628.3639956,
+    "ast_hash": "12ce63083ed928f7c5c65a3cb982d831",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/.planning/codebase/ARCHITECTURE.md": {
+    "mtime": 1791050616.3012695,
+    "ast_hash": "172ff6419938291cda94ff6b3954f00f",
+    "semantic_hash": ""
+  },
+  "/home/trading_ceo/projects/brahmand/.planning/codebase/STACK.md": {
+    "mtime": 1791050590.4478664,
+    "ast_hash": "eec518444d33bf56b042cd7febfc3ee1",
     "semantic_hash": ""
   }
 }

@@ -58,10 +58,11 @@ def _ensure_imports():
 
     import sys as _sys
 
-    _antariksh_root = Path(__file__).parent.parent
-    for p in (_antariksh_root, str(_antariksh_root)):
+    _projects_root = Path(__file__).parent.parent
+    _antariksh_root = _projects_root / "antariksh"
+    for p in (str(_projects_root), str(_antariksh_root)):
         if p not in _sys.path:
-            _sys.path.insert(0, str(_antariksh_root))
+            _sys.path.insert(0, p)
 
     from antariksh.tools.entry_tools import (
         query_trend,

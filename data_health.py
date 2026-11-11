@@ -24,19 +24,29 @@ HEARTBEAT_DIR = Path("/home/trading_ceo/projects/antariksh/data/live")
 def _is_market_hours() -> bool:
     now = datetime.now()
     hour, minute = now.hour, now.minute
-    if now.weekday() >= 5:
-        return False
     tm = hour * 60 + minute
-    return 9 * 60 + 15 <= tm <= 15 * 60 + 30
+    if not (9 * 60 + 15 <= tm <= 15 * 60 + 30):
+        return False
+    try:  # holiday gate — weekends are covered by the calendar too
+        from market_calendar import is_trading_day
+
+        return is_trading_day(now.date(), "NSE")
+    except Exception:
+        return now.weekday() < 5
 
 
 def _is_mcx_hours() -> bool:
     now = datetime.now()
     hour, minute = now.hour, now.minute
-    if now.weekday() >= 5:
-        return False
     tm = hour * 60 + minute
-    return 9 * 60 + 15 <= tm <= 23 * 60 + 30
+    if not (9 * 60 + 15 <= tm <= 23 * 60 + 30):
+        return False
+    try:
+        from market_calendar import is_trading_day
+
+        return is_trading_day(now.date(), "MCX")
+    except Exception:
+        return now.weekday() < 5
 
 
 def _heartbeat_age(prefix: str, instrument: str) -> float | None:

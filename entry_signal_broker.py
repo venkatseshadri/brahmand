@@ -244,9 +244,15 @@ class EntrySignalBroker:
         """Check if current time is within trading hours (9:15 AM - 3:30 PM)"""
         now = datetime.now()
 
-        # Skip weekends
-        if now.weekday() >= 5:
-            return False
+        # Skip weekends and exchange holidays
+        try:
+            from market_calendar import is_trading_day
+
+            if not is_trading_day(now.date(), "NSE"):
+                return False
+        except Exception:
+            if now.weekday() >= 5:
+                return False
 
         # Check time: 9:15 AM to 3:30 PM
         market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
